@@ -7,6 +7,9 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
      [SerializeField]private  float moveSpeed;
     [SerializeField]private float JumpForce;
+
+    [Header("Dash")]
+    [SerializeField]
     private float xInput; 
 
     private Animator anim;
