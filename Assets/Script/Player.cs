@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
      [SerializeField]private  float moveSpeed;
     [SerializeField]private float JumpForce;
 
-    [Header("Dash")]
+    [Header("Dash")]private float DashDuration;
     [SerializeField]
     private float xInput; 
 
