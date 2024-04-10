@@ -8,8 +8,10 @@ public class Player : MonoBehaviour
      [SerializeField]private  float moveSpeed;
     [SerializeField]private float JumpForce;
 
-    [Header("Dash")]private float DashDuration;
-    [SerializeField]
+    [Header("Dash")]
+    [SerializeField] private float DashSpeed;
+    [SerializeField]private float DashDuration;
+    [SerializeField]private float DashTime;
     private float xInput; 
 
     private Animator anim;
@@ -30,7 +32,7 @@ public class Player : MonoBehaviour
     {
         rb=GetComponent<Rigidbody2D>();
         anim=GetComponentInChildren<Animator>();
-
+        
     }
 
     void Update()
@@ -39,7 +41,19 @@ public class Player : MonoBehaviour
         CheckInput();
         CollisionCheck();
 
-        Debug.Log(isGrounded);
+        //DashTime = DashTime - Time.deltaTime;
+        DashTime -= Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            DashTime = DashDuration;
+        }
+
+        if(DashTime > 0)
+        {
+            Debug.Log("I'm doing dash ability");
+        }
+       
         AnimatorController();
         FlipController();
 
@@ -72,7 +86,16 @@ public class Player : MonoBehaviour
     //좌우 움직임 컨트롤
     private void Movement()
     {
-        rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
+        if(DashTime>0)
+        {
+            //rb.velocity = new Vector2(xInput * DashSpeed, rb.velocity.y);
+            rb.velocity = new Vector2(xInput * DashSpeed, 0);
+        }
+        else 
+        { 
+            rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
+        }
+
     }
 
     //점프
@@ -93,6 +116,7 @@ public class Player : MonoBehaviour
         bool isMoving = rb.velocity.x != 0;
         anim.SetBool("isMoving", isMoving);
         anim.SetBool("isGrounded",isGrounded);
+        anim.SetBool("isDashing",DashTime>0);
     }
 
     private void Filp(){
