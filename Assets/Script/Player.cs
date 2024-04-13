@@ -15,6 +15,8 @@ public class Player : MonoBehaviour
 
 
     [Header("Attack Info")]
+    [SerializeField]private float comboTime=.3f;
+    private float comboTimeWindow;
     [SerializeField]private bool isAttacking;
     private int comboCounter;
 
@@ -49,13 +51,7 @@ public class Player : MonoBehaviour
 
         dashTime -= Time.deltaTime;
         dashCooldownTimer -= Time.deltaTime;
-
-
-        if (dashTime > 0)
-        {
-            Debug.Log("I'm doing dash ability");
-        }
-
+        comboTimeWindow -= Time.deltaTime;
         AnimatorController();
         FlipController();
 
@@ -66,6 +62,13 @@ public class Player : MonoBehaviour
     public void AttackOver()
     {
         isAttacking=false;
+        comboCounter++;
+
+        if(comboCounter > 2)
+        {
+            comboCounter = 0;
+        }
+        
     }
 
     private void CollisionCheck()
@@ -82,8 +85,9 @@ public class Player : MonoBehaviour
     private void CheckInput()
     {
         xInput = Input.GetAxisRaw("Horizontal");
-        if (Input.GetKeyDown(KeyCode.Mouse0)){
-            isAttacking=true;
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            StartAttackEvent();
         }
 
 
@@ -98,9 +102,27 @@ public class Player : MonoBehaviour
 
     }
 
+    private void StartAttackEvent()
+    {
+        
+        if(!isGrounded)
+        {
+            return;//이 시점에서 함수 완료 및 그 아래 있는 문들을 실행시키지 않도록 함
+        }
+
+        if (comboTimeWindow < 0)
+        {
+            comboCounter = 0;
+        }
+
+
+        isAttacking = true;
+        comboTimeWindow = comboTime;
+    }
+
     private void DashAbility()
     {
-        if (dashCooldownTimer < 0)
+        if (dashCooldownTimer < 0 && !isAttacking)
         {
             dashCooldownTimer = dashCooldown;
             dashTime = dashDuration;
@@ -110,10 +132,15 @@ public class Player : MonoBehaviour
     //좌우 움직임 컨트롤
     private void Movement()
     {
-        if (dashTime > 0)
+        if(isAttacking)
+        {
+            rb.velocity = new Vector2(0, 0);
+        }
+
+        else if (dashTime > 0)
         {
             //rb.velocity = new Vector2(xInput * dashSpeed, rb.velocity.y);
-            rb.velocity = new Vector2(xInput * dashSpeed, 0);
+            rb.velocity = new Vector2(facingDir * dashSpeed, 0);
         }
         else
         {

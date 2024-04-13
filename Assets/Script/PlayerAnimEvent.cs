@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAnimEvent : MonoBehaviour
-{
-    // Start is called before the first frame update
+{   
+    private Player player;
+    
     void Start()
     {
-        
+        player =GetComponentInParent<Player>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void AnimationTrigger()
     {
-        
+        player.AttackOver();
     }
+    
 }
