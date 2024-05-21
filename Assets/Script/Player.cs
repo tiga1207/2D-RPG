@@ -1,9 +1,12 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Entity
 {
-    private Rigidbody2D rb;
-    [SerializeField] private float moveSpeed;
+    // private Rigidbody2D rb;
+    // private Animator anim;
+
+    [Header("Move Info ")]
+     [SerializeField] private float moveSpeed;
     [SerializeField] private float JumpForce;
 
     [Header("Dash")]
@@ -22,32 +25,37 @@ public class Player : MonoBehaviour
 
     private float xInput;
 
-    private Animator anim;
 
-    [Header("Collision info")]
-    [SerializeField] private float groundCheckDistance;
-    [SerializeField] private LayerMask whatIsGround;
-    private bool isGrounded;
-
-
+    // [Header("Collision info")]
+    // [SerializeField] private float groundCheckDistance;  
+    // [SerializeField] private LayerMask whatIsGround;
+    // private bool isGrounded;
+  
 
 
-    private int facingDir = 1;
-    private bool facingRight = true;
 
+    // private int facingDir = 1;
+    // private bool facingRight = true;
 
-    void Start()
+    protected override void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponentInChildren<Animator>();
-
+        base.Start();
+          
     }
 
-    void Update()
+    // void Start()
+    // {
+    //     // rb = GetComponent<Rigidbody2D>();
+    //     // anim = GetComponentInChildren<Animator>();
+
+    // }
+
+    protected override void Update()
     {
+        base.Update(); 
         Movement();
         CheckInput();
-        CollisionCheck();
+        // CollisionCheck();
 
         dashTime -= Time.deltaTime;
         dashCooldownTimer -= Time.deltaTime;
@@ -71,15 +79,7 @@ public class Player : MonoBehaviour
         
     }
 
-    private void CollisionCheck()
-    {
 
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
-
-        //캡슐 콜라이더로 체크할 경우 아래 코드
-        // isGrounded = Physics2D.Raycast(transform.position, Vector2.down, capsuleCollider2D.size.y/2f +0.5f, whatIsGround);
-
-    }
 
     //
     private void CheckInput()
@@ -174,12 +174,12 @@ public class Player : MonoBehaviour
 
     }
 
-    private void Filp()
-    {
-        facingDir = facingDir * -1;
-        facingRight = !facingRight;
-        transform.Rotate(0, 180, 0);
-    }
+    // private void Filp()
+    // {
+    //     facingDir = facingDir * -1;
+    //     facingRight = !facingRight;
+    //     transform.Rotate(0, 180, 0);
+    // }
 
     private void FlipController()
     {
@@ -194,10 +194,10 @@ public class Player : MonoBehaviour
     }
 
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - groundCheckDistance));
-    }
+    // private void OnDrawGizmos()
+    // {
+    //     Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - groundCheckDistance));
+    // }
 
 
 
