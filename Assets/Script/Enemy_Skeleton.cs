@@ -2,17 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_Skeleton : Entity 
+public class Enemy_Skeleton : Entity
 {
-    // Start is called before the first frame update
-    void Start()
+    [Header("Move info")]
+    [SerializeField] private float moveSpeed;
+    protected override void Start()
     {
-        
+        base.Start();
     }
-
-    // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
-        
+        base.Update();
+        if(!isGrounded)
+            Filp();
+        rb.velocity = new Vector2 (moveSpeed *facingDir, rb.velocity.y);
     }
 }
