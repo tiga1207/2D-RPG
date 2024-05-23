@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TreeEditor;
 using UnityEngine;
 
 public class Entity : MonoBehaviour
@@ -10,9 +11,15 @@ public class Entity : MonoBehaviour
     [Header("Collision info")]
     [SerializeField] protected Transform groundCheck; 
     [SerializeField] protected float groundCheckDistance;  
+    [Space]
+    [SerializeField] protected Transform wallCheck;
+    [SerializeField] protected float wallCheckDistance;
     [SerializeField] protected  LayerMask whatIsGround;
-
+    
     protected bool isGrounded;
+    protected bool isWallDeteted;
+
+
 
 
     protected int facingDir = 1;
@@ -22,6 +29,12 @@ public class Entity : MonoBehaviour
     {
         anim=GetComponentInChildren<Animator>();
         rb=GetComponent<Rigidbody2D>();  
+
+
+        // 플레이어에게 wallCheck을 따로 할당 안해주면 오류가 생기는 것을 방지해줌
+        if(wallCheck==null){
+            wallCheck=transform;
+        }
 
     }
 
@@ -35,6 +48,7 @@ public class Entity : MonoBehaviour
     {
 
         isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
+        isWallDeteted=Physics2D.Raycast(wallCheck.position,Vector2.right, wallCheckDistance*facingDir, whatIsGround);
 
         //캡슐 콜라이더로 체크할 경우 아래 코드
         // isGrounded = Physics2D.Raycast(transform.position, Vector2.down, capsuleCollider2D.size.y/2f +0.5f, whatIsGround);
@@ -51,5 +65,6 @@ public class Entity : MonoBehaviour
     protected virtual void OnDrawGizmos()
     {
         Gizmos.DrawLine(groundCheck.position, new Vector3(groundCheck.position.x, groundCheck.position.y - groundCheckDistance));
+        Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance*facingDir , wallCheck.position.y));
     }
 }

@@ -192,6 +192,10 @@ public class Player : Entity
             Filp();
         }
     }
+    protected override void CollisionCheck()
+    {
+        base.CollisionCheck();
+    }
 
 
     // private void OnDrawGizmos()
