@@ -25,27 +25,27 @@ public class Player : Entity
 
     private float xInput;
 
-    [Header("Camera")]
-    public static Player Instance;
-
-
 
 
     [Header("JumpAbilty")]
     [SerializeField]private int jumpCount=0;
     [SerializeField] private int maxJumpCount = 2; // 최대 점프 횟수
 
-    private void Awake()
-    {
-        if(Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
-    }
+    //싱글톤
+    //[Header("Camera")]
+    //public static Player Instance;
+
+    //private void Awake()
+    //{
+    //    if(Instance != null && Instance != this)
+    //    {
+    //        Destroy(gameObject);
+    //    }
+    //    else
+    //    {
+    //        Instance = this;
+    //    }
+    //}
 
 
     protected override void Start()
@@ -200,5 +200,9 @@ public class Player : Entity
         }
     }
 
+    protected override void CollisionCheck()
+    {
+        base.CollisionCheck();
+    }
 }
 

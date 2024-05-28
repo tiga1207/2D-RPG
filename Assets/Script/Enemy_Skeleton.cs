@@ -38,13 +38,15 @@ public class Enemy_Skeleton : Entity
             }
 
         }
+        else //평상시
+        {
+            Movement();
+        }
 
         if (!isGrounded || isWallDeteted) // 벽 혹은 땅쪽일 경우 방향 전환
         {
             Filp();
         }
-
-        Movement();  
 
     }
 
