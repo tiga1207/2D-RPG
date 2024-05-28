@@ -25,43 +25,49 @@ public class Player : Entity
 
     private float xInput;
 
-
-    // [Header("Collision info")]
-    // [SerializeField] private float groundCheckDistance;  
-    // [SerializeField] private LayerMask whatIsGround;
-    // private bool isGrounded;
-  
+    [Header("Camera")]
+    public static Player Instance;
 
 
 
-    // private int facingDir = 1;
-    // private bool facingRight = true;
+
+    [Header("JumpAbilty")]
+    [SerializeField]private int jumpCount=0;
+    [SerializeField] private int maxJumpCount = 2; // 최대 점프 횟수
+
+    private void Awake()
+    {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+
 
     protected override void Start()
     {
         base.Start();
           
     }
-
-    // void Start()
-    // {
-    //     // rb = GetComponent<Rigidbody2D>();
-    //     // anim = GetComponentInChildren<Animator>();
-
-    // }
-
     protected override void Update()
     {
         base.Update(); 
         Movement();
+        JumpAbilty();
         CheckInput();
-        // CollisionCheck();
 
         dashTime -= Time.deltaTime;
         dashCooldownTimer -= Time.deltaTime;
         comboTimeWindow -= Time.deltaTime;
         AnimatorController();
         FlipController();
+
+        
+        Debug.Log("Jump Count: " + jumpCount);
 
 
 
@@ -80,9 +86,7 @@ public class Player : Entity
     }
 
 
-
-    //
-    private void CheckInput()
+    private void CheckInput() //사용자 입력 조작
     {
         xInput = Input.GetAxisRaw("Horizontal");
         if (Input.GetKeyDown(KeyCode.Mouse0))
@@ -152,9 +156,19 @@ public class Player : Entity
     //점프
     private void Jump()
     {
-        if (isGrounded)
+        if (isGrounded || jumpCount < maxJumpCount)
         {
             rb.velocity = new Vector2(rb.velocity.x, JumpForce);
+            jumpCount++;
+        }
+
+    }
+
+    private void JumpAbilty()
+    {
+        if (isGrounded && rb.velocity.y <= 0)
+        {
+            jumpCount = 0;
         }
     }
 
@@ -174,13 +188,6 @@ public class Player : Entity
 
     }
 
-    // private void Filp()
-    // {
-    //     facingDir = facingDir * -1;
-    //     facingRight = !facingRight;
-    //     transform.Rotate(0, 180, 0);
-    // }
-
     private void FlipController()
     {
         if (rb.velocity.x > 0 && !facingRight)
@@ -192,18 +199,6 @@ public class Player : Entity
             Filp();
         }
     }
-    protected override void CollisionCheck()
-    {
-        base.CollisionCheck();
-    }
-
-
-    // private void OnDrawGizmos()
-    // {
-    //     Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - groundCheckDistance));
-    // }
-
-
 
 }
 

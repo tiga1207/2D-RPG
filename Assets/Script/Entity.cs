@@ -9,8 +9,8 @@ public class Entity : MonoBehaviour
     protected Rigidbody2D rb;
 
     [Header("Collision info")]
-    [SerializeField] protected Transform groundCheck; 
-    [SerializeField] protected float groundCheckDistance;  
+    [SerializeField] protected Transform groundCheck;
+    [SerializeField] protected float groundCheckDistance;
     [Space]
     [SerializeField] protected Transform wallCheck;
     [SerializeField] protected float wallCheckDistance;
@@ -22,8 +22,12 @@ public class Entity : MonoBehaviour
 
 
 
+
     protected int facingDir = 1;
-    protected  bool facingRight = true; 
+    protected  bool facingRight = true;
+
+
+
 
     protected virtual  void Start()
     {
@@ -41,10 +45,10 @@ public class Entity : MonoBehaviour
     // Update is called once per frame
     protected virtual   void Update()
     {
-        CollisionCheck(); 
+        CollisionCheck();
     }
 
-    protected virtual void CollisionCheck()
+    protected virtual void CollisionCheck()// Ground & Wall 체크
     {
 
         isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
@@ -55,14 +59,15 @@ public class Entity : MonoBehaviour
 
     }
 
-    protected virtual void Filp()
+
+    protected virtual void Filp() //캐릭터 좌.우 뒤집기
     {
         facingDir = facingDir * -1;
         facingRight = !facingRight;
         transform.Rotate(0, 180, 0);
     }
 
-    protected virtual void OnDrawGizmos()
+    protected virtual void OnDrawGizmos() //Ground & Wall 체크 기즈모(선)
     {
         Gizmos.DrawLine(groundCheck.position, new Vector3(groundCheck.position.x, groundCheck.position.y - groundCheckDistance));
         Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance*facingDir , wallCheck.position.y));

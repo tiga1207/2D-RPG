@@ -23,7 +23,7 @@ public class Enemy_Skeleton : Entity
         base.Update();
 
 
-        if (isPlayerDectected)
+        if (isPlayerDectected) //플레이어 발견시 행동
         {
             if (isPlayerDectected.distance > 1)
             {
