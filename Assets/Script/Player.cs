@@ -23,13 +23,16 @@ public class Player : Entity
     [SerializeField]private bool isAttacking;
     private int comboCounter;
 
-    private float xInput;
+    private float xInput,yInput;
 
 
 
     [Header("JumpAbilty")]
     [SerializeField]private int jumpCount=0;
     [SerializeField] private int maxJumpCount = 2; // 최대 점프 횟수
+
+    
+
 
     //싱글톤
     //[Header("Camera")]
@@ -65,15 +68,30 @@ public class Player : Entity
         comboTimeWindow -= Time.deltaTime;
         AnimatorController();
         FlipController();
-
-        
-        Debug.Log("Jump Count: " + jumpCount);
-
-
-
     }
 
-    public void AttackOver()
+      private void StartAttackEvent() //공격 시작시점
+    {
+        
+        if(!isGrounded)
+        {
+            return;//이 시점에서 함수 완료 및 그 아래 있는 문들을 실행시키지 않도록 함
+        }
+
+        if (comboTimeWindow < 0)
+        {
+            comboCounter = 0;
+        }
+        if(yInput==0 || yInput<0 && isGrounded){
+            
+            Instantiate(slashEffect,AttackTransform);
+        }
+        Hit(AttackTransform,AttackArea); // 공격 이펙트와 별개로 데미지 적용 문제 해결해야함.
+        isAttacking = true;
+        comboTimeWindow = comboTime;
+    }
+
+    public void AttackOver() //공격 종료 시점
     {
         isAttacking=false;
         comboCounter++;
@@ -82,6 +100,7 @@ public class Player : Entity
         {
             comboCounter = 0;
         }
+
         
     }
 
@@ -89,6 +108,7 @@ public class Player : Entity
     private void CheckInput() //사용자 입력 조작
     {
         xInput = Input.GetAxisRaw("Horizontal");
+        yInput = Input.GetAxisRaw("Vertical"); 
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             StartAttackEvent();
@@ -106,23 +126,7 @@ public class Player : Entity
 
     }
 
-    private void StartAttackEvent()
-    {
-        
-        if(!isGrounded)
-        {
-            return;//이 시점에서 함수 완료 및 그 아래 있는 문들을 실행시키지 않도록 함
-        }
-
-        if (comboTimeWindow < 0)
-        {
-            comboCounter = 0;
-        }
-
-
-        isAttacking = true;
-        comboTimeWindow = comboTime;
-    }
+  
 
     private void DashAbility()
     {

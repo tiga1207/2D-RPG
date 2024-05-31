@@ -19,6 +19,17 @@ public class Entity : MonoBehaviour
     protected bool isGrounded;
     protected bool isWallDeteted;
 
+    [Header("Attack")]
+    [SerializeField]protected Transform AttackTransform;
+    [SerializeField]protected Vector2 AttackArea;
+    [SerializeField]protected LayerMask attackableLayer;
+    [SerializeField]protected GameObject slashEffect;
+
+
+    [Header("HP")]
+    [SerializeField]protected float hp;
+    [SerializeField]protected float damage;
+
 
 
 
@@ -71,5 +82,29 @@ public class Entity : MonoBehaviour
     {
         Gizmos.DrawLine(groundCheck.position, new Vector3(groundCheck.position.x, groundCheck.position.y - groundCheckDistance));
         Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance*facingDir , wallCheck.position.y));
+        Gizmos.DrawWireCube(AttackTransform.position, AttackArea);
+    }
+    protected virtual void Hit(Transform _attackTransform, Vector2 _attackArea)
+    {
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0,attackableLayer);
+        if(objectsToHit.Length >0){
+             Debug.Log("hit");
+        }
+        for(int i=0; i< objectsToHit.Length; ++i){
+            if(objectsToHit[i].GetComponent<Enemy_Skeleton>()!= null)
+            {
+                objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage);
+            }
+        }
+    }
+
+    protected void HpController(){
+        if(hp<=0){
+            Destroy(gameObject);
+        }
+    }
+    protected void Hited(float _damageDone){
+        hp-=_damageDone;
+        Debug.Log("Enemy HP"+hp);
     }
 }

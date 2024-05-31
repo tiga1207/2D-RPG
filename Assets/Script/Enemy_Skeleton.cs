@@ -17,12 +17,29 @@ public class Enemy_Skeleton : Entity
     protected override void Start()
     {
         base.Start();
+
+        if(AttackTransform==null){
+            AttackTransform=transform;
+        }
     }
     protected override void Update()
     {
         base.Update();
 
 
+        HpController(); 
+        Movement();
+
+        if (!isGrounded || isWallDeteted) // 벽 혹은 땅쪽일 경우 방향 전환
+        {
+            Filp();
+        }
+
+    }
+
+
+    private void Movement()//기본 이동
+    {
         if (isPlayerDectected) //플레이어 발견시 행동
         {
             if (isPlayerDectected.distance > 1)
@@ -40,20 +57,9 @@ public class Enemy_Skeleton : Entity
         }
         else //평상시
         {
-            Movement();
+            rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
+
         }
-
-        if (!isGrounded || isWallDeteted) // 벽 혹은 땅쪽일 경우 방향 전환
-        {
-            Filp();
-        }
-
-    }
-
-
-    private void Movement()//기본 이동
-    {
-        rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
     }
 
     protected override void CollisionCheck()//충돌 체크

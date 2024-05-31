@@ -725,6 +725,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1819998913}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &666367604
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 666367605}
+  m_Layer: 6
+  m_Name: AttackTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &666367605
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666367604}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.47, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1128691316}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &666413665
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,6 +1031,7 @@ Transform:
   m_Children:
   - {fileID: 135369662}
   - {fileID: 666413666}
+  - {fileID: 666367605}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1128691318
@@ -1021,6 +1053,14 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
+  AttackTransform: {fileID: 666367605}
+  AttackArea: {x: 3, y: 3}
+  attackableLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  slashEffect: {fileID: 750351155395176926, guid: acf2fb224691549939a6dff670b40c67, type: 3}
+  hp: 0
+  damage: 1
   moveSpeed: 6
   JumpForce: 30
   dashSpeed: 25
@@ -1077,7 +1117,7 @@ GameObject:
   - component: {fileID: 1819998916}
   - component: {fileID: 1819998915}
   - component: {fileID: 1819998917}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy_Skeleton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1183,6 +1223,14 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
+  AttackTransform: {fileID: 0}
+  AttackArea: {x: 0, y: 0}
+  attackableLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  slashEffect: {fileID: 0}
+  hp: 3
+  damage: 0
   moveSpeed: 1
   playerCheckDistance: 4
   whatIsPlayer:
