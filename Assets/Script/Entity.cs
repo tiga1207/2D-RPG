@@ -8,6 +8,7 @@ public class Entity : MonoBehaviour
     protected Animator anim;
     protected Rigidbody2D rb;
 
+
     [Header("Collision info")]
     [SerializeField] protected Transform groundCheck;
     [SerializeField] protected float groundCheckDistance;
@@ -27,24 +28,31 @@ public class Entity : MonoBehaviour
 
 
     [Header("HP")]
+    [SerializeField]protected float maxHp;
     [SerializeField]protected float hp;
     [SerializeField]protected float damage;
-
-
-
-
+    [SerializeField] public bool invincible =false;
 
     protected int facingDir = 1;
     protected  bool facingRight = true;
 
+    // [Header("Recoil")]
+    // [SerializeField] protected float recoilLength;
+    // [SerializeField] protected float recoilFactor;
+    // [SerializeField] protected bool isRecoiling = false;
+    // [SerializeField] protected float recoilTimer;
+
+    // [SerializeField]protected bool recoilX, recoilY;
 
 
 
-    protected virtual  void Start()
+    protected virtual void Awake()
     {
         anim=GetComponentInChildren<Animator>();
         rb=GetComponent<Rigidbody2D>();  
-
+    }
+    protected virtual  void Start()
+    {
 
         // 플레이어에게 wallCheck을 따로 할당 안해주면 오류가 생기는 것을 방지해줌
         if(wallCheck==null){
@@ -54,9 +62,10 @@ public class Entity : MonoBehaviour
     }
 
     // Update is called once per frame
-    protected virtual   void Update()
+    protected virtual void Update()
     {
         CollisionCheck();
+        
     }
 
     protected virtual void CollisionCheck()// Ground & Wall 체크
@@ -84,27 +93,74 @@ public class Entity : MonoBehaviour
         Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance*facingDir , wallCheck.position.y));
         Gizmos.DrawWireCube(AttackTransform.position, AttackArea);
     }
+    // protected virtual void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilDir, float _recoilStrength)
     protected virtual void Hit(Transform _attackTransform, Vector2 _attackArea)
     {
         Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0,attackableLayer);
-        if(objectsToHit.Length >0){
-             Debug.Log("hit");
+        
+        if(objectsToHit.Length >0) //타격시 
+        {
+            //  Debug.Log("hit");
+
+            // _recoilDir= true;
         }
+
         for(int i=0; i< objectsToHit.Length; ++i){
             if(objectsToHit[i].GetComponent<Enemy_Skeleton>()!= null)
-            {
-                objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage);
+            {   
+                // objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage,(transform.position - objectsToHit[i].transform.position).normalized, _recoilStrength);   
+                objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage,(transform.position - objectsToHit[i].transform.position).normalized);   
             }
         }
     }
 
-    protected void HpController(){
-        if(hp<=0){
+    protected virtual void HpController(){
+
+        if(Hp<=0){
             Destroy(gameObject);
         }
     }
-    protected void Hited(float _damageDone){
-        hp-=_damageDone;
-        Debug.Log("Enemy HP"+hp);
+
+  public virtual float Hp
+{
+    get { return hp; }
+    set 
+    {
+        if (hp != value)
+        {
+            hp = Mathf.Clamp(value, 0, maxHp);
+        }
     }
 }
+
+    
+    // protected virtual void Hited(float _damageDone, Vector2 _hitDirection, float _hitForce){
+    protected virtual void Hited(float _damageDone, Vector2 _hitDirection){
+        Hp-=_damageDone;
+        // takeDamage = true;
+
+        
+        // if(!isRecoiling)
+        // {
+        //     rb.AddForce(_hitForce * recoilFactor * _hitDirection);
+        // }
+    }
+
+    
+
+    // protected virtual void RecoilController(){
+    //     if(isRecoiling)
+    //     {
+    //         if(recoilTimer<recoilLength){
+    //             recoilTimer+=Time.deltaTime;
+        
+    //         }
+    //         else
+    //         {
+    //             isRecoiling=false;
+    //             recoilTimer=0;
+    //         }
+    //     }
+    // }
+    
+   }
