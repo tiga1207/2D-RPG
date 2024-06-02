@@ -5,6 +5,7 @@ public class Player : Entity
 {
     // private Rigidbody2D rb;
     // private Animator anim;
+    private SpriteRenderer childSr;
     private float xInput,yInput;
 
     [Header("Move Info ")]
@@ -26,7 +27,13 @@ public class Player : Entity
     [SerializeField]private bool isAttacking;
     private int comboCounter;
 
+    [Header("Player State")]
+    [SerializeField] GameObject bloodEffect;
+    [SerializeField] float hitFlashSpeed;
+    [SerializeField] public bool invincible =false;
     public bool isTakeDamage = false;
+    [SerializeField] GameObject sr;
+
 
 
  
@@ -51,6 +58,7 @@ public class Player : Entity
     protected override void Awake()
     {
         base.Awake();
+
         if(Instance != null && Instance != this)
        {
            Destroy(gameObject);
@@ -59,6 +67,33 @@ public class Player : Entity
        {
            Instance = this;
        }
+
+       if (sr != null)
+    {
+        Debug.Log("Animator GameObject is assigned in the Inspector.");
+        childSr = sr.GetComponent<SpriteRenderer>();
+
+        if (childSr != null)
+        {
+            Debug.Log("SpriteRenderer component found on the Animator GameObject.");
+        }
+        else
+        {
+            Debug.LogError("SpriteRenderer component not found on the assigned Animator GameObject.");
+        }
+    }
+    else
+    {
+        Debug.LogError("Animator GameObject is not assigned in the Inspector.");
+    }
+
+    //    childSr=sr.GetComponent<SpriteRenderer>();
+
+    // GameObject animatorObject = GameObject.Find("Animator");
+    // if (animatorObject != null)
+    // {
+    //     childSr = animatorObject.GetComponent<SpriteRenderer>();
+    // }
     //    Hp = maxHp;
     }
     protected override void Start()
@@ -75,6 +110,7 @@ public class Player : Entity
         CooldownManager();
         AnimatorController();
         FlipController();
+        FlashWhileInvicible();
 
         // Recoil();
     }
@@ -243,13 +279,45 @@ public class Player : Entity
     IEnumerator StopTakeDamage()
     {
         invincible =true;
-        // ClampHp();
+        GameObject _bloodEffectParticle = Instantiate(bloodEffect, transform.position, Quaternion.identity);
+        Destroy(_bloodEffectParticle,1.5f);
         yield return new WaitForSeconds(1f);
         isTakeDamage = false;
         invincible = false;
     }
 
 
+
+// public void FlashWhileInvicible() //불투명도 변화
+// {
+//     if (invincible && childSr != null)
+//     {
+//         // 투명도(알파 값)를 0에서 1로 반복적으로 변경하여 깜빡임 효과를 줌
+//         float alpha = Mathf.PingPong(Time.time * hitFlashSpeed, 1.0f);
+//         Color color = childSr.color;
+//         color.a = alpha;
+//         childSr.color = color;
+//     }
+//     else if (childSr != null)
+//     {
+//         // 무적 상태가 아닐 때는 원래 색상으로 설정
+//         Color color = childSr.color;
+//         color.a = 1.0f;
+//         childSr.color = color;
+//     }
+// }
+
+public void FlashWhileInvicible() //색변화
+{
+    if (invincible && childSr != null)
+    {
+        childSr.color = Color.Lerp(Color.white, Color.black, Mathf.PingPong(Time.time * hitFlashSpeed, 1.0f));
+    }
+    else if (childSr != null)
+    {
+        childSr.color = Color.white;
+    }
+}
 
     /*
           void Recoil()

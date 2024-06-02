@@ -1,12 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
     protected Animator anim;
     protected Rigidbody2D rb;
+    // protected SpriteRenderer sr;
+
 
 
     [Header("Collision info")]
@@ -31,10 +31,13 @@ public class Entity : MonoBehaviour
     [SerializeField]protected float maxHp;
     [SerializeField]protected float hp;
     [SerializeField]protected float damage;
-    [SerializeField] public bool invincible =false;
 
     protected int facingDir = 1;
     protected  bool facingRight = true;
+
+    [Header("GameSpeed")]
+    [SerializeField] protected bool restoreTime;
+    [SerializeField] protected float  restoreTimeSpeed;
 
     // [Header("Recoil")]
     // [SerializeField] protected float recoilLength;
@@ -50,6 +53,7 @@ public class Entity : MonoBehaviour
     {
         anim=GetComponentInChildren<Animator>();
         rb=GetComponent<Rigidbody2D>();  
+        // sr=GetComponentInChildren<SpriteRenderer>();
     }
     protected virtual  void Start()
     {
@@ -65,7 +69,7 @@ public class Entity : MonoBehaviour
     protected virtual void Update()
     {
         CollisionCheck();
-        
+        // RestoreTimeScale(); 
     }
 
     protected virtual void CollisionCheck()// Ground & Wall 체크
@@ -146,7 +150,40 @@ public class Entity : MonoBehaviour
         // }
     }
 
-    
+    // public void RestoreTimeScale()
+    // {
+    //     if(restoreTime)
+    //     {
+    //         if(Time.timeScale<1)
+    //         {
+    //             Time.timeScale += Time.deltaTime * restoreTimeSpeed;
+    //         }
+    //         else
+    //         {
+    //             Time.timeScale =1;
+    //             restoreTime = false;
+    //         }
+    //     }
+    // }
+    // public void HitStopTime(float _newTimeScale, int _restoreSpeed, float _delay)
+    // {
+    //     restoreTimeSpeed = _restoreSpeed;
+    //     Time.timeScale=_newTimeScale;
+    //     if(_delay>0)
+    //     {
+    //         StopCoroutine(StartTimeAgain(_delay));
+    //         StartCoroutine(StartTimeAgain(_delay));
+    //     }
+    //     else
+    //     {
+    //         restoreTime = true;
+    //     }
+    // } 
+    // IEnumerator StartTimeAgain(float _delay)
+    // {
+    //     restoreTime =true;
+    //     yield return new WaitForSeconds(_delay);
+    // }
 
     // protected virtual void RecoilController(){
     //     if(isRecoiling)

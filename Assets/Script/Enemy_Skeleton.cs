@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy_Skeleton : Entity
@@ -100,6 +99,7 @@ public class Enemy_Skeleton : Entity
         if (!Player.Instance.invincible)
         {
             Player.Instance.TakeDamage(damage);
+            // Player.Instance.HitStopTime(0,5,0.5f);
         }
     }
 
