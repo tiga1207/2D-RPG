@@ -393,7 +393,7 @@ MonoBehaviour:
   damage: 1
   moveSpeed: 6
   gravity: 3.5
-  jumpForce: 0
+  jumpForce: 30
   dashSpeed: 25
   dashDuration: 0.25
   dashCooldown: 1.5

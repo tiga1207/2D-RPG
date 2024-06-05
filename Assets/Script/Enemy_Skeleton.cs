@@ -101,13 +101,17 @@ public class Enemy_Skeleton : Entity
     protected override void Hited(float _damageDone, Vector2 _hitDirection)
     {
         base.Hited(_damageDone, _hitDirection);
+        if (Hp <= 0)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
 
     public void AttackPlayer()
     {
         if (player != null && !player.invincible)
         {
-            player.TakeDamage(damage);
+            player.TakeDamageRPC(damage);
         }
     }
 }

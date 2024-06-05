@@ -52,23 +52,10 @@ public class Player : Entity, IPunObservable
         NickNameText.color = PV.IsMine ? Color.green : Color.red;
 
         if (sr != null)
-        {
-            Debug.Log("Animator GameObject is assigned in the Inspector.");
+        {    
             childSr = sr.GetComponent<SpriteRenderer>();
-
-            if (childSr != null)
-            {
-                Debug.Log("SpriteRenderer component found on the Animator GameObject.");
-            }
-            else
-            {
-                Debug.LogError("SpriteRenderer component not found on the assigned Animator GameObject.");
-            }
         }
-        else
-        {
-            Debug.LogError("Animator GameObject is not assigned in the Inspector.");
-        }
+       
     }
 
     protected override void Start()
@@ -203,39 +190,6 @@ public class Player : Entity, IPunObservable
         anim.SetBool("isTakeDamage", isTakeDamage);
     }
 
-    private void FlipController()
-    {
-        if (rb.velocity.x > 0 && !facingRight)
-        {
-            Flip();
-            NickNameText.transform.Rotate(0, 180, 0);
-
-        }
-        else if (rb.velocity.x < 0 && facingRight)
-        {
-            Flip();
-            NickNameText.transform.Rotate(0, 180, 0);
-
-        }
-    }
-
-    public virtual void TakeDamage(float _damage)
-    {
-        Hp -= Mathf.RoundToInt(_damage);
-        isTakeDamage = true;
-        StartCoroutine(StopTakeDamage());
-    }
-
-    private IEnumerator StopTakeDamage()
-    {
-        invincible = true;
-        GameObject _bloodEffectParticle = Instantiate(bloodEffect, transform.position, Quaternion.identity);
-        Destroy(_bloodEffectParticle, 1.5f);
-        yield return new WaitForSeconds(1f);
-        isTakeDamage = false;
-        invincible = false;
-    }
-
     private void FlashWhileInvincible()
     {
         if (invincible && childSr != null)
@@ -252,6 +206,50 @@ public class Player : Entity, IPunObservable
             childSr.color = color;
         }
     }
+
+    private void FlipController()
+    {
+        if (rb.velocity.x > 0 && !facingRight)
+        {
+            PV.RPC("FlipRPC", RpcTarget.AllBuffered, true);
+
+        }
+        else if (rb.velocity.x < 0 && facingRight)
+        {
+            PV.RPC("FlipRPC", RpcTarget.AllBuffered, false);
+
+        }
+    }
+
+    [PunRPC]
+    private void FlipRPC(bool faceRight)
+    {
+        facingRight = faceRight;
+        facingDir = faceRight ? 1 : -1;
+        transform.Rotate(0, 180, 0);
+        NickNameText.transform.Rotate(0, 180, 0);
+
+    }
+
+    [PunRPC]
+    public virtual void TakeDamageRPC(float _damage)
+    {
+        Hp -= Mathf.RoundToInt(_damage);
+        isTakeDamage = true;
+        StartCoroutine(StopTakeDamage());
+    }
+
+    private IEnumerator StopTakeDamage()
+    {
+        invincible = true;
+        //GameObject _bloodEffectParticle = Instantiate(bloodEffect, transform.position, Quaternion.identity);
+        GameObject _bloodEffectParticle = PhotonNetwork.Instantiate(bloodEffect.name, transform.position, Quaternion.identity);
+        Destroy(_bloodEffectParticle, 1.5f);
+        yield return new WaitForSeconds(1f);
+        isTakeDamage = false;
+        invincible = false;
+    }
+
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
