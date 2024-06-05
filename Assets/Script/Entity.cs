@@ -1,13 +1,10 @@
-using System.Collections;
+using Photon.Pun;
 using UnityEngine;
 
-public class Entity : MonoBehaviour
+public class Entity : MonoBehaviourPunCallbacks
 {
     protected Animator anim;
     protected Rigidbody2D rb;
-    // protected SpriteRenderer sr;
-
-
 
     [Header("Collision info")]
     [SerializeField] protected Transform groundCheck;
@@ -15,189 +12,100 @@ public class Entity : MonoBehaviour
     [Space]
     [SerializeField] protected Transform wallCheck;
     [SerializeField] protected float wallCheckDistance;
-    [SerializeField] protected  LayerMask whatIsGround;
-    
+    [SerializeField] protected LayerMask whatIsGround;
+
     protected bool isGrounded;
-    protected bool isWallDeteted;
+    protected bool isWallDetected;
 
     [Header("Attack")]
-    [SerializeField]protected Transform AttackTransform;
-    [SerializeField]protected Vector2 AttackArea;
-    [SerializeField]protected LayerMask attackableLayer;
-    [SerializeField]protected GameObject slashEffect;
-
+    [SerializeField] protected Transform AttackTransform;
+    [SerializeField] protected Vector2 AttackArea;
+    [SerializeField] protected LayerMask attackableLayer;
+    [SerializeField] protected GameObject slashEffect;
 
     [Header("HP")]
-    [SerializeField]protected float maxHp;
-    [SerializeField]protected float hp;
-    [SerializeField]protected float damage;
+    [SerializeField] protected float maxHp;
+    [SerializeField] protected float hp;
+    [SerializeField] protected float damage;
 
     protected int facingDir = 1;
-    protected  bool facingRight = true;
-
-    [Header("GameSpeed")]
-    [SerializeField] protected bool restoreTime;
-    [SerializeField] protected float  restoreTimeSpeed;
-
-    // [Header("Recoil")]
-    // [SerializeField] protected float recoilLength;
-    // [SerializeField] protected float recoilFactor;
-    // [SerializeField] protected bool isRecoiling = false;
-    // [SerializeField] protected float recoilTimer;
-
-    // [SerializeField]protected bool recoilX, recoilY;
-
-
+    protected bool facingRight = true;
 
     protected virtual void Awake()
     {
-        anim=GetComponentInChildren<Animator>();
-        rb=GetComponent<Rigidbody2D>();  
-        // sr=GetComponentInChildren<SpriteRenderer>();
+        anim = GetComponentInChildren<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+
     }
-    protected virtual  void Start()
+
+    protected virtual void Start()
     {
-
-        // 플레이어에게 wallCheck을 따로 할당 안해주면 오류가 생기는 것을 방지해줌
-        if(wallCheck==null){
-            wallCheck=transform;
+        if (wallCheck == null)
+        {
+            wallCheck = transform;
         }
-
     }
 
-    // Update is called once per frame
     protected virtual void Update()
     {
         CollisionCheck();
-        // RestoreTimeScale(); 
     }
 
-    protected virtual void CollisionCheck()// Ground & Wall 체크
+    protected virtual void CollisionCheck()
     {
-
         isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
-        isWallDeteted=Physics2D.Raycast(wallCheck.position,Vector2.right, wallCheckDistance*facingDir, whatIsGround);
-
-        //캡슐 콜라이더로 체크할 경우 아래 코드
-        // isGrounded = Physics2D.Raycast(transform.position, Vector2.down, capsuleCollider2D.size.y/2f +0.5f, whatIsGround);
-
+        isWallDetected = Physics2D.Raycast(wallCheck.position, Vector2.right, wallCheckDistance * facingDir, whatIsGround);
     }
 
-
-    protected virtual void Filp() //캐릭터 좌.우 뒤집기
+    protected virtual void Flip()
     {
-        facingDir = facingDir * -1;
+        facingDir *= -1;
         facingRight = !facingRight;
         transform.Rotate(0, 180, 0);
     }
 
-    protected virtual void OnDrawGizmos() //Ground & Wall 체크 기즈모(선)
+    protected virtual void OnDrawGizmos()
     {
         Gizmos.DrawLine(groundCheck.position, new Vector3(groundCheck.position.x, groundCheck.position.y - groundCheckDistance));
-        Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance*facingDir , wallCheck.position.y));
+        Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance * facingDir, wallCheck.position.y));
         Gizmos.DrawWireCube(AttackTransform.position, AttackArea);
     }
-    // protected virtual void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilDir, float _recoilStrength)
+
     protected virtual void Hit(Transform _attackTransform, Vector2 _attackArea)
     {
-        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0,attackableLayer);
-        
-        if(objectsToHit.Length >0) //타격시 
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+        for (int i = 0; i < objectsToHit.Length; ++i)
         {
-            //  Debug.Log("hit");
-
-            // _recoilDir= true;
-        }
-
-        for(int i=0; i< objectsToHit.Length; ++i){
-            if(objectsToHit[i].GetComponent<Enemy_Skeleton>()!= null)
-            {   
-                // objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage,(transform.position - objectsToHit[i].transform.position).normalized, _recoilStrength);   
-                objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage,(transform.position - objectsToHit[i].transform.position).normalized);   
+            if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
+            {
+                objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage, (transform.position - objectsToHit[i].transform.position).normalized);
             }
         }
     }
 
-    protected virtual void HpController(){
-
-        if(Hp<=0){
+    protected virtual void HpController()
+    {
+        if (Hp <= 0)
+        {
             Destroy(gameObject);
         }
     }
 
-  public virtual float Hp
-{
-    get { return hp; }
-    set 
+    public virtual float Hp
     {
-        if (hp != value)
+        get { return hp; }
+        set
         {
-            hp = Mathf.Clamp(value, 0, maxHp);
+            if (hp != value)
+            {
+                hp = Mathf.Clamp(value, 0, maxHp);
+            }
         }
     }
-}
 
-    
-    // protected virtual void Hited(float _damageDone, Vector2 _hitDirection, float _hitForce){
-    protected virtual void Hited(float _damageDone, Vector2 _hitDirection){
-        Hp-=_damageDone;
-        // takeDamage = true;
-
-        
-        // if(!isRecoiling)
-        // {
-        //     rb.AddForce(_hitForce * recoilFactor * _hitDirection);
-        // }
+    protected virtual void Hited(float _damageDone, Vector2 _hitDirection)
+    {
+        Hp -= _damageDone;
     }
-
-    // public void RestoreTimeScale()
-    // {
-    //     if(restoreTime)
-    //     {
-    //         if(Time.timeScale<1)
-    //         {
-    //             Time.timeScale += Time.deltaTime * restoreTimeSpeed;
-    //         }
-    //         else
-    //         {
-    //             Time.timeScale =1;
-    //             restoreTime = false;
-    //         }
-    //     }
-    // }
-    // public void HitStopTime(float _newTimeScale, int _restoreSpeed, float _delay)
-    // {
-    //     restoreTimeSpeed = _restoreSpeed;
-    //     Time.timeScale=_newTimeScale;
-    //     if(_delay>0)
-    //     {
-    //         StopCoroutine(StartTimeAgain(_delay));
-    //         StartCoroutine(StartTimeAgain(_delay));
-    //     }
-    //     else
-    //     {
-    //         restoreTime = true;
-    //     }
-    // } 
-    // IEnumerator StartTimeAgain(float _delay)
-    // {
-    //     restoreTime =true;
-    //     yield return new WaitForSeconds(_delay);
-    // }
-
-    // protected virtual void RecoilController(){
-    //     if(isRecoiling)
-    //     {
-    //         if(recoilTimer<recoilLength){
-    //             recoilTimer+=Time.deltaTime;
-        
-    //         }
-    //         else
-    //         {
-    //             isRecoiling=false;
-    //             recoilTimer=0;
-    //         }
-    //     }
-    // }
-    
-   }
+}
