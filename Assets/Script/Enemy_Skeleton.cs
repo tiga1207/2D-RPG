@@ -4,6 +4,8 @@ using Photon.Pun;
 
 public class Enemy_Skeleton : Entity
 {
+
+    public PhotonView PV;
     bool isAttacking;
     [Header("Move info")]
     [SerializeField] private float moveSpeed = 1f;
@@ -13,7 +15,7 @@ public class Enemy_Skeleton : Entity
     [SerializeField] private LayerMask whatIsPlayer;
     private RaycastHit2D isPlayerDetected;
 
-    private Player player;
+    public Player player;
 
     protected override void Awake()
     {
@@ -56,10 +58,10 @@ public class Enemy_Skeleton : Entity
             }
         }
 
-        if (this.player == null)
-        {
-            Debug.LogError("Local player not found!");
-        }
+        // if (this.player == null)
+        // {
+        //     Debug.LogError("Local player not found!");
+        // }
     }
 
     private void Movement()
@@ -111,7 +113,8 @@ public class Enemy_Skeleton : Entity
     {
         if (player != null && !player.invincible)
         {
-            player.TakeDamageRPC(damage);
+            Debug.Log("플레이어 공격중");
+            player.TakeDamage(damage);
         }
     }
 }

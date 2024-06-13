@@ -42,20 +42,21 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private void SpawnPlayer()
     {
         GameObject player = PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(-6f, 19f), 4, 0), Quaternion.identity);
-        if (player != null)
-        {
-            Debug.Log("Player object instantiated successfully.");
-        }
-        else
-        {
-            Debug.LogError("Player object not instantiated.");
-        }
+        GameObject enemy = PhotonNetwork.Instantiate("Enemy_Skeleton", new Vector3(Random.Range(-6f, 19f), 4, 0), Quaternion.identity);
+        // if (player != null)
+        // {
+        //     Debug.Log("Player object instantiated successfully.");
+        // }
+        // else
+        // {
+        //     Debug.LogError("Player object not instantiated.");
+        // }
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
         base.OnDisconnected(cause);
         DisconnectPanel.SetActive(true);
-        RespawnPanel.SetActive(true);
+        RespawnPanel.SetActive(false);
     }
 }

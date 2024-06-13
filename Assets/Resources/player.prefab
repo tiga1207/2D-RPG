@@ -391,7 +391,7 @@ MonoBehaviour:
   maxHp: 20
   hp: 20
   damage: 1
-  moveSpeed: 6
+  moveSpeed: 15
   gravity: 3.5
   jumpForce: 30
   dashSpeed: 25
@@ -458,7 +458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObservedComponentsFoldoutOpen: 1
   Group: 0
-  prefixField: -1
+  prefixField: 0
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
