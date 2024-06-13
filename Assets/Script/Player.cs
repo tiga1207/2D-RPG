@@ -119,7 +119,8 @@ public class Player : Entity, IPunObservable
         if (yInput == 0 || yInput < 0 && isGrounded)
         {
             Hit(AttackTransform, AttackArea);
-            Instantiate(slashEffect, AttackTransform);
+            PhotonNetwork.Instantiate(slashEffect.name, AttackTransform.position, Quaternion.identity); // 슬래시 이펙트를 네트워크 상에서 생성
+            // Instantiate(slashEffect, AttackTransform);
         }
         isAttacking = true;
         comboTimeWindow = comboTime;
@@ -140,11 +141,7 @@ public class Player : Entity, IPunObservable
     {
         xInput = Input.GetAxisRaw("Horizontal");
         yInput = Input.GetAxisRaw("Vertical");
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            StartAttackEvent();
-        }
-
+        
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Jump();
@@ -153,6 +150,17 @@ public class Player : Entity, IPunObservable
         {
             DashAbility();
         }
+        
+        if(isTakeDamage)
+        {
+            return;
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            StartAttackEvent();
+        }
+
     }
 
     private void DashAbility()
@@ -253,8 +261,8 @@ public class Player : Entity, IPunObservable
 
     public void TakeDamage(float _damage)
     {
-
         PV.RPC("TakeDamageRPC", RpcTarget.AllBuffered, _damage);
+
 
         // if (PV != null && PV.IsMine)
         // {
@@ -266,10 +274,13 @@ public class Player : Entity, IPunObservable
     [PunRPC]
     private void TakeDamageRPC(float _damage)
     {
-        Debug.Log("TakeDamageRPC working");
-        Hp -= Mathf.RoundToInt(_damage);
-        isTakeDamage = true;
-        StartCoroutine(StopTakeDamage());
+        if(PV.IsMine)
+        {
+            Debug.Log("TakeDamageRPC working");
+            Hp -= Mathf.RoundToInt(_damage);
+            isTakeDamage = true;
+            StartCoroutine(StopTakeDamage());
+        }
     }
 
     private IEnumerator StopTakeDamage()

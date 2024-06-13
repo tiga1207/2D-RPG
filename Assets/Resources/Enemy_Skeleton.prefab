@@ -166,7 +166,7 @@ MonoBehaviour:
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 64
-  player: {fileID: 2230855623847063890, guid: 763d92aa957c7a242892d46524ea6795, type: 3}
+  player: {fileID: 0}
 --- !u!114 &7686444234326162874
 MonoBehaviour:
   m_ObjectHideFlags: 0

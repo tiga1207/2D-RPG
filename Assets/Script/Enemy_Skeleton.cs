@@ -78,7 +78,8 @@ public class Enemy_Skeleton : Entity
             {
                 Debug.Log("Attack " + isPlayerDetected.collider.gameObject.name);
                 isAttacking = true;
-                AttackPlayer();
+                AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID);
+                // AttackPlayer();
             }
         }
         else //평상시
@@ -109,12 +110,26 @@ public class Enemy_Skeleton : Entity
         }
     }
 
-    public void AttackPlayer()
+    public void AttackPlayer(int playerViewID)
     {
-        if (player != null && !player.invincible)
+        PhotonView playerPV = PhotonView.Find(playerViewID);
+        if (playerPV != null && playerPV.IsMine)
         {
-            Debug.Log("플레이어 공격중");
-            player.TakeDamage(damage);
+            Player player = playerPV.GetComponent<Player>();
+            if (player != null && !player.invincible)
+            {
+                Debug.Log("플레이어 공격중");
+                player.TakeDamage(damage);
+            }
         }
     }
+
+    // public void AttackPlayer()
+    // {
+    //     if (player != null && !player.invincible)
+    //     {
+    //         Debug.Log("플레이어 공격중");
+    //         player.TakeDamage(damage);
+    //     }
+    // }
 }
