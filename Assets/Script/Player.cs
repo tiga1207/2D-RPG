@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Cinemachine;
-using Cinemachine;
 
 public class Player : Entity, IPunObservable
 {
@@ -54,19 +53,19 @@ public class Player : Entity, IPunObservable
         NickNameText.color = PV.IsMine ? Color.green : Color.red;
 
         if (sr != null)
-        {
+        {    
             childSr = sr.GetComponent<SpriteRenderer>();
 
         }
 
-        if (PV.IsMine)
+         if (PV.IsMine)
         {
             // 2D 카메라
             var CM = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
             CM.Follow = transform;
             CM.LookAt = transform;
         }
-
+       
     }
 
     protected override void Start()
@@ -86,16 +85,6 @@ public class Player : Entity, IPunObservable
             AnimatorController();
             FlipController();
             FlashWhileInvincible();
-            PlayerHpController();
-        }
-    }
-
-    private void PlayerHpController()
-    {
-        if (Hp <= 0)
-        {
-            PhotonNetwork.Destroy(gameObject);
-            GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
             PlayerHpController();
         }
     }
@@ -274,20 +263,7 @@ public class Player : Entity, IPunObservable
         // }
     }
 
-    public void TakeDamage(float _damage)
-    {
-
-        PV.RPC("TakeDamageRPC", RpcTarget.AllBuffered, _damage);
-
-        // if (PV != null && PV.IsMine)
-        // {
-        //     PV.RPC("TakeDamageRPC", RpcTarget.AllBuffered, _damage);
-        //     Debug.Log("TakeDamage working");
-        // }
-    }
-
     [PunRPC]
-    private void TakeDamageRPC(float _damage)
     private void TakeDamageRPC(float _damage)
     {
         Debug.Log("TakeDamageRPC working");
