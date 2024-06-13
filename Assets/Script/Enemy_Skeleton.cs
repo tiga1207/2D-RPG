@@ -101,12 +101,27 @@ public class Enemy_Skeleton : Entity
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + playerCheckDistance * facingDir, transform.position.y));
     }
 
+    // protected override void Hited(float _damageDone, Vector2 _hitDirection)
+    // {
+    //     base.Hited(_damageDone, _hitDirection);
+    //     if (Hp <= 0)
+    //     {
+    //         PhotonNetwork.Destroy(gameObject);
+    //     }
+    // }
+
     protected override void Hited(float _damageDone, Vector2 _hitDirection)
     {
         base.Hited(_damageDone, _hitDirection);
         if (Hp <= 0)
         {
+            Vector3 respawnPosition = transform.position;
             PhotonNetwork.Destroy(gameObject);
+            EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+            if (enemyManager != null && PhotonNetwork.IsMasterClient)
+            {
+                enemyManager.RespawnEnemy(respawnPosition);
+            }
         }
     }
 

@@ -119,7 +119,11 @@ public class Player : Entity, IPunObservable
         if (yInput == 0 || yInput < 0 && isGrounded)
         {
             Hit(AttackTransform, AttackArea);
-            PhotonNetwork.Instantiate(slashEffect.name, AttackTransform.position, Quaternion.identity); // 슬래시 이펙트를 네트워크 상에서 생성
+            GameObject slash = PhotonNetwork.Instantiate(slashEffect.name, AttackTransform.position, Quaternion.identity); // 슬래시 이펙트를 네트워크 상에서 생성
+            if(!facingRight)
+            {
+                slash.transform.Rotate(0f, 180f, 0f);
+            }
             // Instantiate(slashEffect, AttackTransform);
         }
         isAttacking = true;
