@@ -266,13 +266,6 @@ public class Player : Entity, IPunObservable
     public void TakeDamage(float _damage)
     {
         PV.RPC("TakeDamageRPC", RpcTarget.AllBuffered, _damage);
-
-
-        // if (PV != null && PV.IsMine)
-        // {
-        //     PV.RPC("TakeDamageRPC", RpcTarget.AllBuffered, _damage);
-        //     Debug.Log("TakeDamage working");
-        // }
     }
 
     [PunRPC]

@@ -57,11 +57,6 @@ public class Enemy_Skeleton : Entity
                 break;
             }
         }
-
-        // if (this.player == null)
-        // {
-        //     Debug.LogError("Local player not found!");
-        // }
     }
 
     private void Movement()
@@ -101,24 +96,39 @@ public class Enemy_Skeleton : Entity
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + playerCheckDistance * facingDir, transform.position.y));
     }
 
-    // protected override void Hited(float _damageDone, Vector2 _hitDirection)
-    // {
-    //     base.Hited(_damageDone, _hitDirection);
-    //     if (Hp <= 0)
-    //     {
-    //         PhotonNetwork.Destroy(gameObject);
-    //     }
-    // }
-
     protected override void Hited(float _damageDone, Vector2 _hitDirection)
     {
         base.Hited(_damageDone, _hitDirection);
         if (Hp <= 0)
         {
             Vector3 respawnPosition = transform.position;
-            PhotonNetwork.Destroy(gameObject);
+
+            if (PV.IsMine || PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(gameObject);
+                EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+                if (enemyManager != null && PhotonNetwork.IsMasterClient)
+                {
+                    enemyManager.RespawnEnemy(respawnPosition);
+                }
+            }
+            else
+            {
+                // 마스터 클라이언트에게 삭제 요청
+                PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition);
+            }
+        }
+    }
+
+    [PunRPC]
+    private void RequestDestroy(int viewID, Vector3 respawnPosition)
+    {
+        PhotonView enemyPV = PhotonView.Find(viewID);
+        if (enemyPV != null && PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(enemyPV.gameObject);
             EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
-            if (enemyManager != null && PhotonNetwork.IsMasterClient)
+            if (enemyManager != null)
             {
                 enemyManager.RespawnEnemy(respawnPosition);
             }
@@ -138,13 +148,4 @@ public class Enemy_Skeleton : Entity
             }
         }
     }
-
-    // public void AttackPlayer()
-    // {
-    //     if (player != null && !player.invincible)
-    //     {
-    //         Debug.Log("플레이어 공격중");
-    //         player.TakeDamage(damage);
-    //     }
-    // }
 }
