@@ -35,6 +35,7 @@ public class Player : Entity, IPunObservable
     [SerializeField] public bool invincible = false;
     public bool isTakeDamage = false;
     [SerializeField] private GameObject sr;
+    // [SerializeField] private Image hpBar;
 
     [Header("Jump Ability")]
     [SerializeField] private int jumpCount = 0;
@@ -260,6 +261,7 @@ public class Player : Entity, IPunObservable
         facingDir = faceRight ? 1 : -1;
         transform.Rotate(0, 180, 0);
         NickNameText.transform.Rotate(0, 180, 0);
+        hpBar.transform.Rotate(0,180,0);
 
     }
 
