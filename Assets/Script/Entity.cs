@@ -39,6 +39,15 @@ public class Entity : MonoBehaviourPunCallbacks
     [SerializeField] protected Image mpBar;
     [SerializeField] protected TextMeshProUGUI MpText;
 
+    [Header("Damaged")]
+    public GameObject floatingDamageTextPrefab; // 프리팹 레퍼런스 추가
+    public Transform DmgTextTransform;
+    public float textMoveSpeed;
+    public float textColorSpeed;
+    public float textDestroyTime;
+
+
+
     
 
     protected int facingDir = 1;
@@ -182,5 +191,20 @@ public class Entity : MonoBehaviourPunCallbacks
     protected virtual void Hited(float _damageDone, Vector2 _hitDirection)
     {
         Hp -= _damageDone;
+        photonView.RPC("ShowDamageText", RpcTarget.All, _damageDone, DmgTextTransform.position); // RPC 호출
     }
+
+    [PunRPC]
+    protected void ShowDamageText(float _damage, Vector3 position)
+    {
+        if (floatingDamageTextPrefab != null)
+        {
+            // PhotonNetwork.Instantiate를 사용하여 피해 텍스트 프리팹을 생성
+            GameObject floatingText = PhotonNetwork.Instantiate(floatingDamageTextPrefab.name, position, Quaternion.identity);
+            floatingText.GetComponent<FloatingDamageText>().Initialize(_damage);
+            Debug.Log("데미지 텍스트 생성");
+        }
+    }
+
+    
 }

@@ -1,6 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using Photon.Pun;
+using TMPro;
+using UnityEngine.UI;
+using System;
 
 public class Enemy_Skeleton : Entity
 {
@@ -96,6 +99,8 @@ public class Enemy_Skeleton : Entity
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + playerCheckDistance * facingDir, transform.position.y));
     }
 
+
+    
     protected override void Hited(float _damageDone, Vector2 _hitDirection)
     {
         base.Hited(_damageDone, _hitDirection);

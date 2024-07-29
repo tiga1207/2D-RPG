@@ -834,6 +834,11 @@ MonoBehaviour:
   mp: 100
   mpBar: {fileID: 664507574757989491}
   MpText: {fileID: 2199118339905275053}
+  floatingDamageTextPrefab: {fileID: 0}
+  DmgTextTransform: {fileID: 0}
+  textMoveSpeed: 0
+  textColorSpeed: 0
+  textDestroyTime: 0
   moveSpeed: 6
   gravity: 3.5
   jumpForce: 30

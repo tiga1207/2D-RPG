@@ -69,6 +69,7 @@ Transform:
   - {fileID: 1222283949151579356}
   - {fileID: 3002605183346254416}
   - {fileID: 2429296720611026235}
+  - {fileID: 2965909990536947896}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &1526126815996016712
@@ -167,6 +168,11 @@ MonoBehaviour:
   mp: 0
   mpBar: {fileID: 0}
   MpText: {fileID: 0}
+  floatingDamageTextPrefab: {fileID: 2441219514409268784, guid: 522db3938ea494f8bb8634783894ad28, type: 3}
+  DmgTextTransform: {fileID: 2965909990536947896}
+  textMoveSpeed: 0
+  textColorSpeed: 0
+  textDestroyTime: 0
   PV: {fileID: 7686444234326162874}
   moveSpeed: 1
   playerCheckDistance: 4
@@ -336,6 +342,37 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 0, y: 0}
   m_UseGraphicAlpha: 1
+--- !u!1 &4849746987535967035
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2965909990536947896}
+  m_Layer: 7
+  m_Name: DamageTextArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2965909990536947896
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849746987535967035}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.36, y: 1.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8140598976961325910}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5000904309709245990
 GameObject:
   m_ObjectHideFlags: 0
@@ -589,7 +626,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0000000037253, y: 0}
+  m_AnchoredPosition: {x: -0.0000000037253, y: -0.255}
   m_SizeDelta: {x: 3.449, y: 0.51}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1281329552776135734
