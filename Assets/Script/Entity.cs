@@ -32,6 +32,15 @@ public class Entity : MonoBehaviourPunCallbacks
     [SerializeField] protected Image hpBar;
     [SerializeField] protected TextMeshProUGUI HpText;
 
+
+    [Header("Mana")]
+    [SerializeField] protected float maxMp;
+    [SerializeField] protected float mp;
+    [SerializeField] protected Image mpBar;
+    [SerializeField] protected TextMeshProUGUI MpText;
+
+    
+
     protected int facingDir = 1;
     protected bool facingRight = true;
 
@@ -39,21 +48,24 @@ public class Entity : MonoBehaviourPunCallbacks
     {
         anim = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
-    }
-
-    protected virtual void Start()
-    {
         if (wallCheck == null)
         {
             wallCheck = transform;
         }
+    }
+
+    protected virtual void Start()
+    {
         hp = maxHp; // 초기 HP 설정
-        hpBarController(hp); // 초기 HP바 설정
+        HpBarController(hp); // 초기 HP바 설정
+        mp = maxMp;
+        MpBarController(mp);
     }
 
     protected virtual void Update()
     {
         CollisionCheck();
+        // Heal();
     }
 
     protected virtual void CollisionCheck()
@@ -105,13 +117,13 @@ public class Entity : MonoBehaviourPunCallbacks
             if (hp != value)
             {
                 hp = Mathf.Clamp(value, 0, maxHp);
-                hpBarController(hp); // HP가 변경될 때 HP바 업데이트
+                HpBarController(hp); // HP가 변경될 때 HP바 업데이트
                 HpController(); // HP가 변경될 때 HP 상태 확인
             }
         }
     }
 
-    public virtual void hpBarController(float hp)
+    public virtual void HpBarController(float hp)
     {
         if (hpBar != null)
         {
@@ -122,6 +134,50 @@ public class Entity : MonoBehaviourPunCallbacks
             HpText.text = hp.ToString("F0"); // 텍스트로 변환
         }
     }
+
+    public virtual float Mp
+    {
+        get { return mp; }
+        set
+        {
+            if (mp != value)
+            {
+                mp = Mathf.Clamp(value, 0, maxMp);
+                MpBarController(mp); // HP가 변경될 때 HP바 업데이트
+            }
+        }
+    }
+
+    public virtual void MpBarController(float mp)
+    {
+        if (mpBar != null)
+        {
+            mpBar.fillAmount = mp / maxMp;
+        }
+        if (MpText != null)
+        {
+            MpText.text = mp.ToString("F0"); // 텍스트로 변환
+        }
+    }
+
+    // public virtual void Heal()
+    // {
+    //     if(Input.GetKeyDown(KeyCode.T) && isGrounded)//점프 및 대쉬 상태가 아니어야함.
+    //     {
+    //         //
+    //         healCoolTimer+=Time.deltaTime;
+    //         if(healCoolTimer>=healingTime)
+    //         {
+    //             hp++;
+    //             healCoolTimer=0;  
+    //         }
+    //         else
+    //         {
+    //             healCoolTimer=0;
+    //         }
+    //     }
+
+    // }
 
     protected virtual void Hited(float _damageDone, Vector2 _hitDirection)
     {

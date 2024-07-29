@@ -163,6 +163,10 @@ MonoBehaviour:
   damage: 2
   hpBar: {fileID: 2465744573858256583}
   HpText: {fileID: 1294589479123610186}
+  maxMp: 0
+  mp: 0
+  mpBar: {fileID: 0}
+  MpText: {fileID: 0}
   PV: {fileID: 7686444234326162874}
   moveSpeed: 1
   playerCheckDistance: 4

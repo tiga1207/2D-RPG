@@ -19,9 +19,10 @@ public class Player : Entity, IPunObservable
     [Header("Dash")]
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashDuration;
-    private float dashTime;
     [SerializeField] private float dashCooldown;
+    private float dashTime;
     private float dashCooldownTimer;
+    public bool isDashing = false;
 
     [Header("Attack Info")]
     [SerializeField] private float comboTime = 0.3f;
@@ -35,16 +36,35 @@ public class Player : Entity, IPunObservable
     [SerializeField] public bool invincible = false;
     public bool isTakeDamage = false;
     [SerializeField] private GameObject sr;
-    // [SerializeField] private Image hpBar;
+
 
     [Header("Jump Ability")]
     [SerializeField] private int jumpCount = 0;
     [SerializeField] private int maxJumpCount = 2;
+    public bool isJumping= false;
 
     [Header("Photon")]
     public TMP_Text NickNameText;
     public Image HealthImage;
+    public Image ManaImage;
+    
     public PhotonView PV;
+
+    [Header("Skill")]
+
+    [Header("Healing")]
+    [SerializeField] private GameObject healEffect;
+
+    public bool isHealing = false; // 힐 스킬 사용 여부
+    public int healAmount = 1; //힐량
+    public int healManaCost = 3;
+    [SerializeField] protected float healCooldown= 5; //쿨타임 시간.
+    [SerializeField] protected float  healCoolTimer=5; //쿨타임 타이머
+    [SerializeField] protected float  healChanneling= 2; // 정신집중 시간.
+    [SerializeField] protected float  healChannelingTimer =2; // 정신집중 시간.
+
+    [SerializeField] protected float healInterval = 1; // 힐 간격
+    private Coroutine healCoroutine;
 
     protected override void Awake()
     {
@@ -66,6 +86,7 @@ public class Player : Entity, IPunObservable
             CM.Follow = transform;
             CM.LookAt = transform;
         }
+        
        
     }
 
@@ -87,6 +108,7 @@ public class Player : Entity, IPunObservable
             FlipController();
             FlashWhileInvincible();
             PlayerHpController();
+            DashAbility();
         }
     }
 
@@ -104,8 +126,10 @@ public class Player : Entity, IPunObservable
         dashTime -= Time.deltaTime;
         dashCooldownTimer -= Time.deltaTime;
         comboTimeWindow -= Time.deltaTime;
-    }
+        healCoolTimer-=Time.deltaTime;// 힐 쿨타임. 0보다 작으면 사용가능.
 
+    }
+//공격
     private void StartAttackEvent()
     {
         if (!isGrounded)
@@ -142,6 +166,7 @@ public class Player : Entity, IPunObservable
         }
     }
 
+//키 입출력
     private void CheckInput()
     {
         xInput = Input.GetAxisRaw("Horizontal");
@@ -153,7 +178,7 @@ public class Player : Entity, IPunObservable
         }
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            DashAbility();
+            Dash();
         }
         
         if(isTakeDamage)
@@ -166,14 +191,40 @@ public class Player : Entity, IPunObservable
             StartAttackEvent();
         }
 
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            StartHealing();
+        }
+        if (Input.GetKeyUp(KeyCode.T))
+        {
+            StopHealing();
+        }
+
+        // if(Input.GetKeyDown(KeyCode.T))
+        // {
+        //     healChannelingTimer-=Time.deltaTime;//키다운 즉시 타이머 시작 키다운이 아닐때는 시간이 초기값인 상태로 정지해 있어야함.
+
+        //     Heal();
+        // }
+
+
     }
 
-    private void DashAbility()
+//대시 기능
+    private void Dash()
     {
         if (dashCooldownTimer < 0 && !isAttacking)
         {
+            isDashing=true;
             dashCooldownTimer = dashCooldown;
             dashTime = dashDuration;
+        }
+    }
+
+    private void DashAbility(){
+        if(dashTime<0)
+        {
+            isDashing=false;
         }
     }
 
@@ -197,6 +248,7 @@ public class Player : Entity, IPunObservable
     {
         if (isGrounded || jumpCount < maxJumpCount)
         {
+            isJumping=true;
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             jumpCount++;
         }
@@ -207,9 +259,11 @@ public class Player : Entity, IPunObservable
         if (isGrounded && rb.velocity.y <= 0)
         {
             jumpCount = 0;
+            isJumping=false;
         }
     }
 
+//애니메이션 관리
     private void AnimatorController()
     {
         anim.SetFloat("yVelopcity", rb.velocity.y);
@@ -240,6 +294,7 @@ public class Player : Entity, IPunObservable
         }
     }
 
+//뒤집기
     private void FlipController()
     {
         if (rb.velocity.x > 0 && !facingRight)
@@ -262,6 +317,7 @@ public class Player : Entity, IPunObservable
         transform.Rotate(0, 180, 0);
         NickNameText.transform.Rotate(0, 180, 0);
         hpBar.transform.Rotate(0,180,0);
+        mpBar.transform.Rotate(0,180,0);
 
     }
 
@@ -282,6 +338,7 @@ public class Player : Entity, IPunObservable
         }
     }
 
+    
     private IEnumerator StopTakeDamage()
     {
         invincible = true;
@@ -300,11 +357,73 @@ public class Player : Entity, IPunObservable
         {
             stream.SendNext(transform.position);
             stream.SendNext(Hp);
+            stream.SendNext(Mp);
+
         }
         else
         {
             transform.position = (Vector3)stream.ReceiveNext();
             Hp = (float)stream.ReceiveNext();
+            Mp = (float)stream.ReceiveNext();
         }
     }
+
+
+    private void StartHealing()
+        {
+            if (healCoolTimer <= 0 && Hp < maxHp)
+            {
+                isHealing=true;
+                healCoroutine = StartCoroutine(HealCoroutine());
+            }
+        }
+
+        private void StopHealing()
+        {
+            if (healCoroutine != null)
+            {
+                StopCoroutine(healCoroutine);
+                healCoroutine = null;
+            }
+                isHealing=false;
+                healChannelingTimer=healChanneling;
+        }
+
+        private IEnumerator HealCoroutine()
+    {
+        while (Input.GetKey(KeyCode.T) && healCoolTimer <= 0)
+        {
+            healChannelingTimer -= healInterval;
+            PV.RPC("HealRPC", RpcTarget.AllBuffered, healAmount, healManaCost);
+            GameObject _healEffect = PhotonNetwork.Instantiate(healEffect.name, transform.position, Quaternion.identity);
+            Destroy(_healEffect, 1.5f);
+            if(healChannelingTimer<=0)
+            {
+                healCoolTimer=healCooldown;
+                StopHealing();
+                yield break;
+            }
+            yield return new WaitForSeconds(healInterval);
+        }
+        isHealing=false;
+    }
+
+
+    [PunRPC]
+    private void HealRPC(int _healAmount, int _manaAmount)
+    {
+        if(PV.IsMine)
+        {
+            Mp -=Mathf.RoundToInt(_manaAmount);
+            if(Hp+ _healAmount >maxHp)
+            {
+                Hp =maxHp;
+            }
+            else
+            {
+                Hp +=Mathf.RoundToInt(_healAmount);
+            }
+        }
+    }
+
 }
