@@ -106,6 +106,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private void SpawnPlayer()
     {
         GameObject player = PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(-6f, 19f), 4, 0), Quaternion.identity);
+        player.GetComponent<Inventory>().Initialize();
     }
 
     public override void OnLeftRoom()
