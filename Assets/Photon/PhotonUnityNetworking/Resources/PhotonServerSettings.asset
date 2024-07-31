@@ -46,6 +46,8 @@ MonoBehaviour:
   - HealRPC
   - DamagedTextController
   - ShowDamageText
+  - HpPotionRPC
+  - MpPotionRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

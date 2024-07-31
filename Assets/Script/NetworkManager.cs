@@ -14,6 +14,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public TMP_Text loadingText;
 
     private EnemyManager enemyManagerInstance; // EnemyManager 인스턴스 참조
+
+    private ItemDataBase itemDataBaseInstance;
     private Coroutine loadingCoroutine;
 
     void Awake()
@@ -24,6 +26,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         // 씬에서 EnemyManager 오브젝트 찾기
         enemyManagerInstance = FindObjectOfType<EnemyManager>();
+        itemDataBaseInstance= FindObjectOfType<ItemDataBase>();
     }
 
     private void Start()
@@ -101,6 +104,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             // 마스터 클라이언트가 적 스폰 관리
             enemyManagerInstance.SpawnEnemies();
         }
+
+        if (PhotonNetwork.IsMasterClient && enemyManagerInstance != null)
+        {
+            // 마스터 클라이언트가 아이템 생성 관리
+            itemDataBaseInstance.Initialize();
+        }
+
     }
 
     private void SpawnPlayer()

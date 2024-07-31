@@ -1,58 +1,3 @@
-// using System;
-// using System.Collections;
-// using System.Collections.Generic;
-// using UnityEngine;
-// using UnityEngine.UI;
-
-// public class InventoryUI : MonoBehaviour
-// {
-//     Inventory inven;
-//     public GameObject inventoryPanel;
-//     bool activeInventory = false;
-
-//     [Header("Slot")]
-//     public Slot[] slots;
-//     public Transform slotHolder;
-
-
-//     public void Start()
-//     {
-//         inven = Inventory.instace;
-        
-//         inventoryPanel.SetActive(activeInventory);
-//         inven.onSlotCountChange += SlotChange;
-//         slots= slotHolder.GetComponentsInChildren<Slot>();
-//     }
-
-//     private void SlotChange(int val)
-//     {
-//         for(int i = 0; i < slots.Length; ++i)
-//         {
-//             if(i<inven.SlotCnt)
-//             {
-//                 slots[i].GetComponent<Button>().interactable = true;
-//             }
-//             else
-//             {
-//                 slots[i].GetComponent<Button>().interactable = false;   
-//             }
-//         }
-//     }
-
-//     public void Update()
-//     {
-//         if(Input.GetKeyDown(KeyCode.I))
-//         {
-//             activeInventory=!activeInventory;
-//             inventoryPanel.SetActive(activeInventory);
-//         }
-//     }
-
-//     public void AddSlot()
-//     {
-//         inven.SlotCnt++;
-//     }
-// }
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -91,12 +36,15 @@ public class InventoryUI : MonoBehaviour
         inventoryPanel.SetActive(activeInventory);
         inven.onSlotCountChange += SlotChange;
         slots = slotHolder.GetComponentsInChildren<Slot>();
+        inven.onChangeItem += RedrawSlotUI;
+        SlotChange(inven.SlotCnt);
     }
 
     private void SlotChange(int val)
     {
         for (int i = 0; i < slots.Length; ++i)
         {
+            slots[i].slotnum = i;
             if (i < inven.SlotCnt)
             {
                 slots[i].GetComponent<Button>().interactable = true;
@@ -121,5 +69,18 @@ public class InventoryUI : MonoBehaviour
     public void AddSlot()
     {
         inven.SlotCnt++;
+    }
+
+    void RedrawSlotUI()
+    {
+        for (int i = 0; i < slots.Length; i++)
+        {
+            slots[i].RemoveSlot();
+        }
+        for (int i = 0; i < inven.items.Count; i++)
+        {
+            slots[i].item = inven.items[i];
+            slots[i].UpdateSlotUI();
+        }
     }
 }

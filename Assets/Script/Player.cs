@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Cinemachine;
+using UnityEngine.EventSystems;
 
 public class Player : Entity, IPunObservable
 {
@@ -172,6 +173,11 @@ public class Player : Entity, IPunObservable
         xInput = Input.GetAxisRaw("Horizontal");
         yInput = Input.GetAxisRaw("Vertical");
         
+        if (EventSystem.current.IsPointerOverGameObject()) // UI가 클릭시 게임 입력을 처리하지 않음
+        {
+            return; 
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Jump();
@@ -199,15 +205,6 @@ public class Player : Entity, IPunObservable
         {
             StopHealing();
         }
-
-        // if(Input.GetKeyDown(KeyCode.T))
-        // {
-        //     healChannelingTimer-=Time.deltaTime;//키다운 즉시 타이머 시작 키다운이 아닐때는 시간이 초기값인 상태로 정지해 있어야함.
-
-        //     Heal();
-        // }
-
-
     }
 
 //대시 기능
@@ -368,7 +365,8 @@ public class Player : Entity, IPunObservable
         }
     }
 
-
+    #region 체력회복 스킬 관련
+    #region 1. 체력회복 시작 메서드
     private void StartHealing()
         {
             if (healCoolTimer <= 0 && Hp < maxHp)
@@ -378,6 +376,8 @@ public class Player : Entity, IPunObservable
             }
         }
 
+    #endregion
+    #region 2.체력회복 멈춤 메서드
         private void StopHealing()
         {
             if (healCoroutine != null)
@@ -389,6 +389,9 @@ public class Player : Entity, IPunObservable
                 healChannelingTimer=healChanneling;
         }
 
+    #endregion
+
+    #region 3.체력회복 코루틴
         private IEnumerator HealCoroutine()
     {
         while (Input.GetKey(KeyCode.T) && healCoolTimer <= 0)
@@ -407,8 +410,8 @@ public class Player : Entity, IPunObservable
         }
         isHealing=false;
     }
-
-
+    #endregion
+    #region 4.RPC
     [PunRPC]
     private void HealRPC(int _healAmount, int _manaAmount)
     {
@@ -425,5 +428,71 @@ public class Player : Entity, IPunObservable
             }
         }
     }
+    #endregion
 
+    #endregion
+
+    #region 체력포션
+    [PunRPC]
+    private void HpPotionRPC(int _healAmount)
+    {
+        if(PV.IsMine)
+        {
+            if(PV.IsMine)
+            {
+                if(Hp+ _healAmount >maxHp)
+                {
+                    Hp =maxHp;
+                }
+                else
+                {
+                    Hp +=Mathf.RoundToInt(_healAmount);
+                }
+            }
+        }
+    }
+
+    public void HpPotion(int _healAmount)
+    {
+        PV.RPC("HpPotionRPC",RpcTarget.AllBuffered, _healAmount);
+    }
+    #endregion
+
+    #region 마나 포션
+
+    [PunRPC]
+    private void MpPotionRPC(int _ManaAmount)
+    {
+        if(PV.IsMine)
+        {
+            if(PV.IsMine)
+            {
+                if(Mp+ _ManaAmount >maxMp)
+                {
+                    Mp =maxMp;
+                }
+                else
+                {
+                    Mp +=Mathf.RoundToInt(_ManaAmount);
+                }
+            }
+        }
+    }
+
+    public void MpPotion(int _ManaAmount)
+    {
+        PV.RPC("MpPotionRPC",RpcTarget.AllBuffered, _ManaAmount);
+    }
+
+
+#endregion
+
+    public void UseItem(ItemEffect itemEffect)
+    {
+        if(itemEffect == null)
+        {
+            return;
+        }
+        itemEffect.ExecuteRole(this);
+    }
 }
