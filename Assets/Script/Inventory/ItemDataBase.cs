@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-public class ItemDataBase : MonoBehaviour
+public class ItemDataBase : MonoBehaviourPunCallbacks
 {
     public static ItemDataBase instace;
 
@@ -17,16 +17,34 @@ public class ItemDataBase : MonoBehaviour
     public Vector3[] pos;
     //public List<Transform> itemLocation; // 아이템 위치 목록
 
+    // public void Initialize()
+    // {
+    //     for(int i=0; i<itemDB.Count; ++i)
+    //     {
+    //         GameObject go = PhotonNetwork.Instantiate(fieldItemPrefab.name,pos[i],Quaternion.identity);
+    //         go.GetComponent<FieldItems>().SetItem(itemDB[i]); 
+    //     }
+    // }
+
+    public Item GetItemByID(int id)
+    {
+        return itemDB.Find(item => item.itemID == id);
+    }
+
     public void Initialize()
     {
-        for(int i=0; i<2; ++i)
+        for (int i = 0; i < itemDB.Count; ++i)
         {
-            GameObject go = PhotonNetwork.Instantiate(fieldItemPrefab.name,pos[i],Quaternion.identity);
-            go.GetComponent<FieldItems>().SetItem(itemDB[Random.Range(0,2)]); 
+            GameObject go = PhotonNetwork.Instantiate(fieldItemPrefab.name, pos[i], Quaternion.identity);
+            go.GetComponent<PhotonView>().RPC("SetItemID", RpcTarget.AllBuffered, itemDB[i].itemID);
         }
     }
     private void Start()
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Initialize();
+        }
         
     }
 }

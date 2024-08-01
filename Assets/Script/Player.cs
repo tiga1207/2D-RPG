@@ -67,9 +67,14 @@ public class Player : Entity, IPunObservable
     [SerializeField] protected float healInterval = 1; // 힐 간격
     private Coroutine healCoroutine;
 
+    private Collider2D playerCollider;
+    private Inventory playerInventory;
+
     protected override void Awake()
     {
         base.Awake();
+        playerCollider = GetComponent<Collider2D>();
+        playerInventory = GetComponent<Inventory>();
 
         NickNameText.text = PV.IsMine ? PhotonNetwork.NickName : PV.Owner.NickName;
         NickNameText.color = PV.IsMine ? Color.green : Color.red;
@@ -87,6 +92,9 @@ public class Player : Entity, IPunObservable
             CM.Follow = transform;
             CM.LookAt = transform;
         }
+
+        int playerLayer = LayerMask.NameToLayer("Player");
+        Physics2D.IgnoreLayerCollision(playerLayer, playerLayer);
         
        
     }
@@ -315,7 +323,6 @@ public class Player : Entity, IPunObservable
         NickNameText.transform.Rotate(0, 180, 0);
         hpBar.transform.Rotate(0,180,0);
         mpBar.transform.Rotate(0,180,0);
-
     }
 
     public void TakeDamage(float _damage)
@@ -387,6 +394,10 @@ public class Player : Entity, IPunObservable
             }
                 isHealing=false;
                 healChannelingTimer=healChanneling;
+                if(healCoolTimer<0)
+                {
+                    healCoolTimer=healCooldown;
+                }
         }
 
     #endregion
@@ -487,12 +498,21 @@ public class Player : Entity, IPunObservable
 
 #endregion
 
-    public void UseItem(ItemEffect itemEffect)
+public void UseItem(ItemEffect item)
+{
+    if(item == null || playerInventory == null)
     {
-        if(itemEffect == null)
-        {
-            return;
-        }
-        itemEffect.ExecuteRole(this);
+        return;
     }
+    item.ExecuteRole(this);
+}
+
+    // public void UseItem(ItemEffect itemEffect)
+    // {
+    //     if(itemEffect == null)
+    //     {
+    //         return;
+    //     }
+    //     itemEffect.ExecuteRole(this);
+    // }
 }

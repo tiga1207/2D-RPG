@@ -1,20 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class FieldItems : MonoBehaviour
+public class FieldItems : MonoBehaviourPun
 {
     public Item item;
     public SpriteRenderer image;
 
-    public void SetItem(Item _item)
+    [PunRPC]
+    public void SetItemID(int itemID)
     {
-        item.itemName = _item.itemName;
-        item.itemImage = _item.itemImage;
-        item.itemType = _item.itemType;
-        item.effects= _item.effects;
-
-        image.sprite = item.itemImage;
+        item = ItemDataBase.instace.GetItemByID(itemID);
+        if (item != null)
+        {
+            image.sprite = item.itemImage;
+        }
     }
 
     public Item GetItem()
@@ -24,6 +25,19 @@ public class FieldItems : MonoBehaviour
 
     public void DestroyItem()
     {
-        Destroy(gameObject);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+        else
+        {
+            photonView.RPC("RequestDestroyItem", RpcTarget.MasterClient);
+        }
+    }
+
+    [PunRPC]
+    public void RequestDestroyItem()
+    {
+        PhotonNetwork.Destroy(gameObject);
     }
 }

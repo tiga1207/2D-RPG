@@ -10,8 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4825652413699495140}
   - component: {fileID: 2016777322751450019}
-  - component: {fileID: 3033224489130470281}
-  - component: {fileID: 6192388257288578450}
   m_Layer: 0
   m_Name: ItemDataBase
   m_TagString: Untagged
@@ -47,52 +45,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemDB:
-  - itemType: 1
+  - itemID: 0
+    itemType: 1
     itemName: hpPotion
     itemImage: {fileID: 21300000, guid: 2f605f8487435b64780f2f663cc01c4c, type: 3}
-  - itemType: 1
+    effects: []
+  - itemID: 1
+    itemType: 1
     itemName: mpPotion
-    itemImage: {fileID: 21300000, guid: 496254eaa192f7946a180ced39f4ffe3, type: 3}
+    itemImage: {fileID: 21300000, guid: 12b9289cee25b433fa06373acb394069, type: 2}
+    effects: []
   fieldItemPrefab: {fileID: 6549036706612274581, guid: 8d62bfc3e352f4318b2823324d37065a, type: 3}
   pos:
   - {x: 5, y: -8, z: 0}
   - {x: 10, y: -8, z: 0}
---- !u!114 &3033224489130470281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3685082900158985760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 6192388257288578450}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &6192388257288578450
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3685082900158985760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1

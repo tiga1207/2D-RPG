@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Slot : MonoBehaviour,IPointerUpHandler
+public class Slot : MonoBehaviour, IPointerUpHandler
 {
     public Item item;
     public Image itemIcon;
@@ -12,8 +12,15 @@ public class Slot : MonoBehaviour,IPointerUpHandler
 
     public void UpdateSlotUI()
     {
-        itemIcon.sprite = item.itemImage;
-        itemIcon.gameObject.SetActive(true);
+        if(item != null)
+        {
+            itemIcon.sprite = item.itemImage;
+            itemIcon.gameObject.SetActive(true);
+        }
+        else
+        {
+            itemIcon.gameObject.SetActive(false);
+        }
     }
 
     public void RemoveSlot()
@@ -21,18 +28,28 @@ public class Slot : MonoBehaviour,IPointerUpHandler
         item = null;
         itemIcon.gameObject.SetActive(false);
     }
-
+    
     public void OnPointerUp(PointerEventData eventData)
     {
-        Player player = FindObjectOfType<Player>();
-        if (player != null)
+        if(item !=null)
         {
-            bool isUse=item.Use(player);
-            if(isUse)
-            {
-                Inventory.instance.RemoveItem(slotnum);
-            }
 
+            Player player = FindObjectOfType<Player>();
+            if (player != null)
+            {
+                bool isUse = item.Use(player);
+                if (isUse)
+                {
+                    Inventory inven = player.GetComponent<Inventory>();
+                    if (inven != null)
+                    {
+                        inven.RemoveItem(slotnum);
+                    }
+                }
+                else{
+                    Debug.Log("클릭 안됨");
+                }
+            }
         }
     }
 }

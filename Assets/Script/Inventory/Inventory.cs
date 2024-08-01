@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class Inventory : MonoBehaviour
+public class Inventory : MonoBehaviourPun
 {
-    public static Inventory instance;
-
     private int slotCnt;
 
     public delegate void OnSlotCountChange(int val);
@@ -13,7 +12,7 @@ public class Inventory : MonoBehaviour
 
     public delegate void OnChangeItem();
     public OnChangeItem onChangeItem;
-    public List<Item> items = new List<Item>(); 
+    public List<Item> items = new List<Item>();
 
     public int SlotCnt
     {
@@ -27,27 +26,20 @@ public class Inventory : MonoBehaviour
 
     private void Awake()
     {
-        if (instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
         DontDestroyOnLoad(gameObject); // 씬 전환 시 파괴되지 않도록 설정
     }
 
     public void Initialize()
     {
-        slotCnt = 4;
+        slotCnt = 1;
         onSlotCountChange?.Invoke(slotCnt);
     }
 
     public bool AddItem(Item _item)
     {
-        if(items.Count < slotCnt)
+        if (items.Count < slotCnt)
         {
             items.Add(_item);
-            if(onChangeItem!=null)
             onChangeItem?.Invoke();
             return true;
         }
@@ -60,11 +52,12 @@ public class Inventory : MonoBehaviour
         onChangeItem?.Invoke();
     }
 
-    private void OnTriggerEnter2D(Collider2D other) {
-        if(other.CompareTag("FieldItem"))
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("FieldItem"))
         {
             FieldItems fieldItems = other.GetComponent<FieldItems>();
-            if(AddItem(fieldItems.GetItem()))
+            if (fieldItems != null && AddItem(fieldItems.GetItem()))
             {
                 fieldItems.DestroyItem();
             }

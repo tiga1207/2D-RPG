@@ -45,8 +45,32 @@ public class Enemy_Skeleton : Entity
 
         if (!isGrounded || isWallDetected) // 벽 혹은 땅쪽일 경우 방향 전환
         {
-            Flip();
+            FlipController();
         }
+    }
+
+
+    private void FlipController()
+    {
+        if (rb.velocity.x > 0 && !facingRight)
+        {
+            PV.RPC("FlipRPC", RpcTarget.AllBuffered, true);
+
+        }
+        else if (rb.velocity.x < 0 && facingRight)
+        {
+            PV.RPC("FlipRPC", RpcTarget.AllBuffered, false);
+
+        }
+    }
+
+    [PunRPC]
+    private void FlipRPC(bool faceRight)
+    {
+        facingRight = faceRight;
+        facingDir = faceRight ? 1 : -1;
+        transform.Rotate(0, 180, 0);
+        hpBar.transform.Rotate(0,180,0);
     }
 
     private void FindLocalPlayer()

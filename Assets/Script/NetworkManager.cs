@@ -99,17 +99,21 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
         }
         SpawnPlayer();
-        if (PhotonNetwork.IsMasterClient && enemyManagerInstance != null)
+
+        if(PhotonNetwork.IsMasterClient)  // 마스터 클라이언트가 적 스폰 및 아이템데이터베이스 관리
         {
-            // 마스터 클라이언트가 적 스폰 관리
-            enemyManagerInstance.SpawnEnemies();
+            if(enemyManagerInstance != null)
+            {
+                enemyManagerInstance.SpawnEnemies();
+            }
+            if (itemDataBaseInstance != null)
+            {
+                // 마스터 클라이언트가 아이템 생성 관리
+                itemDataBaseInstance.Initialize();
+            }
         }
 
-        if (PhotonNetwork.IsMasterClient && enemyManagerInstance != null)
-        {
-            // 마스터 클라이언트가 아이템 생성 관리
-            itemDataBaseInstance.Initialize();
-        }
+
 
     }
 

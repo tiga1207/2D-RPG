@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
-    Inventory inven;
+    private Inventory inven;
     public GameObject inventoryPanel;
     bool activeInventory = false;
 
@@ -21,13 +21,15 @@ public class InventoryUI : MonoBehaviour
 
     private IEnumerator InitializeInventory()
     {
-        // Inventory 객체가 생성될 때까지 대기
-        while (Inventory.instance == null)
+        // Player 객체가 생성될 때까지 대기
+        Player player = null;
+        while (player == null)
         {
+            player = FindObjectOfType<Player>();
             yield return null;
         }
 
-        inven = Inventory.instance;
+        inven = player.GetComponent<Inventory>();
         if (inven == null)
         {
             yield break;
@@ -58,7 +60,7 @@ public class InventoryUI : MonoBehaviour
 
     private void Update()
     {
-        if (Inventory.instance == null) return; // Inventory 객체가 없으면 리턴
+        if (inven == null) return; // Inventory 객체가 없으면 리턴
         if (Input.GetKeyDown(KeyCode.I))
         {
             activeInventory = !activeInventory;
@@ -84,3 +86,4 @@ public class InventoryUI : MonoBehaviour
         }
     }
 }
+

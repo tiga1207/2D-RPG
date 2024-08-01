@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7594f5390802749629ed427e2cd726c9, type: 3}
   m_Name: HpEffect
   m_EditorClassIdentifier: 
-  healingPoint: 5
+  healingAmount: 5
