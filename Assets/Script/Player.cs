@@ -48,6 +48,7 @@ public class Player : Entity, IPunObservable
     public TMP_Text NickNameText;
     public Image HealthImage;
     public Image ManaImage;
+    public Inventory playerInventory;
     
     public PhotonView PV;
 
@@ -68,7 +69,6 @@ public class Player : Entity, IPunObservable
     private Coroutine healCoroutine;
 
     private Collider2D playerCollider;
-    private Inventory playerInventory;
 
     protected override void Awake()
     {
@@ -93,10 +93,22 @@ public class Player : Entity, IPunObservable
             CM.LookAt = transform;
         }
 
+        //플레이어끼리의 충돌 방지
         int playerLayer = LayerMask.NameToLayer("Player");
         Physics2D.IgnoreLayerCollision(playerLayer, playerLayer);
+
+        if (PV.IsMine)
+        {
+            photonView.RPC("InitializeInventory", RpcTarget.AllBuffered); // 인벤토리 초기화
+        }
         
        
+    }
+
+    [PunRPC]
+    public void InitializeInventory()
+    {
+        playerInventory.Initialize();
     }
 
     protected override void Start()
@@ -348,12 +360,19 @@ public class Player : Entity, IPunObservable
         invincible = true;
         //GameObject _bloodEffectParticle = Instantiate(bloodEffect, transform.position, Quaternion.identity);
         GameObject _bloodEffectParticle = PhotonNetwork.Instantiate(bloodEffect.name, transform.position, Quaternion.identity);
-        Destroy(_bloodEffectParticle, 1.5f);
+        StartCoroutine(DestroyAfter(_bloodEffectParticle, 1.5f));
         yield return new WaitForSeconds(1f);
         isTakeDamage = false;
         invincible = false;
     }
-
+    private IEnumerator DestroyAfter(GameObject _gameObject, float _delay)
+    {  
+        yield return new WaitForSeconds(_delay);
+        if(_gameObject !=null)
+        {
+            PhotonNetwork.Destroy(_gameObject);
+        }
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -410,7 +429,7 @@ public class Player : Entity, IPunObservable
             healChannelingTimer -= healInterval;
             PV.RPC("HealRPC", RpcTarget.AllBuffered, healAmount, healManaCost);
             GameObject _healEffect = PhotonNetwork.Instantiate(healEffect.name, transform.position, Quaternion.identity);
-            Destroy(_healEffect, 1.5f);
+            StartCoroutine(DestroyAfter(_healEffect, 1.5f));
             if(healChannelingTimer<=0)
             {
                 healCoolTimer=healCooldown;
@@ -447,18 +466,16 @@ public class Player : Entity, IPunObservable
     [PunRPC]
     private void HpPotionRPC(int _healAmount)
     {
+
         if(PV.IsMine)
-        {
-            if(PV.IsMine)
+        {                
+            if(Hp+ _healAmount >maxHp)
             {
-                if(Hp+ _healAmount >maxHp)
-                {
-                    Hp =maxHp;
-                }
-                else
-                {
-                    Hp +=Mathf.RoundToInt(_healAmount);
-                }
+                Hp =maxHp;
+            }
+            else
+            {
+                Hp +=Mathf.RoundToInt(_healAmount);
             }
         }
     }
@@ -476,18 +493,15 @@ public class Player : Entity, IPunObservable
     {
         if(PV.IsMine)
         {
-            if(PV.IsMine)
+            if(Mp+ _ManaAmount >maxMp)
             {
-                if(Mp+ _ManaAmount >maxMp)
-                {
-                    Mp =maxMp;
-                }
-                else
-                {
-                    Mp +=Mathf.RoundToInt(_ManaAmount);
-                }
+                Mp =maxMp;
             }
-        }
+            else
+            {
+                Mp +=Mathf.RoundToInt(_ManaAmount);
+            }
+        } 
     }
 
     public void MpPotion(int _ManaAmount)
@@ -498,21 +512,14 @@ public class Player : Entity, IPunObservable
 
 #endregion
 
-public void UseItem(ItemEffect item)
-{
-    if(item == null || playerInventory == null)
-    {
-        return;
-    }
-    item.ExecuteRole(this);
-}
 
-    // public void UseItem(ItemEffect itemEffect)
-    // {
-    //     if(itemEffect == null)
-    //     {
-    //         return;
-    //     }
-    //     itemEffect.ExecuteRole(this);
-    // }
+// public void UseItem(ItemEffect item)
+// {
+//     if(item == null || playerInventory == null)
+//     {
+//         return;
+//     }
+//     item.ExecuteRole(this);
+// }
+
 }

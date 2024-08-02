@@ -53,6 +53,13 @@ MonoBehaviour:
   - SetItemID
   - RequestDestroyItem
   - UpdateInventoryUI
+  - Initialize
+  - InitializeInventory
+  - RPC_AddItem
+  - RPC_UseItem
+  - AddItemRPC
+  - RemoveItemRPC
+  - UseItemRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class Slot : MonoBehaviour, IPointerUpHandler
 {
@@ -33,7 +34,6 @@ public class Slot : MonoBehaviour, IPointerUpHandler
     {
         if(item !=null)
         {
-
             Player player = FindObjectOfType<Player>();
             if (player != null)
             {

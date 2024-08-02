@@ -31,7 +31,7 @@ public class Inventory : MonoBehaviourPun
 
     public void Initialize()
     {
-        slotCnt = 1;
+        slotCnt = 2; //슬롯 초기값.
         onSlotCountChange?.Invoke(slotCnt);
     }
 
@@ -51,7 +51,6 @@ public class Inventory : MonoBehaviourPun
         items.RemoveAt(_index);
         onChangeItem?.Invoke();
     }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("FieldItem"))

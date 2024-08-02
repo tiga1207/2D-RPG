@@ -85,5 +85,6 @@ public class InventoryUI : MonoBehaviour
             slots[i].UpdateSlotUI();
         }
     }
+    
 }
 

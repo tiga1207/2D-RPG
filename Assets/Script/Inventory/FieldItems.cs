@@ -38,6 +38,10 @@ public class FieldItems : MonoBehaviourPun
     [PunRPC]
     public void RequestDestroyItem()
     {
-        PhotonNetwork.Destroy(gameObject);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
+    
 }

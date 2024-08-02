@@ -860,6 +860,7 @@ MonoBehaviour:
   NickNameText: {fileID: 6027896450566526839}
   HealthImage: {fileID: 2295747386967473338}
   ManaImage: {fileID: 664507574757989491}
+  playerInventory: {fileID: -6711382382737738178}
   PV: {fileID: 1523211523370137496}
   healEffect: {fileID: 158530, guid: be9fa4cf050e848df821231d39718be4, type: 3}
   isHealing: 0
@@ -935,11 +936,12 @@ MonoBehaviour:
   prefixField: 0
   Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 2
+  observableSearch: 0
   ObservedComponents:
   - {fileID: 2230855623847063890}
   - {fileID: 6409218357704173548}
   - {fileID: 3339415452581135648}
+  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

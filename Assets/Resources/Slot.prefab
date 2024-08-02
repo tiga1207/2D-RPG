@@ -226,7 +226,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item:
+    itemID: 0
     itemType: 0
     itemName: 
     itemImage: {fileID: 0}
+    effects: []
   itemIcon: {fileID: 3745550319399613673}
+  slotnum: 0
+  player: {fileID: 2230855623847063890, guid: 763d92aa957c7a242892d46524ea6795, type: 3}
+  inven: {fileID: 0}
