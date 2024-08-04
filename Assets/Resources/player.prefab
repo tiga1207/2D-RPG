@@ -626,6 +626,37 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 0, y: 0}
   m_UseGraphicAlpha: 1
+--- !u!1 &1763064786185246255
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6301664609572627377}
+  m_Layer: 7
+  m_Name: DamageTextArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6301664609572627377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763064786185246255}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.01, y: -0.49, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5547500187906680006}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2247904017254615119
 GameObject:
   m_ObjectHideFlags: 0
@@ -768,6 +799,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6301664609572627377}
   - {fileID: 3638381776170127510}
   - {fileID: 1981194128964173402}
   - {fileID: 3010158931055562133}
@@ -835,8 +867,8 @@ MonoBehaviour:
   mp: 100
   mpBar: {fileID: 664507574757989491}
   MpText: {fileID: 2199118339905275053}
-  floatingDamageTextPrefab: {fileID: 0}
-  DmgTextTransform: {fileID: 0}
+  floatingDamageTextPrefab: {fileID: 2441219514409268784, guid: 57ab39bf78d2649fea5caaf77d717532, type: 3}
+  DmgTextTransform: {fileID: 6301664609572627377}
   textMoveSpeed: 0
   textColorSpeed: 0
   textDestroyTime: 0
@@ -936,12 +968,11 @@ MonoBehaviour:
   prefixField: 0
   Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 0
+  observableSearch: 2
   ObservedComponents:
   - {fileID: 2230855623847063890}
   - {fileID: 6409218357704173548}
   - {fileID: 3339415452581135648}
-  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
