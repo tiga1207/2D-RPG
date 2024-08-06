@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
@@ -27,6 +28,7 @@ public class Entity : MonoBehaviourPunCallbacks
 
     [Header("HP")]
     [SerializeField] protected float maxHp;
+    
     [SerializeField] protected float hp;
     [SerializeField] protected float damage;
     [SerializeField] protected Image hpBar;
@@ -35,6 +37,7 @@ public class Entity : MonoBehaviourPunCallbacks
 
     [Header("Mana")]
     [SerializeField] protected float maxMp;
+
     [SerializeField] protected float mp;
     [SerializeField] protected Image mpBar;
     [SerializeField] protected TextMeshProUGUI MpText;
@@ -46,9 +49,20 @@ public class Entity : MonoBehaviourPunCallbacks
     public float textColorSpeed;
     public float textDestroyTime;
 
+    [Header("Level")]
+    [SerializeField] protected float level=1;
+    [SerializeField] protected float maxLevel = 1000;
+    [SerializeField] protected TextMeshProUGUI levelText;
 
 
-    
+    [Header("Exp")]
+
+    [SerializeField] protected float maxExp =100;
+    [SerializeField] protected float exp;
+    // [SerializeField] protected Image ExpBar;
+    // [SerializeField] protected TextMeshProUGUI ExpText;
+    [SerializeField] protected float experiencePoints= 80;
+    public List<PhotonView> attackers = new List<PhotonView>();
 
     protected int facingDir = 1;
     protected bool facingRight = true;
@@ -69,6 +83,9 @@ public class Entity : MonoBehaviourPunCallbacks
         HpBarController(hp); // 초기 HP바 설정
         mp = maxMp;
         MpBarController(mp);
+        exp=0;
+        // ExpBarController(exp);
+        LevelController(level);
     }
 
     protected virtual void Update()
@@ -97,24 +114,28 @@ public class Entity : MonoBehaviourPunCallbacks
         Gizmos.DrawWireCube(AttackTransform.position, AttackArea);
     }
 
-    protected virtual void Hit(Transform _attackTransform, Vector2 _attackArea)
-    {
-        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+    // protected virtual void Hit(Transform _attackTransform, Vector2 _attackArea)
+    // {
+    //     Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
 
-        for (int i = 0; i < objectsToHit.Length; ++i)
-        {
-            if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
-            {
-                objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage, (transform.position - objectsToHit[i].transform.position).normalized);
-            }
-        }
-    }
+    //     for (int i = 0; i < objectsToHit.Length; ++i)
+    //     {
+    //         if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
+    //         {
+    //             objectsToHit[i].GetComponent<Enemy_Skeleton>().Hited(damage, (transform.position - objectsToHit[i].transform.position).normalized);
+    //         }
+    //     }
+    // }
 
     protected virtual void HpController()
     {
         if (Hp <= 0)
         {
-            Destroy(gameObject);
+            if(photonView.IsMine || PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(gameObject);
+            }
+            // PhotonNetwork.Destroy(gameObject);
         }
     }
 
@@ -131,7 +152,9 @@ public class Entity : MonoBehaviourPunCallbacks
             }
         }
     }
-
+    public virtual float MaxHp => maxHp;
+    public virtual float MaxExp => maxExp;
+    // public virtual float MaxLevel => maxLevel;
     public virtual void HpBarController(float hp)
     {
         if (hpBar != null)
@@ -157,6 +180,7 @@ public class Entity : MonoBehaviourPunCallbacks
         }
     }
 
+    public virtual float MaxMp => maxMp;
     public virtual void MpBarController(float mp)
     {
         if (mpBar != null)
@@ -169,30 +193,59 @@ public class Entity : MonoBehaviourPunCallbacks
         }
     }
 
-    // public virtual void Heal()
-    // {
-    //     if(Input.GetKeyDown(KeyCode.T) && isGrounded)//점프 및 대쉬 상태가 아니어야함.
-    //     {
-    //         //
-    //         healCoolTimer+=Time.deltaTime;
-    //         if(healCoolTimer>=healingTime)
-    //         {
-    //             hp++;
-    //             healCoolTimer=0;  
-    //         }
-    //         else
-    //         {
-    //             healCoolTimer=0;
-    //         }
-    //     }
+    public virtual float Exp
+    {
+        get { return exp; }
+        set
+        {
+            if (exp != value)
+            {
+                exp = Mathf.Clamp(value, 0, maxExp);
+            }
+        }
+    }
 
-    // }
-
-    protected virtual void Hited(float _damageDone, Vector2 _hitDirection)
+     public virtual float Level
+    {
+        get { return level; }
+        set
+        {
+            if (level != value)
+            {
+                level = Mathf.Clamp(value, 0, maxLevel);
+            }
+        }
+    }
+    public virtual void LevelController(float level)
+    {
+        if (levelText != null)
+        {
+            levelText.text = "Lv " + level.ToString("F0");
+        }
+    }
+    public virtual void Hited(float _damageDone, Vector2 _hitDirection)
     {
         Hp -= _damageDone;
+        // photonView.RPC("EnemyTakeDamageRPC",RpcTarget.All,Hp,_damageDone);
         photonView.RPC("ShowDamageText", RpcTarget.All, _damageDone, DmgTextTransform.position); // RPC 호출
+
+        // 적의 HP가 0 이하가 된 경우 경험치 처리
+        if (Hp <= 0)
+        {
+            foreach (PhotonView attacker in attackers)
+            {
+                if (attacker != null)
+                {
+                    attacker.RPC("AddExpRPC", attacker.Owner, exp); // 경험치 부여
+                }
+            }
+        }
     }
+    // [PunRPC]
+    // protected void EnemyTakeDamageRPC(float _hp, float _damageDone)
+    // {
+    //     _hp -= _damageDone;
+    // }
 
     [PunRPC]
     protected void ShowDamageText(float _damage, Vector3 position)
@@ -202,9 +255,9 @@ public class Entity : MonoBehaviourPunCallbacks
             // PhotonNetwork.Instantiate를 사용하여 피해 텍스트 프리팹을 생성
             GameObject floatingText = PhotonNetwork.Instantiate(floatingDamageTextPrefab.name, position, Quaternion.identity);
             floatingText.GetComponent<FloatingDamageText>().Initialize(_damage);
-            Debug.Log("데미지 텍스트 생성");
         }
     }
+
 
     
 }

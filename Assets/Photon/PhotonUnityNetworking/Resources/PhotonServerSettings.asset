@@ -60,6 +60,11 @@ MonoBehaviour:
   - AddItemRPC
   - RemoveItemRPC
   - UseItemRPC
+  - AddExpRPC
+  - UpdateLevelUIRPC
+  - DestroyRPC
+  - EnemyTakeDamageRPC
+  - HitedRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

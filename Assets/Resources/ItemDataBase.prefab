@@ -57,9 +57,7 @@ MonoBehaviour:
     itemImage: {fileID: 21300000, guid: 12b9289cee25b433fa06373acb394069, type: 2}
     effects: []
   fieldItemPrefab: {fileID: 6549036706612274581, guid: 8d62bfc3e352f4318b2823324d37065a, type: 3}
-  pos:
-  - {x: 25, y: -8, z: 0}
-  - {x: 30, y: -8, z: 0}
+  itemLocations: []
 --- !u!114 &170194878898601264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76,7 +74,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 2
   observableSearch: 2
   ObservedComponents: []
   sceneViewId: 0

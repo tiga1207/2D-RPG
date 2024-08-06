@@ -173,6 +173,13 @@ MonoBehaviour:
   textMoveSpeed: 0
   textColorSpeed: 0
   textDestroyTime: 0
+  level: 1
+  maxLevel: 1000
+  levelText: {fileID: 0}
+  maxExp: 100
+  exp: 0
+  experiencePoints: 80
+  attackers: []
   PV: {fileID: 7686444234326162874}
   moveSpeed: 1
   playerCheckDistance: 4
@@ -195,10 +202,11 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
+  Synchronization: 1
+  OwnershipTransfer: 2
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 1677611912271747132}
   - {fileID: 2347062846238539502}
   sceneViewId: 0
   InstantiationId: 0

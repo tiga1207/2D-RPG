@@ -8,9 +8,11 @@ using Cinemachine;
 using UnityEngine.EventSystems;
 
 public class Player : Entity, IPunObservable
-{
+{   
+    public string currentMapName;
     private float xInput, yInput;
     private SpriteRenderer childSr;
+    private Collider2D playerCollider;
 
     [Header("Move Info")]
     [SerializeField] private float moveSpeed;
@@ -68,8 +70,6 @@ public class Player : Entity, IPunObservable
     [SerializeField] protected float healInterval = 1; // 힐 간격
     private Coroutine healCoroutine;
 
-    private Collider2D playerCollider;
-
     protected override void Awake()
     {
         base.Awake();
@@ -114,6 +114,18 @@ public class Player : Entity, IPunObservable
     protected override void Start()
     {
         base.Start();
+        if (PV.IsMine)
+        {
+            // 초기 HP와 MP 설정
+            Hp = maxHp;
+            Mp = maxMp;
+            Exp=0;
+            Level=1;
+            UIManager.Instance.SetPlayer(this);
+            SkillUIManager.Instance.SetPlayer(this);
+
+        }
+        // UIManager.Instance.InitializeUI(Hp, maxHp, Mp, maxMp, Exp, maxExp);
     }
 
     protected override void Update()
@@ -335,6 +347,7 @@ public class Player : Entity, IPunObservable
         NickNameText.transform.Rotate(0, 180, 0);
         hpBar.transform.Rotate(0,180,0);
         mpBar.transform.Rotate(0,180,0);
+        levelText.transform.Rotate(0,180,0);
     }
 
     public void TakeDamage(float _damage)
@@ -347,7 +360,6 @@ public class Player : Entity, IPunObservable
     {
         if(PV.IsMine)
         {
-            Debug.Log("TakeDamageRPC working");
             Hp -= Mathf.RoundToInt(_damage);
             isTakeDamage = true;
             StartCoroutine(StopTakeDamage());
@@ -381,6 +393,8 @@ public class Player : Entity, IPunObservable
             stream.SendNext(transform.position);
             stream.SendNext(Hp);
             stream.SendNext(Mp);
+            stream.SendNext(Exp);
+            stream.SendNext(Level);
 
         }
         else
@@ -388,6 +402,9 @@ public class Player : Entity, IPunObservable
             transform.position = (Vector3)stream.ReceiveNext();
             Hp = (float)stream.ReceiveNext();
             Mp = (float)stream.ReceiveNext();
+            Exp=(float)stream.ReceiveNext();
+            Level=(float)stream.ReceiveNext();
+
         }
     }
 
@@ -512,6 +529,178 @@ public class Player : Entity, IPunObservable
 
 #endregion
 
+    public void AddExp(float _ExpAmount)
+    {
+        PV.RPC("AddExpRPC", RpcTarget.AllBuffered, _ExpAmount);
+    }
+
+    [PunRPC]
+    public void AddExpRPC(float _ExpAmount)
+    {
+        if(PV.IsMine)
+        {
+            if(Exp + _ExpAmount >= maxExp)
+            {
+                Exp = Exp + _ExpAmount - maxExp;
+                Level +=1;
+                maxExp*=2;
+                PV.RPC("UpdateLevelUIRPC", RpcTarget.AllBuffered, Level);
+            }
+            else
+            {
+                // Exp +=Mathf.RoundToInt(_ExpAmount);
+                Exp += _ExpAmount;
+            }
+        }
+    }
+
+
+    [PunRPC]
+    private void UpdateLevelUIRPC(float newLevel)
+    {
+        level = newLevel;
+        LevelController(newLevel);
+    }
+
+
+    
+    // protected override void Hit(Transform _attackTransform, Vector2 _attackArea)
+    // {
+    //     Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+    //     for (int i = 0; i < objectsToHit.Length; ++i)
+    //     {
+    //         if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
+    //         {
+    //             Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+    //             if (!enemy.attackers.Contains(PV))
+    //             {
+    //                 enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+    //             }
+    //             enemy.Hited(damage, (transform.position - objectsToHit[i].transform.position).normalized);
+    //         }
+    //     }
+    // }
+//     protected override void Hit(Transform _attackTransform, Vector2 _attackArea)
+// {
+//     Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+//     for (int i = 0; i < objectsToHit.Length; ++i)
+//     {
+//         if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
+//         {
+//             Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+//             if (!enemy.attackers.Contains(PV))
+//             {
+//                 enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+//             }
+//             enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (transform.position - objectsToHit[i].transform.position).normalized);
+//         }
+//     }
+// }
+
+
+protected void Hit(Transform _attackTransform, Vector2 _attackArea)
+{
+    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+    for (int i = 0; i < objectsToHit.Length; ++i)
+    {
+        if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
+        {
+            Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+            if (!enemy.attackers.Contains(PV))
+            {
+                enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+            }
+            enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
+        }
+    }
+}
+
+// [PunRPC]
+// public void HitedRPC(float _damageDone, Vector2 _hitDirection)
+// {
+//     Hited(_damageDone, _hitDirection);
+// }
+
+    public override float Hp
+    {
+        get { return hp; }
+        set
+        {
+            if (hp != value)
+            {
+                hp = Mathf.Clamp(value, 0, maxHp);
+                if (PV.IsMine)
+                {
+                    UIManager.Instance.UpdateHP(hp, maxHp);
+                    HpBarController(hp);
+                }
+            }
+        }
+    }
+
+    public override float Mp
+    {
+        get { return mp; }
+        set
+        {
+            if (mp != value)
+            {
+                mp = Mathf.Clamp(value, 0, maxMp);
+                if (PV.IsMine)
+                {
+                    UIManager.Instance.UpdateMP(mp, maxMp);
+                    MpBarController(mp);
+                }
+            }
+        }
+    }
+
+    public override float Exp
+    {
+        get { return exp; }
+        set
+        {
+            if (exp != value)
+            {
+                exp = Mathf.Clamp(value, 0, maxExp);
+                if (PV.IsMine)
+                {
+                    UIManager.Instance.UpdateEXP(exp, maxExp);
+                }
+            }
+        }
+    }
+
+    public override float Level
+    {
+        get { return level; }
+        set
+        {
+            if (level != value)
+            {
+                level = Mathf.Clamp(value, 0, maxLevel);
+                if (PV.IsMine)
+                {
+                    UIManager.Instance.UpdateLEVEL(level);
+                }
+            }
+        }
+    }
+
+
+    public override void HpBarController(float hp)
+    {
+        base.HpBarController(hp);
+    }
+    public override void MpBarController(float mp)
+    {
+        base.MpBarController(mp);
+    }
+
+}
 
 // public void UseItem(ItemEffect item)
 // {
@@ -522,4 +711,3 @@ public class Player : Entity, IPunObservable
 //     item.ExecuteRole(this);
 // }
 
-}

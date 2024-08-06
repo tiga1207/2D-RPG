@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 
-public class Enemy_Skeleton : Entity
+public class Enemy_Skeleton : Entity,IPunObservable
 {
 
     public PhotonView PV;
@@ -19,6 +19,7 @@ public class Enemy_Skeleton : Entity
     private RaycastHit2D isPlayerDetected;
 
     public Player player;
+    // [SerializeField] private float experiencePoints = 90;
 
     protected override void Awake()
     {
@@ -40,7 +41,7 @@ public class Enemy_Skeleton : Entity
     {
         base.Update();
 
-        HpController();
+        // HpController();
         Movement();
 
         if (!isGrounded || isWallDetected) // 벽 혹은 땅쪽일 경우 방향 전환
@@ -71,6 +72,7 @@ public class Enemy_Skeleton : Entity
         facingDir = faceRight ? 1 : -1;
         transform.Rotate(0, 180, 0);
         hpBar.transform.Rotate(0,180,0);
+        HpText.transform.Rotate(0,180,0);
     }
 
     private void FindLocalPlayer()
@@ -123,16 +125,50 @@ public class Enemy_Skeleton : Entity
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + playerCheckDistance * facingDir, transform.position.y));
     }
 
+    // public override void Hited(float _damageDone, Vector2 _hitDirection)
+    // {
+    //     base.Hited(_damageDone, _hitDirection);
+    //     if (Hp <= 0)
+    //     {
+    //         Vector3 respawnPosition = transform.position;
 
-    
-    protected override void Hited(float _damageDone, Vector2 _hitDirection)
+    //         if (PhotonNetwork.IsMasterClient)
+    //         {
+    //             PhotonNetwork.Destroy(gameObject);
+    //             EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+    //             if (enemyManager != null && PhotonNetwork.IsMasterClient)
+    //             {
+    //                 enemyManager.RespawnEnemy(respawnPosition);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition);
+    //         }
+    //         // 적을 처치한 플레이어에게 경험치 부여
+    //         foreach (PhotonView attacker in attackers)
+    //         {
+    //             if (attacker != null)
+    //             {
+    //                 attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
+    //             }
+    //         }
+
+    //     }
+    // }
+
+    [PunRPC]
+    public void HitedRPC(float _damageDone, Vector2 _hitDirection)
     {
-        base.Hited(_damageDone, _hitDirection);
+        Hp -= _damageDone;
+        HpBarController(Hp);
+        ShowDamageText(_damageDone, transform.position);
+
         if (Hp <= 0)
         {
             Vector3 respawnPosition = transform.position;
 
-            if (PV.IsMine || PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient)
             {
                 PhotonNetwork.Destroy(gameObject);
                 EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
@@ -143,11 +179,22 @@ public class Enemy_Skeleton : Entity
             }
             else
             {
-                // 마스터 클라이언트에게 삭제 요청
                 PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition);
+            }
+
+            // 적을 처치한 플레이어에게 경험치 부여
+            foreach (PhotonView attacker in attackers)
+            {
+                if (attacker != null)
+                {
+                    attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
+                }
             }
         }
     }
+
+
+
 
     [PunRPC]
     private void RequestDestroy(int viewID, Vector3 respawnPosition)
@@ -175,6 +222,48 @@ public class Enemy_Skeleton : Entity
                 Debug.Log("플레이어 공격중");
                 player.TakeDamage(damage);
             }
+        }
+    }
+    public override void HpBarController(float hp)
+{
+    base.HpBarController(hp);
+    if (hpBar != null)
+    {
+        hpBar.fillAmount = hp / maxHp;
+    }
+    if (HpText != null)
+    {
+        HpText.text = hp.ToString("F0"); // 텍스트로 변환
+    }
+}
+
+    public override float Hp
+    {
+        get { return hp; }
+        set
+        {
+            if (hp != value)
+            {
+                hp = Mathf.Clamp(value, 0, maxHp);
+                HpBarController(hp);
+
+            }
+        }
+    }
+
+
+     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(Hp);
+            // stream.SendNext(maxHp);
+        }
+        else
+        {
+            Hp = (float)stream.ReceiveNext();
+            // maxHp = (float)stream.ReceiveNext();
+            // HpBarController(hp);
         }
     }
 }
