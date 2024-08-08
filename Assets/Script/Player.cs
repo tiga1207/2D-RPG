@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cinemachine;
 using UnityEngine.EventSystems;
+using System;
 
 public class Player : Entity, IPunObservable
 {   
@@ -21,13 +22,18 @@ public class Player : Entity, IPunObservable
 
     [Header("Dash")]
     [SerializeField] private float dashSpeed;
-    [SerializeField] private float dashDuration;
-    [SerializeField] private float dashCooldown;
-    private float dashTime;
-    private float dashCooldownTimer;
+    [SerializeField] private float dashDuration; // 대시 지속시간
+    [SerializeField] public float dashCooldown;//대시 스킬 쿨타임
+    [SerializeField] private float dashTime;// 대시 지속시간 쿨타이머 0으로 떨어질 시 대시 끝
+    [SerializeField] public float dashCooldownTimer;
+    [SerializeField] public bool dashActive= false;
     public bool isDashing = false;
 
     [Header("Attack Info")]
+    [SerializeField] private float attackCooldown=1f;
+    [SerializeField] private float attackCooldownTimer;
+    [SerializeField] private bool attackActive = true;
+    
     [SerializeField] private float comboTime = 0.3f;
     private float comboTimeWindow;
     [SerializeField] private bool isAttacking;
@@ -60,10 +66,11 @@ public class Player : Entity, IPunObservable
     [SerializeField] private GameObject healEffect;
 
     public bool isHealing = false; // 힐 스킬 사용 여부
+    public bool healActive= true;
     public int healAmount = 1; //힐량
     public int healManaCost = 3;
-    [SerializeField] protected float healCooldown= 5; //쿨타임 시간.
-    [SerializeField] protected float  healCoolTimer=5; //쿨타임 타이머
+    public float healCooldown= 5; //쿨타임 시간.
+    public float  healCoolTimer=5; //쿨타임 타이머
     [SerializeField] protected float  healChanneling= 2; // 정신집중 시간.
     [SerializeField] protected float  healChannelingTimer =2; // 정신집중 시간.
 
@@ -141,7 +148,7 @@ public class Player : Entity, IPunObservable
             FlipController();
             FlashWhileInvincible();
             PlayerHpController();
-            DashAbility();
+            // DashAbility(); //대시 코루틴 미사용시
         }
     }
 
@@ -156,10 +163,28 @@ public class Player : Entity, IPunObservable
 
     private void CooldownManager()
     {
-        dashTime -= Time.deltaTime;
-        dashCooldownTimer -= Time.deltaTime;
+        /*대시 스킬 코루틴 미사용시
+        if (!dashActive)
+        {
+            dashCooldownTimer -= Time.deltaTime;
+            if (dashCooldownTimer <= 0)
+            {
+                dashCooldownTimer = 0;
+                dashActive = true;
+            }
+        }
+        if (isDashing)
+        {
+            dashTime -= Time.deltaTime;
+            if (dashTime <= 0)
+            {
+                dashTime = 0;
+                isDashing = true;
+            }
+        }
+        */
+        // healCoolTimer-=Time.deltaTime;// 힐 쿨타임. 0보다 작으면 사용가능.
         comboTimeWindow -= Time.deltaTime;
-        healCoolTimer-=Time.deltaTime;// 힐 쿨타임. 0보다 작으면 사용가능.
 
     }
 //공격
@@ -167,30 +192,74 @@ public class Player : Entity, IPunObservable
     {
         if (!isGrounded)
         {
-            return;
+            return; // 플레이어가 땅에 있지 않으면 아래 다 날리기.
         }
 
         if (comboTimeWindow < 0)
         {
             comboCounter = 0;
         }
-        if (yInput == 0 || yInput < 0 && isGrounded)
+        if (attackActive && (yInput == 0 || yInput < 0) && isGrounded)
         {
+            isAttacking= true;
+            attackActive=false;
+            // comboCounter++;
+            // if (comboCounter > 2)
+            // {
+            //     comboCounter = 0;
+            // }
+            attackCooldownTimer=attackCooldown;
             Hit(AttackTransform, AttackArea);
+            StartCoroutine(AttackCooldown());
             GameObject slash = PhotonNetwork.Instantiate(slashEffect.name, AttackTransform.position, Quaternion.identity); // 슬래시 이펙트를 네트워크 상에서 생성
             if(!facingRight)
             {
                 slash.transform.Rotate(0f, 180f, 0f);
             }
-            // Instantiate(slashEffect, AttackTransform);
+            comboTimeWindow = comboTime;
+            // isAttacking=false;
+            // attackActive=false;
+            // attackCooldownTimer=attackCooldown;
+
+        // isAttacking = true;
         }
-        isAttacking = true;
-        comboTimeWindow = comboTime;
     }
+
+    private IEnumerator AttackCooldown()
+    {
+        while (attackCooldownTimer >= 0)
+        {
+            // isAttacking=false;
+            attackCooldownTimer -= Time.deltaTime;
+            yield return null;
+        }
+        attackActive= true;
+    }
+
+    protected void Hit(Transform _attackTransform, Vector2 _attackArea)
+{
+    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+    for (int i = 0; i < objectsToHit.Length; ++i)
+    {
+        if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
+        {
+            Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+            if (!enemy.attackers.Contains(PV))
+            {
+                enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+            }
+            enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
+           
+        }
+    }
+}
 
     public void AttackOver()
     {
         isAttacking = false;
+        // attackActive=false;
+        attackCooldownTimer=attackCooldown;
         comboCounter++;
 
         if (comboCounter > 2)
@@ -226,7 +295,7 @@ public class Player : Entity, IPunObservable
         
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            StartAttackEvent();
+            StartAttackEvent();// 공격속도 조건 필요
         }
 
         if (Input.GetKeyDown(KeyCode.T))
@@ -242,19 +311,36 @@ public class Player : Entity, IPunObservable
 //대시 기능
     private void Dash()
     {
-        if (dashCooldownTimer < 0 && !isAttacking)
+        if (dashActive && !isAttacking)
         {
             isDashing=true;
+            dashActive=false;
             dashCooldownTimer = dashCooldown;
             dashTime = dashDuration;
+            StartCoroutine(DashDuration());
+            StartCoroutine(DashCooldown());
         }
     }
 
-    private void DashAbility(){
-        if(dashTime<0)
+    private IEnumerator DashDuration()
+    {
+        while (dashTime >= 0)
         {
-            isDashing=false;
+            dashTime -= Time.deltaTime;
+            yield return null;
         }
+        isDashing = false;
+    }
+
+    private IEnumerator DashCooldown()
+    {
+        while (dashCooldownTimer >= 0)
+        {
+            dashCooldownTimer -= Time.deltaTime;
+            SkillUIManager.Instance.UpdateDash(dashCooldownTimer);
+            yield return null;
+        }
+        dashActive= true;
     }
 
     private void Movement()
@@ -411,37 +497,50 @@ public class Player : Entity, IPunObservable
     #region 체력회복 스킬 관련
     #region 1. 체력회복 시작 메서드
     private void StartHealing()
+    {
+        if (healActive && Hp < maxHp)
         {
-            if (healCoolTimer <= 0 && Hp < maxHp)
-            {
-                isHealing=true;
-                healCoroutine = StartCoroutine(HealCoroutine());
-            }
+            isHealing=true;
+            healCoroutine = StartCoroutine(HealCoroutine());
+            //healCoroutine변수에 해당 코루틴을 담아서 startHealing이 실행 돼야지만 stophealing이 작동되도록 함.
+            // healActive=false;
         }
+    }
 
     #endregion
     #region 2.체력회복 멈춤 메서드
-        private void StopHealing()
+    private void StopHealing()
+    {
+        if (healCoroutine != null)
         {
-            if (healCoroutine != null)
-            {
-                StopCoroutine(healCoroutine);
-                healCoroutine = null;
-            }
-                isHealing=false;
-                healChannelingTimer=healChanneling;
-                if(healCoolTimer<0)
-                {
-                    healCoolTimer=healCooldown;
-                }
+            StopCoroutine(healCoroutine);
+            healActive=false;
+            isHealing=false;
+            healChannelingTimer=healChanneling;
+            healCoolTimer = healCooldown;
+            StartCoroutine(HealCooldown());
+
+            healCoroutine = null;// 위 작업이 끝나면 healCoroutine 변수를 null 값으로 비워줘서 StopHealing 메서드 탈출.
         }
+    }
+
+        private IEnumerator HealCooldown()
+    {
+        while (healCoolTimer >= 0)
+        {
+            healCoolTimer -= Time.deltaTime;
+            SkillUIManager.Instance.UpdateHeal(healCoolTimer);
+            yield return null;
+        }
+        healActive= true;
+    }
 
     #endregion
 
     #region 3.체력회복 코루틴
         private IEnumerator HealCoroutine()
     {
-        while (Input.GetKey(KeyCode.T) && healCoolTimer <= 0)
+        while (Input.GetKey(KeyCode.T) && healActive)
         {
             healChannelingTimer -= healInterval;
             PV.RPC("HealRPC", RpcTarget.AllBuffered, healAmount, healManaCost);
@@ -456,6 +555,7 @@ public class Player : Entity, IPunObservable
             yield return new WaitForSeconds(healInterval);
         }
         isHealing=false;
+        healActive=false;
     }
     #endregion
     #region 4.RPC
@@ -600,23 +700,7 @@ public class Player : Entity, IPunObservable
 // }
 
 
-protected void Hit(Transform _attackTransform, Vector2 _attackArea)
-{
-    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
 
-    for (int i = 0; i < objectsToHit.Length; ++i)
-    {
-        if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
-        {
-            Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
-            if (!enemy.attackers.Contains(PV))
-            {
-                enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
-            }
-            enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
-        }
-    }
-}
 
 // [PunRPC]
 // public void HitedRPC(float _damageDone, Vector2 _hitDirection)

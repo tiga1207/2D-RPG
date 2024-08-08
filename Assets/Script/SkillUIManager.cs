@@ -5,10 +5,15 @@ using UnityEngine.UI;
 public class SkillUIManager : MonoBehaviour
 {
     public static SkillUIManager Instance;
-
-    public Image dashImage; // HP를 표시할 UI 이미지
-    public TextMeshProUGUI dashText;
     private Player currentPlayer; // 현재 플레이어
+
+    //대쉬 스킬
+    public Image dashImage; // 대쉬 스킬을 표시할 UI 이미지
+    public TextMeshProUGUI dashText;
+
+    //힐 스킬
+    public Image healImage; // 대쉬 스킬을 표시할 UI 이미지
+    public TextMeshProUGUI healText;
 
     void Awake()
     {
@@ -26,24 +31,49 @@ public class SkillUIManager : MonoBehaviour
     public void SetPlayer(Player player)
     {
         currentPlayer = player;
-        InitializeUI(player.Hp, player.MaxHp, player.Mp, player.MaxMp, player.Exp, player.MaxExp,player.Level);
+        InitializeUI(player.dashCooldownTimer,player.healCoolTimer);
     }
 
-    public void UpdateHP(float hp, float maxHp)
+    public void UpdateDash(float dashCooldownTimer)
     {
         if (dashImage != null)
         {
-            dashImage.fillAmount = hp / maxHp;
+            dashImage.fillAmount = dashCooldownTimer/currentPlayer.dashCooldown;
         }
         if (dashText != null)
-        {
-            dashText.text = hp.ToString("F0");
+        {          
+            if(dashCooldownTimer == currentPlayer.dashCooldown || dashCooldownTimer<=0)
+            {
+                dashText.text = null;
+            }
+            else{
+                dashText.text = dashCooldownTimer.ToString("F0");
+            }
         }
     }
 
-    public void InitializeUI(float hp, float maxHp, float mp, float maxMp, float exp, float maxExp, float level)
+    public void UpdateHeal(float healCoolTimer)
     {
-        UpdateHP(hp, maxHp);
+        if (healImage != null)
+        {
+            healImage.fillAmount = healCoolTimer/currentPlayer.healCooldown;
+        }
+        if (healText != null)
+        {          
+            if(healCoolTimer == currentPlayer.dashCooldown || healCoolTimer<=0)
+            {
+                healText.text = null;
+            }
+            else{
+                healText.text = healCoolTimer.ToString("F0");
+            }
+        }
+    }
+
+    public void InitializeUI(float dashCooldownTimer,float healCoolTimer)
+    {
+        UpdateDash(dashCooldownTimer);
+        UpdateHeal(healCoolTimer);
 
     }
 
@@ -51,7 +81,8 @@ public class SkillUIManager : MonoBehaviour
     {
         if (currentPlayer != null)
         {
-            UpdateHP(currentPlayer.Hp, currentPlayer.MaxHp);
+            UpdateDash(currentPlayer.dashCooldownTimer);
+            UpdateHeal(currentPlayer.healCoolTimer);
         }
     }
 }

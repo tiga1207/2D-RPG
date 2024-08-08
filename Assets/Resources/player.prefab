@@ -1020,7 +1020,13 @@ MonoBehaviour:
   dashSpeed: 25
   dashDuration: 0.25
   dashCooldown: 1.5
+  dashTime: 0
+  dashCooldownTimer: 0
+  dashActive: 1
   isDashing: 0
+  attackCooldown: 2
+  attackCooldownTimer: 2
+  attackActive: 1
   comboTime: 0.3
   isAttacking: 0
   bloodEffect: {fileID: 3180080277078973904, guid: a5070818335ea465f8feebe2fa229340, type: 3}
@@ -1038,6 +1044,7 @@ MonoBehaviour:
   PV: {fileID: 1523211523370137496}
   healEffect: {fileID: 158530, guid: be9fa4cf050e848df821231d39718be4, type: 3}
   isHealing: 0
+  healActive: 1
   healAmount: 1
   healManaCost: 3
   healCooldown: 5

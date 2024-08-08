@@ -11,6 +11,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public GameObject DisconnectPanel;
     public GameObject RespawnPanel;
     public GameObject UserUi;
+    public GameObject UserSkillUi;
     public GameObject userRespawn;
     public Button RespawnButton;
     public TMP_Text loadingText;
@@ -106,6 +107,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
         SpawnPlayer();
         UserUi.SetActive(true);
+        UserSkillUi.SetActive(true);
+        
 
         if(PhotonNetwork.IsMasterClient)  // 마스터 클라이언트가 적 스폰 및 아이템데이터베이스 관리
         {
