@@ -10,7 +10,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public TMP_InputField NickNameInput;
     public GameObject DisconnectPanel;
     public GameObject RespawnPanel;
-    public GameObject UserUi;
+    public GameObject UserUI;
+    // public GameObject UserStatUI;
+
     public GameObject UserSkillUi;
     public GameObject userRespawn;
     public Button RespawnButton;
@@ -106,7 +108,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
         }
         SpawnPlayer();
-        UserUi.SetActive(true);
+        UserUI.SetActive(true);
         UserSkillUi.SetActive(true);
         
 

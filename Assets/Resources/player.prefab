@@ -1011,7 +1011,7 @@ MonoBehaviour:
   levelText: {fileID: 6165569049861567133}
   maxExp: 100
   exp: 0
-  experiencePoints: 90
+  experiencePoints: 0
   attackers: []
   currentMapName: Cave_1
   moveSpeed: 6
@@ -1024,7 +1024,7 @@ MonoBehaviour:
   dashCooldownTimer: 0
   dashActive: 1
   isDashing: 0
-  attackCooldown: 2
+  attackCooldown: 0.2
   attackCooldownTimer: 2
   attackActive: 1
   comboTime: 0.3
@@ -1034,6 +1034,7 @@ MonoBehaviour:
   invincible: 0
   isTakeDamage: 0
   sr: {fileID: 266314399188597393}
+  levelupStatPoint: 0
   jumpCount: 0
   maxJumpCount: 2
   isJumping: 0

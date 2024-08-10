@@ -30,7 +30,7 @@ public class Entity : MonoBehaviourPunCallbacks
     [SerializeField] protected float maxHp;
     
     [SerializeField] protected float hp;
-    [SerializeField] protected float damage;
+    [SerializeField] public float damage;
     [SerializeField] protected Image hpBar;
     [SerializeField] protected TextMeshProUGUI HpText;
 
@@ -213,6 +213,18 @@ public class Entity : MonoBehaviourPunCallbacks
             if (level != value)
             {
                 level = Mathf.Clamp(value, 0, maxLevel);
+            }
+        }
+    }
+
+    public virtual float Damage
+    {
+        get { return damage; }
+        set
+        {
+            if (damage != value)
+            {
+                damage = Mathf.Max(value, 0);
             }
         }
     }

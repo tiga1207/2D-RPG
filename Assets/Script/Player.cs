@@ -45,6 +45,7 @@ public class Player : Entity, IPunObservable
     [SerializeField] public bool invincible = false;
     public bool isTakeDamage = false;
     [SerializeField] private GameObject sr;
+    public float levelupStatPoint=0;
 
 
     [Header("Jump Ability")]
@@ -128,8 +129,11 @@ public class Player : Entity, IPunObservable
             Mp = maxMp;
             Exp=0;
             Level=1;
+            Damage=5;
+            LevelupStatPoint=0;
             UIManager.Instance.SetPlayer(this);
             SkillUIManager.Instance.SetPlayer(this);
+            StatUI.Instance.SetPlayer(this);
 
         }
         // UIManager.Instance.InitializeUI(Hp, maxHp, Mp, maxMp, Exp, maxExp);
@@ -635,16 +639,17 @@ public class Player : Entity, IPunObservable
     }
 
     [PunRPC]
-    public void AddExpRPC(float _ExpAmount)
+    public void AddExpRPC(float _ExpAmount) //경험치 및 레벨업 시스템.
     {
         if(PV.IsMine)
-        {
+        {//최대 레벨 도달 시 exp 예외 처리도 추가해야함.
             if(Exp + _ExpAmount >= maxExp)
             {
                 Exp = Exp + _ExpAmount - maxExp;
-                Level +=1;
-                maxExp*=2;
+                maxExp *= 2; // 레벨업 시 경험치 통 직전 레벨에 비해 2배 증가
+                PlayerLevelUp();
                 PV.RPC("UpdateLevelUIRPC", RpcTarget.AllBuffered, Level);
+
             }
             else
             {
@@ -654,6 +659,21 @@ public class Player : Entity, IPunObservable
         }
     }
 
+    private void PlayerLevelUp()
+    {
+        Level += 1;
+        maxHp*=1.1f;
+        maxMp*=1.1f;
+        LevelupStatPoint += 1;
+        Hp=maxHp; // 캐릭터 체력 최대체력으로 회복
+        Mp=maxMp; // 캐릭터 마나를 최대 마나로 회복
+        // if (PV.IsMine)
+        // {
+        //     UIManager.Instance.UpdateHP(Hp, maxHp);
+        //     StatUI.Instance.UpdateHP(maxHp);
+        //     HpBarController(Hp);
+        // }
+    }
 
     [PunRPC]
     private void UpdateLevelUIRPC(float newLevel)
@@ -661,46 +681,6 @@ public class Player : Entity, IPunObservable
         level = newLevel;
         LevelController(newLevel);
     }
-
-
-    
-    // protected override void Hit(Transform _attackTransform, Vector2 _attackArea)
-    // {
-    //     Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
-
-    //     for (int i = 0; i < objectsToHit.Length; ++i)
-    //     {
-    //         if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
-    //         {
-    //             Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
-    //             if (!enemy.attackers.Contains(PV))
-    //             {
-    //                 enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
-    //             }
-    //             enemy.Hited(damage, (transform.position - objectsToHit[i].transform.position).normalized);
-    //         }
-    //     }
-    // }
-//     protected override void Hit(Transform _attackTransform, Vector2 _attackArea)
-// {
-//     Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
-
-//     for (int i = 0; i < objectsToHit.Length; ++i)
-//     {
-//         if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null)
-//         {
-//             Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
-//             if (!enemy.attackers.Contains(PV))
-//             {
-//                 enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
-//             }
-//             enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (transform.position - objectsToHit[i].transform.position).normalized);
-//         }
-//     }
-// }
-
-
-
 
 // [PunRPC]
 // public void HitedRPC(float _damageDone, Vector2 _hitDirection)
@@ -719,6 +699,7 @@ public class Player : Entity, IPunObservable
                 if (PV.IsMine)
                 {
                     UIManager.Instance.UpdateHP(hp, maxHp);
+                    StatUI.Instance.UpdateHP(maxHp);
                     HpBarController(hp);
                 }
             }
@@ -736,6 +717,7 @@ public class Player : Entity, IPunObservable
                 if (PV.IsMine)
                 {
                     UIManager.Instance.UpdateMP(mp, maxMp);
+                    StatUI.Instance.UpdateMP(MaxMp);
                     MpBarController(mp);
                 }
             }
@@ -769,6 +751,39 @@ public class Player : Entity, IPunObservable
                 if (PV.IsMine)
                 {
                     UIManager.Instance.UpdateLEVEL(level);
+                    StatUI.Instance.UpdateLEVEL(level);
+                }
+            }
+        }
+    }
+
+    public override float Damage
+    {
+        get { return damage; }
+        set
+        {
+            if (damage != value)
+            {
+                damage = Mathf.Max(value, 0);
+                if (PV.IsMine)
+                {
+                    StatUI.Instance.UpdateDamage(damage);
+                }
+            }
+        }
+    }
+
+    public float LevelupStatPoint
+    {
+        get { return levelupStatPoint; }
+        set
+        {
+            if (levelupStatPoint != value)
+            {
+                levelupStatPoint = Mathf.Max(value, 0);
+                if (PV.IsMine)
+                {
+                    StatUI.Instance.UpdateStatPoint(levelupStatPoint);
                 }
             }
         }
