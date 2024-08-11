@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using TMPro;
@@ -94,10 +95,10 @@ public class Entity : MonoBehaviourPunCallbacks
         // Heal();
     }
 
-    protected virtual void CollisionCheck()
+    protected virtual void CollisionCheck() //충돌 체크
     {
-        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
-        isWallDetected = Physics2D.Raycast(wallCheck.position, Vector2.right, wallCheckDistance * facingDir, whatIsGround);
+        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround); //레이캐스트를 통해 땅에 닿은 레이어가 Ground 시 땅으로 인식.
+        isWallDetected = Physics2D.Raycast(wallCheck.position, Vector2.right, wallCheckDistance * facingDir, whatIsGround); //레이캐스트를 통해 벽에 닿은 레이어가 Ground 시 땅으로 인식.
     }
 
     protected virtual void Flip()
@@ -129,7 +130,7 @@ public class Entity : MonoBehaviourPunCallbacks
 
     protected virtual void HpController()
     {
-        if (Hp <= 0)
+        if (Hp <= 0) // hp가 0 이하시 파괴.
         {
             if(photonView.IsMine || PhotonNetwork.IsMasterClient)
             {
@@ -146,7 +147,7 @@ public class Entity : MonoBehaviourPunCallbacks
         {
             if (hp != value)
             {
-                hp = Mathf.Clamp(value, 0, maxHp);
+                hp = Mathf.Clamp(value, 0, maxHp);// Mathf.Clamp함수를 통해 체력의 최소값과 최대값 범위 결정.
                 HpBarController(hp); // HP가 변경될 때 HP바 업데이트
                 HpController(); // HP가 변경될 때 HP 상태 확인
             }
@@ -235,9 +236,9 @@ public class Entity : MonoBehaviourPunCallbacks
             levelText.text = "Lv " + level.ToString("F0");
         }
     }
-    public virtual void Hited(float _damageDone, Vector2 _hitDirection)
+    public virtual void Hited(float _damageDone, Vector2 _hitDirection) //피격 시
     {
-        Hp -= _damageDone;
+        Hp -= _damageDone; // 데미지 만큼 hp 감소
         // photonView.RPC("EnemyTakeDamageRPC",RpcTarget.All,Hp,_damageDone);
         photonView.RPC("ShowDamageText", RpcTarget.All, _damageDone, DmgTextTransform.position); // RPC 호출
 
@@ -260,13 +261,23 @@ public class Entity : MonoBehaviourPunCallbacks
     // }
 
     [PunRPC]
-    protected void ShowDamageText(float _damage, Vector3 position)
+    protected void ShowDamageText(float _damage, Vector3 position)// 데미지 텍스트 생성
     {
         if (floatingDamageTextPrefab != null)
         {
             // PhotonNetwork.Instantiate를 사용하여 피해 텍스트 프리팹을 생성
             GameObject floatingText = PhotonNetwork.Instantiate(floatingDamageTextPrefab.name, position, Quaternion.identity);
             floatingText.GetComponent<FloatingDamageText>().Initialize(_damage);
+            // StartCoroutine(DestroyAfter(floatingText,2.0f));
+        }
+    }
+
+    public IEnumerator DestroyAfter(GameObject _gameObject, float _delay)// delay 시간 만큼 유지후 게임 오브젝트 파괴
+    {  
+        yield return new WaitForSeconds(_delay);
+        if(_gameObject !=null)
+        {
+            PhotonNetwork.Destroy(_gameObject);
         }
     }
 

@@ -160,26 +160,26 @@ public class Enemy_Skeleton : Entity,IPunObservable
     [PunRPC]
     public void HitedRPC(float _damageDone, Vector2 _hitDirection)
     {
-        Hp -= _damageDone;
-        HpBarController(Hp);
-        ShowDamageText(_damageDone, transform.position);
+        Hp -= _damageDone; //체력 감소
+        HpBarController(Hp);// 체력바 업데이트
+        ShowDamageText(_damageDone, transform.position);// 데미지 표시 텍스트 메서드 호출
 
         if (Hp <= 0)
         {
             Vector3 respawnPosition = transform.position;
 
-            if (PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient)// 마스터 클라이언트 일 경우 
             {
-                PhotonNetwork.Destroy(gameObject);
+                PhotonNetwork.Destroy(gameObject);//네트워크 상에서 적을 파괴함.
                 EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
                 if (enemyManager != null && PhotonNetwork.IsMasterClient)
                 {
-                    enemyManager.RespawnEnemy(respawnPosition);
+                    enemyManager.RespawnEnemy(respawnPosition);// 적 리스폰
                 }
             }
             else
             {
-                PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition);
+                PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition); //마스터 클라이언트에게 파괴 요청.
             }
 
             // 적을 처치한 플레이어에게 경험치 부여
@@ -211,7 +211,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
         }
     }
 
-    public void AttackPlayer(int playerViewID)
+    public void AttackPlayer(int playerViewID)// 플레이어 공격
     {
         PhotonView playerPV = PhotonView.Find(playerViewID);
         if (playerPV != null && playerPV.IsMine)
@@ -225,17 +225,17 @@ public class Enemy_Skeleton : Entity,IPunObservable
         }
     }
     public override void HpBarController(float hp)
-{
-    base.HpBarController(hp);
-    if (hpBar != null)
     {
-        hpBar.fillAmount = hp / maxHp;
+        base.HpBarController(hp);
+        if (hpBar != null)
+        {
+            hpBar.fillAmount = hp / maxHp;
+        }
+        if (HpText != null)
+        {
+            HpText.text = hp.ToString("F0"); // 텍스트로 변환
+        }
     }
-    if (HpText != null)
-    {
-        HpText.text = hp.ToString("F0"); // 텍스트로 변환
-    }
-}
 
     public override float Hp
     {

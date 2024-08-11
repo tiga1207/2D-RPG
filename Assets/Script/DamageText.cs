@@ -1,3 +1,5 @@
+using System.Collections;
+using Photon.Pun;
 using TMPro;
 using UnityEngine;
 
@@ -28,7 +30,8 @@ public class FloatingDamageText : MonoBehaviour
     public void Initialize(float damageAmount)
     {
         damageText.text = damageAmount.ToString();
-        Destroy(gameObject, destroyTime);
+        // Destroy(gameObject, destroyTime);
+        StartCoroutine(DestroyAfter(gameObject,destroyTime));
     }
 
     void Update()
@@ -36,4 +39,15 @@ public class FloatingDamageText : MonoBehaviour
         transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);
         damageText.color = new Color(originalColor.r, originalColor.g, originalColor.b, Mathf.Lerp(damageText.color.a, 0, Time.deltaTime * fadeOutSpeed));
     }
+
+    public IEnumerator DestroyAfter(GameObject _gameObject, float _delay)// delay 시간 만큼 유지후 게임 오브젝트 파괴
+    {  
+        yield return new WaitForSeconds(_delay);
+        if(_gameObject !=null)
+        {
+            PhotonNetwork.Destroy(_gameObject);
+        }
+    }
+
+    
 }
