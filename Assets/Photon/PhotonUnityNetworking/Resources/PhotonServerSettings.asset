@@ -65,6 +65,8 @@ MonoBehaviour:
   - DestroyRPC
   - EnemyTakeDamageRPC
   - HitedRPC
+  - DestroyPlayerInPreviousScene
+  - RequestDestroyPlayerInPreviousScene
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

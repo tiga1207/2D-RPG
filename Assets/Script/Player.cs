@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Cinemachine;
 using UnityEngine.EventSystems;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Player : Entity, IPunObservable
 {   
@@ -77,6 +78,7 @@ public class Player : Entity, IPunObservable
 
     [SerializeField] protected float healInterval = 1; // 힐 간격
     private Coroutine healCoroutine;
+    private string previousMapName;
 
     protected override void Awake()
     {
@@ -108,10 +110,45 @@ public class Player : Entity, IPunObservable
         if (PV.IsMine)
         {
             photonView.RPC("InitializeInventory", RpcTarget.AllBuffered); // 인벤토리 초기화
-        }
-        
-       
+            // SceneManager.sceneLoaded += OnSceneLoaded;  // 씬 로드 이벤트 구독
+        }       
     }
+    //  private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    // {
+    //     if (PV.IsMine)
+    //     {
+    //         previousMapName = currentMapName;
+    //         currentMapName = scene.name;
+
+    //         if (!string.IsNullOrEmpty(previousMapName) && previousMapName != currentMapName)
+    //         {
+    //             // 이전 맵에 있는 본인 플레이어 객체를 삭제
+    //             DestroyPreviousPlayer();
+    //         }
+    //     }
+    // }
+
+    // private void DestroyPreviousPlayer()
+    // {
+    //     // 이전 맵에 남아 있는 본인 플레이어 객체를 파괴
+    //     PhotonView[] allPhotonViews = FindObjectsOfType<PhotonView>();
+    //     foreach (PhotonView pv in allPhotonViews)
+    //     {
+    //         if (pv.IsMine && pv != this.PV)
+    //         {
+    //             PhotonNetwork.Destroy(pv.gameObject);
+    //         }
+    //     }
+    // }
+
+    // private void OnDestroy()
+    // {
+    //     if (PV.IsMine)
+    //     {
+    //         SceneManager.sceneLoaded -= OnSceneLoaded;  // 씬 로드 이벤트 구독 해제
+    //     }
+    // }
+
 
     [PunRPC]
     public void InitializeInventory()

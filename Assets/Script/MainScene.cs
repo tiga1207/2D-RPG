@@ -3,35 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class MainScene : MonoBehaviour
+public class MainScene : MonoBehaviourPunCallbacks
 {
-
     public TMP_InputField NickNameInput;
     public GameObject MainPanel;
     public GameObject GamePanel;
     public GameObject OptionPanel;
-    public Button GameStartBtn;
-    public Button GameOptionBtn;
+    public Button GoGamePanelBtn;
+    public Button GoGameOptionBtn;
+    public Button Roombtn;
 
-    void Start()
+    private void Start()
     {
-        if(GameStartBtn!=null)
+        if (GoGamePanelBtn != null)
         {
-            GameStartBtn.onClick.AddListener(GameStart);
+            GoGamePanelBtn.onClick.AddListener(GoGamePanel);
         }
-        if(GameOptionBtn!=null)
+        if (GoGameOptionBtn != null)
         {
-            GameOptionBtn.onClick.AddListener(Option);
+            GoGameOptionBtn.onClick.AddListener(GoOptionPanel);
+        }
+        if (Roombtn != null)
+        {
+            Roombtn.onClick.AddListener(OnRoomButtonClicked);
         }
     }
 
-    public void GameStart()
+    public void GoGamePanel()
     {
         MainPanel.SetActive(false);
         GamePanel.SetActive(true);
     }
-    public void Option()
+
+    public void GoOptionPanel()
     {
         MainPanel.SetActive(false);
         OptionPanel.SetActive(true);
@@ -39,14 +46,31 @@ public class MainScene : MonoBehaviour
 
     public void BackToMain()
     {
-        if(GamePanel.activeSelf)
+        if (GamePanel.activeSelf)
         {
             GamePanel.SetActive(false);
         }
-        if(OptionPanel.activeSelf)
+        if (OptionPanel.activeSelf)
         {
             OptionPanel.SetActive(false);
         }
         MainPanel.SetActive(true);
+    }
+
+    private void OnRoomButtonClicked()
+    {
+        string nickName = NickNameInput.text;
+        PhotonNetwork.NickName = nickName;
+        PhotonNetwork.ConnectUsingSettings();
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 4 }, null);
+    }
+
+    public override void OnJoinedRoom()
+    {
+        PhotonNetwork.LoadLevel("Cave_1");
     }
 }

@@ -27,6 +27,7 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        DontDestroyOnLoad(gameObject);
     }
 
     public void SetPlayer(Player player)
