@@ -678,15 +678,14 @@ public class Player : Entity, IPunObservable
             if(Exp + _ExpAmount >= maxExp)
             {
                 Exp = Exp + _ExpAmount - maxExp;
-                maxExp *= 2; // 레벨업 시 경험치 통 직전 레벨에 비해 2배 증가
                 PlayerLevelUp();// 레벨업 메서드 호출
                 PV.RPC("UpdateLevelUIRPC", RpcTarget.AllBuffered, Level);
 
             }
             else
             {
-                // Exp +=Mathf.RoundToInt(_ExpAmount);
-                Exp += _ExpAmount;
+                 Exp += Mathf.RoundToInt(_ExpAmount);
+                //Exp += _ExpAmount;
             }
         }
     }
@@ -694,6 +693,7 @@ public class Player : Entity, IPunObservable
     private void PlayerLevelUp()
     {
         Level += 1; // 플레이어 레벨 1 업.
+        maxExp *= 2; // 레벨업 시 경험치 통 직전 레벨에 비해 2배 증가
         maxHp*=1.1f; // 최대 체력을 이전보다 1.1배 증가
         maxMp*=1.1f; // 최대 마나를 이전보다 1.1배 증가
         LevelupStatPoint += 1; // 레벨업 스탯포인트를 1 증가시킴

@@ -19,7 +19,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
     private RaycastHit2D isPlayerDetected;
 
     public Player player;
-    // [SerializeField] private float experiencePoints = 90;
+    [SerializeField] private float experiencePoints = 90;
 
     protected override void Awake()
     {
@@ -188,6 +188,8 @@ public class Enemy_Skeleton : Entity,IPunObservable
                 if (attacker != null)
                 {
                     attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
+                    Debug.Log("경험치 부여");
+                    
                 }
             }
         }

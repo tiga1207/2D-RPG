@@ -5,12 +5,26 @@ using System.Collections.Generic;
 
 public class EnemyManager : MonoBehaviourPunCallbacks
 {
+    //public static EnemyManager Instance;
     [Header("Enemy Settings")]
     public List<Transform> spawnPoints; // 적을 스폰할 위치 목록
     public GameObject enemyPrefab; // 적 프리팹
 
     private List<GameObject> enemies = new List<GameObject>();
 
+
+    //void Awake()
+    //{
+    //    // Singleton 패턴 구현
+    //    if (Instance == null)
+    //    {
+    //        Instance = this;
+    //    }
+    //    else
+    //    {
+    //        Destroy(gameObject);
+    //    }
+    //}
     void Start()
     {
         if (PhotonNetwork.IsMasterClient)

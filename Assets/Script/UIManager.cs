@@ -68,7 +68,7 @@ public class UIManager : MonoBehaviour
         }
         if (expText != null)
         {
-            expText.text = exp.ToString("F0");
+            expText.text = exp.ToString("F0")+" / "+maxExp.ToString("F0");
         }
     }
 

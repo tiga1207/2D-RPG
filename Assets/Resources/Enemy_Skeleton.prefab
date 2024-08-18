@@ -178,7 +178,6 @@ MonoBehaviour:
   levelText: {fileID: 0}
   maxExp: 100
   exp: 0
-  experiencePoints: 80
   attackers: []
   PV: {fileID: 7686444234326162874}
   moveSpeed: 1
@@ -187,6 +186,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   player: {fileID: 0}
+  experiencePoints: 90
 --- !u!114 &7686444234326162874
 MonoBehaviour:
   m_ObjectHideFlags: 0

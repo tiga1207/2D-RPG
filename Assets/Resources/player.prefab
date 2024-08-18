@@ -1011,7 +1011,6 @@ MonoBehaviour:
   levelText: {fileID: 6165569049861567133}
   maxExp: 100
   exp: 0
-  experiencePoints: 0
   attackers: []
   currentMapName: Cave_1
   moveSpeed: 6

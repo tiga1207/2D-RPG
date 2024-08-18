@@ -62,7 +62,7 @@ public class Entity : MonoBehaviourPunCallbacks
     [SerializeField] protected float exp;
     // [SerializeField] protected Image ExpBar;
     // [SerializeField] protected TextMeshProUGUI ExpText;
-    [SerializeField] protected float experiencePoints= 80;
+    //[SerializeField] protected float experiencePoints= 80;
     public List<PhotonView> attackers = new List<PhotonView>();
 
     protected int facingDir = 1;
@@ -236,24 +236,24 @@ public class Entity : MonoBehaviourPunCallbacks
             levelText.text = "Lv " + level.ToString("F0");
         }
     }
-    public virtual void Hited(float _damageDone, Vector2 _hitDirection) //피격 시
-    {
-        Hp -= _damageDone; // 데미지 만큼 hp 감소
-        // photonView.RPC("EnemyTakeDamageRPC",RpcTarget.All,Hp,_damageDone);
-        photonView.RPC("ShowDamageText", RpcTarget.All, _damageDone, DmgTextTransform.position); // RPC 호출
+    //public virtual void Hited(float _damageDone, Vector2 _hitDirection) //피격 시
+    //{
+    //    Hp -= _damageDone; // 데미지 만큼 hp 감소
+    //    // photonView.RPC("EnemyTakeDamageRPC",RpcTarget.All,Hp,_damageDone);
+    //    photonView.RPC("ShowDamageText", RpcTarget.All, _damageDone, DmgTextTransform.position); // RPC 호출
 
-        // 적의 HP가 0 이하가 된 경우 경험치 처리
-        if (Hp <= 0)
-        {
-            foreach (PhotonView attacker in attackers)
-            {
-                if (attacker != null)
-                {
-                    attacker.RPC("AddExpRPC", attacker.Owner, exp); // 경험치 부여
-                }
-            }
-        }
-    }
+    //    // 적의 HP가 0 이하가 된 경우 경험치 처리
+    //    if (Hp <= 0)
+    //    {
+    //        foreach (PhotonView attacker in attackers)
+    //        {
+    //            if (attacker != null)
+    //            {
+    //                attacker.RPC("AddExpRPC", attacker.Owner, exp); // 경험치 부여
+    //            }
+    //        }
+    //    }
+    //}
     // [PunRPC]
     // protected void EnemyTakeDamageRPC(float _hp, float _damageDone)
     // {
