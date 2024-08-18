@@ -44,10 +44,10 @@ public class ItemDataBase : MonoBehaviourPunCallbacks
     }
     private void Start()
     {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            Initialize();
-        }
+        // if (PhotonNetwork.IsMasterClient)
+        // {
+        //     Initialize();
+        // }
         
     }
 }

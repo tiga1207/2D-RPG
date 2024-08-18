@@ -13,6 +13,7 @@ public class Inventory : MonoBehaviourPun
     public delegate void OnChangeItem();
     public OnChangeItem onChangeItem;
     public List<Item> items = new List<Item>();
+    public static Inventory Instance;
 
     public int SlotCnt
     {
@@ -23,11 +24,20 @@ public class Inventory : MonoBehaviourPun
             onSlotCountChange?.Invoke(slotCnt); // Null 체크 후 호출
         }
     }
-
-    private void Awake()
-    {
-        DontDestroyOnLoad(gameObject); // 씬 전환 시 파괴되지 않도록 설정
-    }
+    // private void Awake()
+    // {
+    //     // Singleton 패턴 구현
+    //    if (Instance == null)
+    //    {
+    //        Instance = this;
+    //        DontDestroyOnLoad(gameObject);
+    //    }
+    //    else
+    //    {
+    //        Destroy(gameObject);
+    //    }
+        
+    // }
 
     public void Initialize()
     {

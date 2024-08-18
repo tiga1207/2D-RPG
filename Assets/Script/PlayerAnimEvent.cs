@@ -11,7 +11,16 @@ public class PlayerAnimEvent : MonoBehaviour
 
     private void AnimationTrigger()
     {
-        player.AttackOver();
+        if (!player.isTakeDamage)
+        {
+            player.AttackOver();
+        }
+        // player.AttackOver();
+    }
+
+    private void DestoryEffect()
+    {
+        Destroy(gameObject);
     }
     
 }

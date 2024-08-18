@@ -8,6 +8,7 @@ using Photon.Realtime;
 
 public class MainScene : MonoBehaviourPunCallbacks
 {
+    public TMP_Text loadingText;
     public TMP_InputField NickNameInput;
     public GameObject MainPanel;
     public GameObject GamePanel;
@@ -15,6 +16,7 @@ public class MainScene : MonoBehaviourPunCallbacks
     public Button GoGamePanelBtn;
     public Button GoGameOptionBtn;
     public Button Roombtn;
+        private Coroutine loadingCoroutine;
 
     private void Start()
     {
@@ -61,6 +63,15 @@ public class MainScene : MonoBehaviourPunCallbacks
     {
         string nickName = NickNameInput.text;
         PhotonNetwork.NickName = nickName;
+
+        if (loadingText != null)
+        {
+            loadingText.gameObject.SetActive(true);
+            if (loadingCoroutine == null)
+            {
+                loadingCoroutine = StartCoroutine(LoadingAnimation());
+            }
+        }
         PhotonNetwork.ConnectUsingSettings();
     }
 
@@ -71,6 +82,43 @@ public class MainScene : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        if (loadingText != null)
+        {
+            loadingText.gameObject.SetActive(false);
+            if (loadingCoroutine != null)
+            {
+                StopCoroutine(loadingCoroutine);
+                loadingCoroutine = null;
+            }
+        }
         PhotonNetwork.LoadLevel("Cave_1");
+    }
+
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        base.OnDisconnected(cause);
+
+        if (loadingText != null)
+        {
+            loadingText.gameObject.SetActive(false);
+            if (loadingCoroutine != null)
+            {
+                StopCoroutine(loadingCoroutine);
+                loadingCoroutine = null;
+            }
+        }
+    }
+    private IEnumerator LoadingAnimation()
+    {
+        string baseText = "로딩 중";
+        int dotCount = 0;
+
+        while (true)
+        {
+            loadingText.text = baseText + new string('.', dotCount);
+            dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3 순으로 반복
+            yield return new WaitForSeconds(0.5f); // 0.5초 간격으로 변경
+        }
     }
 }

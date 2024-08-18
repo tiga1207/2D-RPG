@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
+
+    public InventoryUI Instance;
     private Inventory inven;
     public GameObject inventoryPanel;
     bool activeInventory = false;
@@ -12,6 +14,19 @@ public class InventoryUI : MonoBehaviour
     [Header("Slot")]
     public Slot[] slots;
     public Transform slotHolder;
+
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Start()
     {

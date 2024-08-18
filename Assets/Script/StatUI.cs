@@ -89,9 +89,9 @@ public class StatUI : MonoBehaviour
 
     public void InitializeUI(float maxHp, float maxMp, float level, float damage, float statPoint)
     {
+        UpdateLEVEL(level);
         UpdateHP(maxHp);
         UpdateMP(maxMp);
-        UpdateLEVEL(level);
         UpdateDamage(damage);
         UpdateStatPoint(statPoint);
     }
@@ -100,9 +100,9 @@ public class StatUI : MonoBehaviour
     {
         if (currentPlayer != null)
         {
+            UpdateLEVEL(currentPlayer.Level);
             UpdateHP(currentPlayer.MaxHp);
             UpdateMP(currentPlayer.MaxMp);
-            UpdateLEVEL(currentPlayer.Level);
             UpdateDamage(currentPlayer.Damage);
             UpdateStatPoint(currentPlayer.LevelupStatPoint);
         }

@@ -7,6 +7,7 @@ using System.Collections;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+
     public GameObject RespawnPanel;
     public GameObject UserUI;
     public GameObject UserSkillUi;
@@ -15,7 +16,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private bool isSceneTransitioning = false;
     private EnemyManager enemyManagerInstance;
     private ItemDataBase itemDataBaseInstance;
-    private Coroutine loadingCoroutine;
+    // private Coroutine loadingCoroutine;
 
     public static NetworkManager Instance { get; private set; }
 
@@ -34,7 +35,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         
         
         // 초기화 로직
-        Screen.SetResolution(960, 540, false);
+        // Screen.SetResolution(960, 540, false);
+        Screen.SetResolution(1920, 1080, false);
         PhotonNetwork.SendRate = 60;
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.AutomaticallySyncScene = false;
@@ -58,10 +60,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected)
-        {
-            PhotonNetwork.Disconnect();
-        }
+        //->esc 누를 시에 ui 띄우는 것으로 대체 예정.
+        // if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected)
+        // {
+        //     PhotonNetwork.Disconnect();
+        // } 
     }
 
     public override void OnJoinedRoom()

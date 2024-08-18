@@ -298,6 +298,11 @@ public class Player : Entity, IPunObservable
 
     public void AttackOver()
     {
+
+        if (isTakeDamage)
+        {
+            return; // 피격 상태에서는 공격 종료를 처리하지 않음
+        }
         isAttacking = false;
         // attackActive=false;
         attackCooldownTimer=attackCooldown;
@@ -434,7 +439,7 @@ public class Player : Entity, IPunObservable
 
     private void FlashWhileInvincible()// 플레이어가 무적 상태일 경우 효과 추가.
     {
-        if (invincible && childSr != null)
+        if (isTakeDamage && childSr != null)
         {
             float alpha = Mathf.PingPong(Time.time * hitFlashSpeed, 1.0f);
             Color color = childSr.color;
@@ -488,6 +493,7 @@ public class Player : Entity, IPunObservable
         {
             Hp -= Mathf.RoundToInt(_damage); //hp 감소(damage의 소숫점 첫 번째 자리에서 반올림한 값을 int형으로 반환)
             isTakeDamage = true;
+            isAttacking = false; // 공격중이더라도 피격시 공격 종료.
             StartCoroutine(StopTakeDamage());//데미지를 연속적으로 입는 것을 방지하기 위한 코루틴 호출
         }
     }
@@ -675,9 +681,9 @@ public class Player : Entity, IPunObservable
     {
         if(PV.IsMine)
         {//최대 레벨 도달 시 exp 예외 처리도 추가해야함.
-            if(Exp + _ExpAmount >= maxExp)
+            if(Exp + _ExpAmount >= maxExp)// 경험치 획득량이 현 레벨 최대 경험치량 이상일 때(레벨업 시)
             {
-                Exp = Exp + _ExpAmount - maxExp;
+                Exp += _ExpAmount - maxExp;
                 PlayerLevelUp();// 레벨업 메서드 호출
                 PV.RPC("UpdateLevelUIRPC", RpcTarget.AllBuffered, Level);
 
@@ -694,18 +700,12 @@ public class Player : Entity, IPunObservable
     {
         Level += 1; // 플레이어 레벨 1 업.
         maxExp *= 2; // 레벨업 시 경험치 통 직전 레벨에 비해 2배 증가
+        UIManager.Instance.UpdateEXP(exp,maxExp);
         maxHp*=1.1f; // 최대 체력을 이전보다 1.1배 증가
         maxMp*=1.1f; // 최대 마나를 이전보다 1.1배 증가
         LevelupStatPoint += 1; // 레벨업 스탯포인트를 1 증가시킴
         Hp=maxHp; // 캐릭터 체력 최대체력으로 회복
         Mp=maxMp; // 캐릭터 마나를 최대 마나로 회복
-
-        // if (PV.IsMine)
-        // {
-        //     UIManager.Instance.UpdateHP(Hp, maxHp);
-        //     StatUI.Instance.UpdateHP(maxHp);
-        //     HpBarController(Hp);
-        // }
     }
 
     [PunRPC]
