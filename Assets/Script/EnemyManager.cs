@@ -28,6 +28,7 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     }
     void Start()
     {
+        //적 중복 생성 제거를 위해 주석처리
         // if (PhotonNetwork.IsMasterClient)
         // {
         //     SpawnEnemies();
