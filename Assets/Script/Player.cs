@@ -8,11 +8,12 @@ using Cinemachine;
 using UnityEngine.EventSystems;
 using System;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class Player : Entity, IPunObservable
 {   
-    public string currentMapName;
-    private float xInput, yInput;
+    public string currentMapName; // 플레이어 현 위치 맵(씬)이름
+    private float xInput, yInput; //x축 이동, y축 이동
     private SpriteRenderer childSr;
     private Collider2D playerCollider;
 
@@ -22,6 +23,7 @@ public class Player : Entity, IPunObservable
     [SerializeField] private float jumpForce;
 
     [Header("Dash")]
+    public bool dashSkillActivate;
     [SerializeField] private float dashSpeed;
     [SerializeField] private float dashDuration; // 대시 지속시간
     [SerializeField] public float dashCooldown;//대시 스킬 쿨타임
@@ -46,7 +48,8 @@ public class Player : Entity, IPunObservable
     [SerializeField] public bool invincible = false;
     public bool isTakeDamage = false;
     [SerializeField] private GameObject sr;
-    public float levelupStatPoint=0;
+    public float levelupStatPoint=1;
+    public float levelupSkillPoint=1;
 
 
     [Header("Jump Ability")]
@@ -66,6 +69,7 @@ public class Player : Entity, IPunObservable
 
     [Header("Healing")]
     [SerializeField] private GameObject healEffect;
+    public bool healSkillActivate;
 
     public bool isHealing = false; // 힐 스킬 사용 여부
     public bool healActive= true;
@@ -171,6 +175,7 @@ public class Player : Entity, IPunObservable
             UIManager.Instance.SetPlayer(this);
             SkillUIManager.Instance.SetPlayer(this);
             StatUI.Instance.SetPlayer(this);
+            SkillUI.Instance.SetPlayer(this);
 
         }
         // UIManager.Instance.InitializeUI(Hp, maxHp, Mp, maxMp, Exp, maxExp);
@@ -189,6 +194,7 @@ public class Player : Entity, IPunObservable
             FlipController();
             FlashWhileInvincible();
             PlayerHpController();
+            Debug.Log("대쉬:"+dashSkillActivate);
             // DashAbility(); //대시 코루틴 미사용시
         }
     }
@@ -331,6 +337,7 @@ public class Player : Entity, IPunObservable
         if (Input.GetKeyDown(KeyCode.LeftShift))// 대시 입력 관리
         {
             Dash();
+            Debug.Log("대쉬 키 누름");
         }
         
         if(isTakeDamage)// 캐릭터가 데미지를 입고 있다면 아래 입력 무시.
@@ -346,6 +353,7 @@ public class Player : Entity, IPunObservable
         if (Input.GetKeyDown(KeyCode.T)) // T키를 누를 시에 힐 스킬 시전
         {
             StartHealing();
+            Debug.Log("힐링 키 누름");
         }
         if (Input.GetKeyUp(KeyCode.T)) // T키를 뗄 시에 힐 스킬 중단
         {
@@ -356,7 +364,7 @@ public class Player : Entity, IPunObservable
 //대쉬 기능
     private void Dash() //대쉬 기능
     {
-        if (dashActive && !isAttacking) // 대쉬 조건
+        if (dashActive && !isAttacking && dashSkillActivate) // 대쉬 조건
         {
             isDashing=true;
             dashActive=false;
@@ -537,7 +545,7 @@ public class Player : Entity, IPunObservable
     #region 1. 체력회복 시작 메서드
     private void StartHealing()
     {
-        if (healActive && Hp < maxHp)
+        if (healSkillActivate && healActive && Hp < maxHp)
         {
             isHealing=true;
             healCoroutine = StartCoroutine(HealCoroutine()); //healCoroutine변수에 해당 코루틴을 담아서 startHealing이 실행 돼야지만 stophealing이 작동되도록 함.
@@ -703,7 +711,8 @@ public class Player : Entity, IPunObservable
         UIManager.Instance.UpdateEXP(exp,maxExp);
         maxHp*=1.1f; // 최대 체력을 이전보다 1.1배 증가
         maxMp*=1.1f; // 최대 마나를 이전보다 1.1배 증가
-        LevelupStatPoint += 1; // 레벨업 스탯포인트를 1 증가시킴
+        LevelupStatPoint += 1; // 레벨업 시 스탯포인트를 1 증가시킴
+        LevelupSkillPoint += 1; // 레벨업 시 스킬포인트를 1 증가시킴.
         Hp=maxHp; // 캐릭터 체력 최대체력으로 회복
         Mp=maxMp; // 캐릭터 마나를 최대 마나로 회복
     }
@@ -817,6 +826,22 @@ public class Player : Entity, IPunObservable
                 if (PV.IsMine)
                 {
                     StatUI.Instance.UpdateStatPoint(levelupStatPoint);
+                }
+            }
+        }
+    }
+
+    public float LevelupSkillPoint
+    {
+        get { return levelupSkillPoint; }
+        set
+        {
+            if (levelupSkillPoint != value)
+            {
+                levelupSkillPoint = Mathf.Max(value, 0);
+                if (PV.IsMine)
+                {
+                    SkillUI.Instance.UpdateSkillPoint(levelupSkillPoint);
                 }
             }
         }

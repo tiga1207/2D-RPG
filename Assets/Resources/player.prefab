@@ -1016,6 +1016,7 @@ MonoBehaviour:
   moveSpeed: 6
   gravity: 3.5
   jumpForce: 30
+  dashSkillActivate: 0
   dashSpeed: 25
   dashDuration: 0.25
   dashCooldown: 1.5
@@ -1033,7 +1034,8 @@ MonoBehaviour:
   invincible: 0
   isTakeDamage: 0
   sr: {fileID: 266314399188597393}
-  levelupStatPoint: 0
+  levelupStatPoint: 1
+  levelupSkillPoint: 1
   jumpCount: 0
   maxJumpCount: 2
   isJumping: 0
