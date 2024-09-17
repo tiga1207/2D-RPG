@@ -1045,6 +1045,7 @@ MonoBehaviour:
   playerInventory: {fileID: -6711382382737738178}
   PV: {fileID: 1523211523370137496}
   healEffect: {fileID: 158530, guid: be9fa4cf050e848df821231d39718be4, type: 3}
+  healSkillActivate: 0
   isHealing: 0
   healActive: 1
   healAmount: 1

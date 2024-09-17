@@ -9,7 +9,7 @@ public class FieldItems : MonoBehaviourPun
     public SpriteRenderer image;
 
     [PunRPC]
-    public void SetItemID(int itemID)
+    public void SetItemID(string itemID)
     {
         item = ItemDataBase.instace.GetItemByID(itemID);
         if (item != null)

@@ -176,6 +176,7 @@ public class Player : Entity, IPunObservable
             SkillUIManager.Instance.SetPlayer(this);
             StatUI.Instance.SetPlayer(this);
             SkillUI.Instance.SetPlayer(this);
+            QuestUI.Instance.SetPlayer(this);
 
         }
         // UIManager.Instance.InitializeUI(Hp, maxHp, Mp, maxMp, Exp, maxExp);
@@ -194,7 +195,6 @@ public class Player : Entity, IPunObservable
             FlipController();
             FlashWhileInvincible();
             PlayerHpController();
-            Debug.Log("대쉬:"+dashSkillActivate);
             // DashAbility(); //대시 코루틴 미사용시
         }
     }
@@ -337,7 +337,6 @@ public class Player : Entity, IPunObservable
         if (Input.GetKeyDown(KeyCode.LeftShift))// 대시 입력 관리
         {
             Dash();
-            Debug.Log("대쉬 키 누름");
         }
         
         if(isTakeDamage)// 캐릭터가 데미지를 입고 있다면 아래 입력 무시.

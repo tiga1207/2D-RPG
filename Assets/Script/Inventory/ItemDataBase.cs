@@ -25,7 +25,7 @@ public class ItemDataBase : MonoBehaviourPunCallbacks
     //     }
     // }
 
-    public Item GetItemByID(int id)
+    public Item GetItemByID(string id)
     {
         return itemDB.Find(item => item.itemID == id);
     }

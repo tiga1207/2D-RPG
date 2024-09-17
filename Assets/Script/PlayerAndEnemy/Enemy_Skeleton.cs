@@ -187,9 +187,8 @@ public class Enemy_Skeleton : Entity,IPunObservable
             {
                 if (attacker != null)
                 {
-                    attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
-                    Debug.Log("경험치 부여");
-                    
+                    QuestManager.instance.UpdateKillCount();
+                    attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);                    
                 }
             }
         }
