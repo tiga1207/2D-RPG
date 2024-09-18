@@ -34,8 +34,9 @@ public class Slot : MonoBehaviour, IPointerUpHandler
     {
         if(item !=null)
         {
-            Player player = FindObjectOfType<Player>();
-            if (player != null)
+            // Player player = FindObjectOfType<Player>();
+            Player player = Player.LocalPlayerInstance;
+            if (player != null && player.GetComponent<PhotonView>().IsMine)
             {
                 bool isUse = item.Use(player);
                 if (isUse)
@@ -49,6 +50,9 @@ public class Slot : MonoBehaviour, IPointerUpHandler
                 else{
                     Debug.Log("클릭 안됨");
                 }
+            }
+            else{
+                Debug.Log("you can't do that");
             }
         }
     }

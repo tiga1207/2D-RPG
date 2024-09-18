@@ -14,6 +14,7 @@ public class Inventory : MonoBehaviourPun
     public OnChangeItem onChangeItem;
     public List<Item> items = new List<Item>();
     public static Inventory Instance;
+    private Player currentPlayer;
 
     public int SlotCnt
     {
@@ -24,29 +25,20 @@ public class Inventory : MonoBehaviourPun
             onSlotCountChange?.Invoke(slotCnt); // Null 체크 후 호출
         }
     }
-    // private void Awake()
-    // {
-    //     // Singleton 패턴 구현
-    //    if (Instance == null)
-    //    {
-    //        Instance = this;
-    //        DontDestroyOnLoad(gameObject);
-    //    }
-    //    else
-    //    {
-    //        Destroy(gameObject);
-    //    }
-        
-    // }
 
     public void Initialize()
     {
-        slotCnt = 2; //슬롯 초기값.
-        onSlotCountChange?.Invoke(slotCnt);
+        if(photonView.IsMine)
+        {
+            slotCnt = 2; //슬롯 초기값.
+            onSlotCountChange?.Invoke(slotCnt);
+        }
     }
 
     public bool AddItem(Item _item)
     {
+        if(!photonView.IsMine) return false;
+
         if (items.Count < slotCnt)
         {
             items.Add(_item);
@@ -58,12 +50,22 @@ public class Inventory : MonoBehaviourPun
 
     public void RemoveItem(int _index)
     {
-        items.RemoveAt(_index);
-        onChangeItem?.Invoke();
+        if(!photonView.IsMine) 
+        {
+            Debug.Log("can't remove cus not mine");
+            return;
+        }
+
+        if (_index >= 0 && _index < items.Count)
+        {
+            items.RemoveAt(_index);
+            onChangeItem?.Invoke();
+        }
     }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("FieldItem"))
+        if (other.CompareTag("FieldItem")&&photonView.IsMine)
         {
             FieldItems fieldItems = other.GetComponent<FieldItems>();
             if (fieldItems != null && AddItem(fieldItems.GetItem()))

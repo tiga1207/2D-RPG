@@ -83,6 +83,7 @@ public class Player : Entity, IPunObservable
     [SerializeField] protected float healInterval = 1; // 힐 간격
     private Coroutine healCoroutine;
     private string previousMapName;
+    public static Player LocalPlayerInstance;
 
     protected override void Awake()
     {
@@ -105,18 +106,18 @@ public class Player : Entity, IPunObservable
             var CM = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
             CM.Follow = transform;
             CM.LookAt = transform;
+
+            // SceneManager.sceneLoaded += OnSceneLoaded;  // 씬 로드 이벤트 구독
+
+            photonView.RPC("InitializeInventory", RpcTarget.AllBuffered); // 인벤토리 초기화
+            LocalPlayerInstance = this;
         }
 
         //플레이어끼리의 충돌 방지
         int playerLayer = LayerMask.NameToLayer("Player");
         Physics2D.IgnoreLayerCollision(playerLayer, playerLayer);
-
-        if (PV.IsMine)
-        {
-            photonView.RPC("InitializeInventory", RpcTarget.AllBuffered); // 인벤토리 초기화
-            // SceneManager.sceneLoaded += OnSceneLoaded;  // 씬 로드 이벤트 구독
-        }       
     }
+    
     //  private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     // {
     //     if (PV.IsMine)
@@ -177,7 +178,6 @@ public class Player : Entity, IPunObservable
             StatUI.Instance.SetPlayer(this);
             SkillUI.Instance.SetPlayer(this);
             QuestUI.Instance.SetPlayer(this);
-
         }
         // UIManager.Instance.InitializeUI(Hp, maxHp, Mp, maxMp, Exp, maxExp);
     }
@@ -527,6 +527,8 @@ public class Player : Entity, IPunObservable
             stream.SendNext(Mp);
             stream.SendNext(Exp);
             stream.SendNext(Level);
+            stream.SendNext(maxHp);
+            stream.SendNext(maxMp);
 
         }
         else
@@ -536,6 +538,9 @@ public class Player : Entity, IPunObservable
             Mp = (float)stream.ReceiveNext();
             Exp=(float)stream.ReceiveNext();
             Level=(float)stream.ReceiveNext();
+            maxHp = (float)stream.ReceiveNext(); // 최대 체력 수신
+            maxMp = (float)stream.ReceiveNext(); // 최대 마나 수신
+
 
         }
     }
