@@ -52,21 +52,34 @@ public class QuestUI : MonoBehaviour
         quests = questList;
 
         foreach (var quest in quests)
+    {
+        // 퀘스트가 보상 받은 상태인지 확인
+        if (quest.status == QuestStatus.Rewarded)
         {
-            // 이미 존재하는 퀘스트 항목인지 확인
+            // 보상 받은 퀘스트는 UI에서 제거
             if (questItemMap.TryGetValue(quest.questName, out GameObject questItem))
             {
-                // 이미 존재하면 텍스트만 업데이트
-                UpdateQuestUI(questItem, quest);
+                Destroy(questItem); // UI에서 퀘스트 항목 제거
+                questItemMap.Remove(quest.questName); // 딕셔너리에서 제거
+
             }
-            else
-            {
-                // 존재하지 않으면 새로 생성하고 딕셔너리에 추가
-                questItem = Instantiate(questItemPrefab, content);
-                questItemMap[quest.questName] = questItem;
-                UpdateQuestUI(questItem, quest);
-            }
+            continue; // 완료된 퀘스트는 더 이상 처리하지 않음
         }
+
+        // 이미 존재하는 퀘스트 항목인지 확인
+        if (questItemMap.TryGetValue(quest.questName, out GameObject existingQuestItem))
+        {
+            // 이미 존재하면 텍스트만 업데이트
+            UpdateQuestUI(existingQuestItem, quest);
+        }
+        else
+        {
+            // 존재하지 않으면 새로 생성하고 딕셔너리에 추가
+            GameObject newQuestItem = Instantiate(questItemPrefab, content);
+            questItemMap[quest.questName] = newQuestItem;
+            UpdateQuestUI(newQuestItem, quest);
+        }
+    }
     }
 
     // 퀘스트 UI 업데이트 함수

@@ -36196,7 +36196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a5d95b500b5a4fa0a72ef6f38e8508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcName: second
+  npcId: 2
   npcImage: {fileID: -85727878, guid: 687df074731fbf744b668d2275dbb675, type: 3}
   dialogues:
   - "\uB450 \uBC88\uC9F8 npc \uC785\uB2C8\uB2E4."
@@ -36204,7 +36204,13 @@ MonoBehaviour:
   quest:
     questName: "2\uBC88\uC9F8 npc "
     description: "3\uB9C8\uB9AC \uBAB9 \uC7A1\uAE30."
+    npc: {fileID: 0}
+    npcId: 2
+    questType: 0
     status: 0
+    rewardType: 0
+    experienceReward: 0
+    rewardItems: []
     requiredKills: 3
     currentKills: 0
     requiresItemUsage: 0
@@ -69852,6 +69858,58 @@ PrefabInstance:
       propertyPath: dialogueManager
       value: 
       objectReference: {fileID: 70058309}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: npcId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.npc
+      value: 
+      objectReference: {fileID: 7367295250825003865}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.npcId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.requiredKills
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.experienceReward
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardItems.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardItems.Array.data[0].itemID
+      value: as10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardItems.Array.data[0].itemName
+      value: hpPotion
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardItems.Array.data[0].itemType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardItems.Array.data[0].itemImage
+      value: 
+      objectReference: {fileID: 21300000, guid: 2f605f8487435b64780f2f663cc01c4c, type: 3}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardItems.Array.data[0].effects.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+      propertyPath: quest.rewardItems.Array.data[0].effects.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 9a4bcd5b2e49b43e6a9308601daeaa88, type: 2}
     - target: {fileID: 5933321958031840156, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
       propertyPath: m_Name
       value: Npc
@@ -69901,6 +69959,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+--- !u!114 &7367295250825003865 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2943705091983412484, guid: cb36cfdec081047d9b04d25db315dc30, type: 3}
+  m_PrefabInstance: {fileID: 7367295250825003864}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a5d95b500b5a4fa0a72ef6f38e8508e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8671665625225624584
 PrefabInstance:
   m_ObjectHideFlags: 0

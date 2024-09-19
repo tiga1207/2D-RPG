@@ -124,39 +124,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + playerCheckDistance * facingDir, transform.position.y));
     }
-
-    // public override void Hited(float _damageDone, Vector2 _hitDirection)
-    // {
-    //     base.Hited(_damageDone, _hitDirection);
-    //     if (Hp <= 0)
-    //     {
-    //         Vector3 respawnPosition = transform.position;
-
-    //         if (PhotonNetwork.IsMasterClient)
-    //         {
-    //             PhotonNetwork.Destroy(gameObject);
-    //             EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
-    //             if (enemyManager != null && PhotonNetwork.IsMasterClient)
-    //             {
-    //                 enemyManager.RespawnEnemy(respawnPosition);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition);
-    //         }
-    //         // 적을 처치한 플레이어에게 경험치 부여
-    //         foreach (PhotonView attacker in attackers)
-    //         {
-    //             if (attacker != null)
-    //             {
-    //                 attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
-    //             }
-    //         }
-
-    //     }
-    // }
-
+    
     [PunRPC]
     public void HitedRPC(float _damageDone, Vector2 _hitDirection)
     {

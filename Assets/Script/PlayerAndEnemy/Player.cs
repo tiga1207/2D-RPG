@@ -13,6 +13,8 @@ using System.Collections.Generic;
 public class Player : Entity, IPunObservable
 {   
     public string currentMapName; // 플레이어 현 위치 맵(씬)이름
+    public static Player LocalPlayerInstance;
+
     private float xInput, yInput; //x축 이동, y축 이동
     private SpriteRenderer childSr;
     private Collider2D playerCollider;
@@ -83,7 +85,6 @@ public class Player : Entity, IPunObservable
     [SerializeField] protected float healInterval = 1; // 힐 간격
     private Coroutine healCoroutine;
     private string previousMapName;
-    public static Player LocalPlayerInstance;
 
     protected override void Awake()
     {
