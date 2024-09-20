@@ -193,17 +193,21 @@ public class Enemy_Skeleton : Entity,IPunObservable
             }
         }
     }
+    // public override void HpBarController(float hp)
+    // {
+    //     base.HpBarController(hp);
+    //     if (hpBar != null)
+    //     {
+    //         hpBar.fillAmount = hp / maxHp;
+    //     }
+    //     if (HpText != null)
+    //     {
+    //         HpText.text = hp.ToString("F0"); // 텍스트로 변환
+    //     }
+    // }
     public override void HpBarController(float hp)
     {
         base.HpBarController(hp);
-        if (hpBar != null)
-        {
-            hpBar.fillAmount = hp / maxHp;
-        }
-        if (HpText != null)
-        {
-            HpText.text = hp.ToString("F0"); // 텍스트로 변환
-        }
     }
 
     public override float Hp
@@ -214,7 +218,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
             if (hp != value)
             {
                 hp = Mathf.Clamp(value, 0, maxHp);
-                HpBarController(hp);
+                // HpBarController(hp);
 
             }
         }
