@@ -14,8 +14,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public GameObject userRespawn;
     public Button RespawnButton;
     private bool isSceneTransitioning = false;
-    private EnemyManager enemyManagerInstance;
-    private ItemDataBase itemDataBaseInstance;
+    public EnemyManager enemyManagerInstance;
+    public ItemDataBase itemDataBaseInstance;
     // private Coroutine loadingCoroutine;
 
     public static NetworkManager Instance { get; private set; }
@@ -41,8 +41,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.SerializationRate = 30;
         PhotonNetwork.AutomaticallySyncScene = false;
 
-        enemyManagerInstance = FindObjectOfType<EnemyManager>();
-        itemDataBaseInstance = FindObjectOfType<ItemDataBase>();
+        // enemyManagerInstance = FindObjectOfType<EnemyManager>();
+        // itemDataBaseInstance = FindObjectOfType<ItemDataBase>();
     }
 
     private void Start()
@@ -88,16 +88,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void SpawnPlayer()
+    public void SpawnPlayer()
     {
-        if (PhotonNetwork.LocalPlayer.TagObject != null)
+
+        if (PhotonNetwork.LocalPlayer.TagObject != null)// 로컬플레이어가 중복된 캐릭터 조작 불가능하게.
         {
             return;
         }
         GameObject player = PhotonNetwork.Instantiate("Player", userRespawn.transform.position, Quaternion.identity);
-        PhotonNetwork.LocalPlayer.TagObject = player;
-        // GameObject player = PhotonNetwork.Instantiate("Player", userRespawn.transform.position, Quaternion.identity);
-
+        PhotonNetwork.LocalPlayer.TagObject = player;//
         if (player.GetComponent<PhotonView>().IsMine)
         {
             player.GetComponent<Inventory>().Initialize();

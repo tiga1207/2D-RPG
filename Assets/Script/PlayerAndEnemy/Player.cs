@@ -204,8 +204,11 @@ public class Player : Entity, IPunObservable
     {
         if (Hp <= 0)
         {
-            PhotonNetwork.Destroy(gameObject);
-            GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
+            // PhotonNetwork.Destroy(gameObject);
+            isTakeDamage= false; // 피격상태로 게임 오브젝트가 비활성화 될 경우 리스폰시 피격상태로 판정됨.
+            invincible = false; // 피격상태로 게임 오브젝트가 비활성화 될 경우 리스폰시 피격상태로 판정됨.
+            gameObject.SetActive(false);// 플레이어 오브젝트 비활성화 시키기.
+            PlayerRespawn.Instance.OnRespawnPanel();
         }
     }
 
