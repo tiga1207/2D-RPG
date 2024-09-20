@@ -259,6 +259,8 @@ public class Player : Entity, IPunObservable
             // {
             //     comboCounter = 0;
             // }
+            CameraShaker.Instance.ShakeCamera(2f, 0.1f);//공격시 카메라 흔들림 기능 추가.
+
             attackCooldownTimer=attackCooldown;
             Hit(AttackTransform, AttackArea);// Hit 메서드 호출하여 적 공격.
             StartCoroutine(AttackCooldown());//공격쿨타임(공격속도에 따른) 코루틴 호출
