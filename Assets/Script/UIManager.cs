@@ -16,6 +16,11 @@ public class UIManager : MonoBehaviour
 
     private Player currentPlayer; // 현재 플레이어
 
+    public float hpFillAmount;
+    public float mpFillAmount;
+    public float expFillAmount;
+    public float lerpTime = 10f;
+
     void Awake()
     {
         // Singleton 패턴 구현
@@ -30,17 +35,35 @@ public class UIManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    // void Start()
+    // {
+    // }
+
     public void SetPlayer(Player player)
     {
         currentPlayer = player;
+        InitStatus(player.Hp, player.MaxHp, player.Mp, player.MaxMp, player.Exp, player.MaxExp);
         InitializeUI(player.Hp, player.MaxHp, player.Mp, player.MaxMp, player.Exp, player.MaxExp,player.Level);
+    }
+
+    public void InitStatus(float hp, float maxHp, float mp, float maxMp, float exp, float maxExp)
+    {
+        hpFillAmount = hp / maxHp;
+        hpImage.fillAmount = hpFillAmount;
+
+        mpFillAmount = mp / maxMp;
+        mpImage.fillAmount = mpFillAmount;
+
+        expFillAmount = exp / maxExp;
+        expImage.fillAmount = expFillAmount;
     }
 
     public void UpdateHP(float hp, float maxHp)
     {
         if (hpImage != null)
         {
-            hpImage.fillAmount = hp / maxHp;
+            hpFillAmount = Mathf.Lerp(hpFillAmount, hp/ maxHp, Time.deltaTime * lerpTime);
+            hpImage.fillAmount = hpFillAmount;
         }
         if (hpText != null)
         {
@@ -52,7 +75,9 @@ public class UIManager : MonoBehaviour
     {
         if (mpImage != null)
         {
-            mpImage.fillAmount = mp / maxMp;
+            // mpImage.fillAmount = mp / maxMp;
+            mpFillAmount = Mathf.Lerp(mpFillAmount, mp/ maxMp, Time.deltaTime * lerpTime);
+            mpImage.fillAmount = mpFillAmount;
         }
         if (mpText != null)
         {
@@ -64,7 +89,9 @@ public class UIManager : MonoBehaviour
     {
         if (expImage != null)
         {
-            expImage.fillAmount = exp / maxExp;
+            // expImage.fillAmount = exp / maxExp;
+            expFillAmount = Mathf.Lerp(expFillAmount, exp/ maxExp, Time.deltaTime * lerpTime);
+            expImage.fillAmount = expFillAmount;
         }
         if (expText != null)
         {

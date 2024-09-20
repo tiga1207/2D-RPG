@@ -195,12 +195,20 @@ public class Player : Entity, IPunObservable
             AnimatorController();
             FlipController();
             FlashWhileInvincible();
-            PlayerHpController();
+            PlayerDie();
+            LerpPlayerUI();
             // DashAbility(); //대시 코루틴 미사용시
         }
     }
 
-    private void PlayerHpController()
+    private void LerpPlayerUI()
+    {
+        UIManager.Instance.UpdateHP(hp, maxHp);
+        UIManager.Instance.UpdateMP(mp, maxMp);
+        UIManager.Instance.UpdateEXP(exp,maxExp);
+    }
+
+    private void PlayerDie()
     {
         if (Hp <= 0)
         {
@@ -718,7 +726,7 @@ public class Player : Entity, IPunObservable
     {
         Level += 1; // 플레이어 레벨 1 업.
         maxExp *= 2; // 레벨업 시 경험치 통 직전 레벨에 비해 2배 증가
-        UIManager.Instance.UpdateEXP(exp,maxExp);
+        // UIManager.Instance.UpdateEXP(exp,maxExp);
         maxHp*=1.1f; // 최대 체력을 이전보다 1.1배 증가
         maxMp*=1.1f; // 최대 마나를 이전보다 1.1배 증가
         LevelupStatPoint += 1; // 레벨업 시 스탯포인트를 1 증가시킴
@@ -750,7 +758,7 @@ public class Player : Entity, IPunObservable
                 hp = Mathf.Clamp(value, 0, maxHp);
                 if (PV.IsMine)
                 {
-                    UIManager.Instance.UpdateHP(hp, maxHp);
+                    // UIManager.Instance.UpdateHP(hp, maxHp); // 보간 사용 안할시 해당 위치에서 사용하여 메모리 사용량 줄이기
                     StatUI.Instance.UpdateHP(maxHp);
                 }
                 HpBarController(hp);
@@ -768,7 +776,7 @@ public class Player : Entity, IPunObservable
                 mp = Mathf.Clamp(value, 0, maxMp);
                 if (PV.IsMine)
                 {
-                    UIManager.Instance.UpdateMP(mp, maxMp);
+                    // UIManager.Instance.UpdateMP(mp, maxMp);
                     StatUI.Instance.UpdateMP(MaxMp);
                 }
                 MpBarController(mp);
@@ -786,7 +794,7 @@ public class Player : Entity, IPunObservable
                 exp = Mathf.Clamp(value, 0, maxExp);
                 if (PV.IsMine)
                 {
-                    UIManager.Instance.UpdateEXP(exp, maxExp);
+                    // UIManager.Instance.UpdateEXP(exp, maxExp);
                 }
             }
         }

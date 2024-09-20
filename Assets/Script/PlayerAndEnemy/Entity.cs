@@ -9,6 +9,7 @@ public class Entity : MonoBehaviourPunCallbacks
 {
     protected Animator anim;
     protected Rigidbody2D rb;
+    public float lerpTime = 5f;
 
     [Header("Collision info")]
     [SerializeField] protected Transform groundCheck;
@@ -34,6 +35,7 @@ public class Entity : MonoBehaviourPunCallbacks
     [SerializeField] public float damage;
     [SerializeField] protected Image hpBar;
     [SerializeField] protected TextMeshProUGUI HpText;
+    public float hpFillAmount;
 
 
     [Header("Mana")]
@@ -42,6 +44,7 @@ public class Entity : MonoBehaviourPunCallbacks
     [SerializeField] protected float mp;
     [SerializeField] protected Image mpBar;
     [SerializeField] protected TextMeshProUGUI MpText;
+    public float mpFillAmount;
 
     [Header("Damaged")]
     public GameObject floatingDamageTextPrefab; // 프리팹 레퍼런스 추가
@@ -81,9 +84,20 @@ public class Entity : MonoBehaviourPunCallbacks
     protected virtual void Start()
     {
         hp = maxHp; // 초기 HP 설정
-        HpBarController(hp); // 초기 HP바 설정
+        // HpBarController(hp); // 초기 HP바 설정
         mp = maxMp;
-        MpBarController(mp);
+        // MpBarController(mp);
+        if(hpBar != null)
+        {
+            hpFillAmount = hp / maxHp;
+            hpBar.fillAmount = hpFillAmount;
+        }
+
+        if(mpBar != null )
+        {
+            mpFillAmount = mp / maxMp;
+            mpBar.fillAmount = mpFillAmount;
+        }
         exp=0;
         // ExpBarController(exp);
         LevelController(level);
@@ -92,6 +106,8 @@ public class Entity : MonoBehaviourPunCallbacks
     protected virtual void Update()
     {
         CollisionCheck();
+        HpBarController(hp);
+        MpBarController(mp);
         // Heal();
     }
 
@@ -148,7 +164,7 @@ public class Entity : MonoBehaviourPunCallbacks
             if (hp != value)
             {
                 hp = Mathf.Clamp(value, 0, maxHp);// Mathf.Clamp함수를 통해 체력의 최소값과 최대값 범위 결정.
-                HpBarController(hp); // HP가 변경될 때 HP바 업데이트
+                // HpBarController(hp); // HP가 변경될 때 HP바 업데이트
                 HpController(); // HP가 변경될 때 HP 상태 확인
             }
         }
@@ -160,7 +176,9 @@ public class Entity : MonoBehaviourPunCallbacks
     {
         if (hpBar != null)
         {
-            hpBar.fillAmount = hp / maxHp;
+            hpFillAmount = Mathf.Lerp(hpFillAmount, hp/ maxHp, Time.deltaTime * lerpTime);
+            hpBar.fillAmount = hpFillAmount;
+            // hpBar.fillAmount = hp / maxHp;
         }
         if (HpText != null)
         {
@@ -176,7 +194,7 @@ public class Entity : MonoBehaviourPunCallbacks
             if (mp != value)
             {
                 mp = Mathf.Clamp(value, 0, maxMp);
-                MpBarController(mp); // HP가 변경될 때 HP바 업데이트
+                // MpBarController(mp); // HP가 변경될 때 HP바 업데이트
             }
         }
     }
@@ -186,7 +204,9 @@ public class Entity : MonoBehaviourPunCallbacks
     {
         if (mpBar != null)
         {
-            mpBar.fillAmount = mp / maxMp;
+            mpFillAmount = Mathf.Lerp(mpFillAmount, mp/ maxMp, Time.deltaTime * lerpTime);
+            mpBar.fillAmount = mpFillAmount;
+            // mpBar.fillAmount = mp / maxMp;
         }
         if (MpText != null)
         {
