@@ -14,7 +14,6 @@ public class ItemHealingEffect : ItemEffect
         {
             return false;
         }
-
         player.HpPotion(healingAmount);//hp회복
         return true;
     }

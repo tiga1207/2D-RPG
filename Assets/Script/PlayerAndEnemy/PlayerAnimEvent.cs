@@ -18,6 +18,11 @@ public class PlayerAnimEvent : MonoBehaviour
         // player.AttackOver();
     }
 
+    private void CheckFinishAnim()
+    {
+        player.PlayerDieAfter();
+    }
+
     private void DestoryEffect()
     {
         Destroy(gameObject);

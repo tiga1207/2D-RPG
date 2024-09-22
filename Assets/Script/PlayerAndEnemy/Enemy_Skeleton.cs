@@ -9,6 +9,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
 {
 
     public PhotonView PV;
+    public bool isEnemyDie= false;
     bool isAttacking;
     [Header("Move info")]
     [SerializeField] private float moveSpeed = 1f;
@@ -43,6 +44,9 @@ public class Enemy_Skeleton : Entity,IPunObservable
 
         // HpController();
         Movement();
+        AnimatorController();
+        EnemyDyingCheck();
+
 
         if (!isGrounded || isWallDetected) // 벽 혹은 땅쪽일 경우 방향 전환
         {
@@ -106,10 +110,21 @@ public class Enemy_Skeleton : Entity,IPunObservable
                 // AttackPlayer();
             }
         }
+        else if(isEnemyDie)
+        {
+            rb.velocity = new Vector2(0,0);
+        }
         else //평상시
         {
             rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
         }
+    }
+
+    private void AnimatorController() //플레이어 애니메이션 관리 
+    {
+        bool isMoving = rb.velocity.x != 0;
+        anim.SetBool("isMoving", isMoving);
+        anim.SetBool("isEnemyDie", isEnemyDie);
     }
 
     protected override void CollisionCheck()
@@ -128,42 +143,51 @@ public class Enemy_Skeleton : Entity,IPunObservable
     [PunRPC]
     public void HitedRPC(float _damageDone, Vector2 _hitDirection)
     {
+        Debug.Log("적 히트 rpc 호출");
+        if(Hp<=0) return;
         Hp -= _damageDone; //체력 감소
         HpBarController(Hp);// 체력바 업데이트
         ShowDamageText(_damageDone, transform.position);// 데미지 표시 텍스트 메서드 호출
+    }
 
-        if (Hp <= 0)
+    private void EnemyDyingCheck()
+    {
+        if (Hp <= 0 && !isEnemyDie)
         {
-            Vector3 respawnPosition = transform.position;
-
-            if (PhotonNetwork.IsMasterClient)// 마스터 클라이언트 일 경우 
-            {
-                PhotonNetwork.Destroy(gameObject);//네트워크 상에서 적을 파괴함.
-                EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
-                if (enemyManager != null && PhotonNetwork.IsMasterClient)
-                {
-                    enemyManager.RespawnEnemy(respawnPosition);// 적 리스폰
-                }
-            }
-            else
-            {
-                PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition); //마스터 클라이언트에게 파괴 요청.
-            }
-
-            // 적을 처치한 플레이어에게 경험치 부여
-            foreach (PhotonView attacker in attackers)
-            {
-                if (attacker != null)
-                {
-                    QuestManager.instance.UpdateKillCount();
-                    attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);                    
-                }
-            }
+            // Enemy_DieAfter();
+            isEnemyDie = true;
+            return;
         }
     }
 
+    public void Enemy_DieAfter()
+    {
+        Vector3 respawnPosition = transform.position;
 
+        if (PhotonNetwork.IsMasterClient)// 마스터 클라이언트 일 경우 
+        {
+            PhotonNetwork.Destroy(gameObject);//네트워크 상에서 적을 파괴함.
+            EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+            if (enemyManager != null && PhotonNetwork.IsMasterClient)
+            {
+                enemyManager.RespawnEnemy(respawnPosition);// 적 리스폰
+            }
+        }
+        else
+        {
+            PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition); //마스터 클라이언트에게 파괴 요청.
+        }
 
+        // 적을 처치한 플레이어에게 경험치 부여
+        foreach (PhotonView attacker in attackers)
+        {
+            if (attacker != null)
+            {
+                QuestManager.instance.UpdateKillCount();
+                attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
+            }
+        }
+    }
 
     [PunRPC]
     private void RequestDestroy(int viewID, Vector3 respawnPosition)

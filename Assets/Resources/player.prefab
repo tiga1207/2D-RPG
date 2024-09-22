@@ -979,6 +979,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 021407ee8d81f45bcb530f2e6167a02a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lerpTime: 5
   groundCheck: {fileID: 1981194128964173402}
   groundCheckDistance: 0.15
   wallCheck: {fileID: 1981194128964173402}
@@ -997,10 +998,12 @@ MonoBehaviour:
   damage: 5
   hpBar: {fileID: 2295747386967473338}
   HpText: {fileID: 3485246523442579001}
+  hpFillAmount: 0
   maxMp: 100
   mp: 100
   mpBar: {fileID: 664507574757989491}
   MpText: {fileID: 2199118339905275053}
+  mpFillAmount: 0
   floatingDamageTextPrefab: {fileID: 2441219514409268784, guid: 57ab39bf78d2649fea5caaf77d717532, type: 3}
   DmgTextTransform: {fileID: 6301664609572627377}
   textMoveSpeed: 0
@@ -1033,6 +1036,7 @@ MonoBehaviour:
   hitFlashSpeed: 5
   invincible: 0
   isTakeDamage: 0
+  isPlayerDie: 0
   sr: {fileID: 266314399188597393}
   levelupStatPoint: 1
   levelupSkillPoint: 1

@@ -146,6 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dabcdf12050834165b7af1111c19575d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lerpTime: 5
   groundCheck: {fileID: 3002605183346254416}
   groundCheckDistance: 0.2
   wallCheck: {fileID: 2429296720611026235}
@@ -161,13 +162,15 @@ MonoBehaviour:
   slashEffect: {fileID: 0}
   maxHp: 20
   hp: 10
-  damage: 2
+  damage: 10
   hpBar: {fileID: 2465744573858256583}
   HpText: {fileID: 1294589479123610186}
+  hpFillAmount: 0
   maxMp: 0
   mp: 0
   mpBar: {fileID: 0}
   MpText: {fileID: 0}
+  mpFillAmount: 0
   floatingDamageTextPrefab: {fileID: 2441219514409268784, guid: 522db3938ea494f8bb8634783894ad28, type: 3}
   DmgTextTransform: {fileID: 2965909990536947896}
   textMoveSpeed: 0
@@ -180,6 +183,7 @@ MonoBehaviour:
   exp: 0
   attackers: []
   PV: {fileID: 7686444234326162874}
+  isEnemyDie: 0
   moveSpeed: 1
   playerCheckDistance: 4
   whatIsPlayer:
@@ -208,6 +212,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 1677611912271747132}
   - {fileID: 2347062846238539502}
+  - {fileID: 1293805196580852960}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -391,6 +396,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1222283949151579356}
   - component: {fileID: 7529219578480499655}
+  - component: {fileID: 8984683885349456896}
+  - component: {fileID: 1293805196580852960}
+  - component: {fileID: 7669142888218906751}
   m_Layer: 0
   m_Name: Animator
   m_TagString: Untagged
@@ -407,8 +415,8 @@ Transform:
   m_GameObject: {fileID: 5000904309709245990}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.31, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.31, y: -0.92, z: 0}
+  m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8140598976961325910}
@@ -454,7 +462,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -85727878, guid: 687df074731fbf744b668d2275dbb675, type: 3}
+  m_Sprite: {fileID: -2164340094424659655, guid: 8c89341f7a3ff4e39a3e2b7b9e593d6e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -465,6 +473,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &8984683885349456896
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5000904309709245990}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a569545261ea84a5fb3b9deb5a96548a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1293805196580852960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5000904309709245990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 0
+    Name: isEnemyDie
+  - Type: 4
+    SynchronizeType: 0
+    Name: isMoving
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
+--- !u!114 &7669142888218906751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5000904309709245990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77dc221c4f9da49b6bfe3e7f4fc9d3a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6052562189071236264
 GameObject:
   m_ObjectHideFlags: 0

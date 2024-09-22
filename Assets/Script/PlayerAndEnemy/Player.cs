@@ -49,6 +49,7 @@ public class Player : Entity, IPunObservable
     [SerializeField] private float hitFlashSpeed;
     [SerializeField] public bool invincible = false;
     public bool isTakeDamage = false;
+    public bool isPlayerDie = false;
     [SerializeField] private GameObject sr;
     public float levelupStatPoint=1;
     public float levelupSkillPoint=1;
@@ -180,7 +181,6 @@ public class Player : Entity, IPunObservable
             SkillUI.Instance.SetPlayer(this);
             QuestUI.Instance.SetPlayer(this);
         }
-        // UIManager.Instance.InitializeUI(Hp, maxHp, Mp, maxMp, Exp, maxExp);
     }
 
     protected override void Update()
@@ -188,14 +188,16 @@ public class Player : Entity, IPunObservable
         base.Update();
         if (PV.IsMine)
         {
+            PlayerDying();
+            AnimatorController();
+            
             Movement();
             JumpAbility();
             CheckInput();
             CooldownManager();
-            AnimatorController();
             FlipController();
             FlashWhileInvincible();
-            PlayerDie();
+            
             LerpPlayerUI();
             // DashAbility(); //대시 코루틴 미사용시
         }
@@ -208,15 +210,22 @@ public class Player : Entity, IPunObservable
         UIManager.Instance.UpdateEXP(exp,maxExp);
     }
 
-    private void PlayerDie()
+    public void PlayerDieAfter() //플레이어 사망 후처리 로직
     {
-        if (Hp <= 0)
+        gameObject.SetActive(false);// 플레이어 오브젝트 비활성화 시키기.
+        isPlayerDie = false;
+        PlayerRespawn.Instance.OnRespawnPanel();    
+    }
+
+    public void PlayerDying()
+    {
+        if (Hp <= 0 && !isPlayerDie)
         {
-            // PhotonNetwork.Destroy(gameObject);
             isTakeDamage= false; // 피격상태로 게임 오브젝트가 비활성화 될 경우 리스폰시 피격상태로 판정됨.
-            invincible = false; // 피격상태로 게임 오브젝트가 비활성화 될 경우 리스폰시 피격상태로 판정됨.
-            gameObject.SetActive(false);// 플레이어 오브젝트 비활성화 시키기.
-            PlayerRespawn.Instance.OnRespawnPanel();
+            invincible = false; // 피격상태로 게임 오브젝트가 비활성화 될 경우 리스폰시 피격상태로 판정됨.        
+            isPlayerDie = true; // 죽는 모션 플레이
+            // PhotonNetwork.Destroy(gameObject);
+
         }
     }
 
@@ -336,6 +345,11 @@ public class Player : Entity, IPunObservable
 
     private void CheckInput() // 사용자 키 입출력 관리
     {
+        if(isPlayerDie)
+        {
+            return;
+        }
+
         xInput = Input.GetAxisRaw("Horizontal"); // 수평 입력 관리
         yInput = Input.GetAxisRaw("Vertical"); // 수직 입력 관리
         
@@ -411,7 +425,7 @@ public class Player : Entity, IPunObservable
 
     private void Movement()
     {
-        if (isAttacking) // 플레이어가 공격중일 때
+        if (isAttacking || isPlayerDie) // 플레이어가 공격중일 때
         {
             rb.velocity = new Vector2(0, 0);// 이동 불가.
         }
@@ -456,6 +470,9 @@ public class Player : Entity, IPunObservable
         anim.SetBool("isAttacking", isAttacking);
         anim.SetInteger("comboCounter", comboCounter);
         anim.SetBool("isTakeDamage", isTakeDamage);
+        anim.SetBool("isPlayerDie", isPlayerDie);
+
+        
     }
 
     private void FlashWhileInvincible()// 플레이어가 무적 상태일 경우 효과 추가.
@@ -512,6 +529,10 @@ public class Player : Entity, IPunObservable
     {
         if(PV.IsMine)// 내 플레이어일 경우
         {
+            if(hp<=0)
+            {
+                return;
+            }
             Hp -= Mathf.RoundToInt(_damage); //hp 감소(damage의 소숫점 첫 번째 자리에서 반올림한 값을 int형으로 반환)
             isTakeDamage = true;
             isAttacking = false; // 공격중이더라도 피격시 공격 종료.
