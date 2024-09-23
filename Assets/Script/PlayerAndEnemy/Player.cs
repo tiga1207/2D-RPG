@@ -85,7 +85,7 @@ public class Player : Entity, IPunObservable
 
     [SerializeField] protected float healInterval = 1; // 힐 간격
     private Coroutine healCoroutine;
-    private string previousMapName;
+    // private string previousMapName;
 
     protected override void Awake()
     {
