@@ -16,15 +16,6 @@ public class ItemDataBase : MonoBehaviourPunCallbacks
     public GameObject fieldItemPrefab;
     public List<Transform> itemLocations; // 아이템 위치 목록
 
-    // public void Initialize()
-    // {
-    //     for(int i=0; i<itemDB.Count; ++i)
-    //     {
-    //         GameObject go = PhotonNetwork.Instantiate(fieldItemPrefab.name,pos[i],Quaternion.identity);
-    //         go.GetComponent<FieldItems>().SetItem(itemDB[i]); 
-    //     }
-    // }
-
     public Item GetItemByID(string id)
     {
         return itemDB.Find(item => item.itemID == id);
@@ -42,12 +33,15 @@ public class ItemDataBase : MonoBehaviourPunCallbacks
             }
         }
     }
-    private void Start()
+    public void itemAdd(int i)
     {
-        // if (PhotonNetwork.IsMasterClient)
-        // {
-        //     Initialize();
-        // }
-        
+        if(i < itemDB.Count)
+        {
+            itemDB.Add(itemDB[i]);
+        }
+        else
+        {
+            Debug.Log("i의 값이 현재 아이템 db 수보다 큽니다.");
+        }
     }
 }

@@ -584,7 +584,7 @@ public class Player : Entity, IPunObservable
     #region 1. 체력회복 시작 메서드
     private void StartHealing()
     {
-        if (healSkillActivate && healActive && Hp < maxHp)
+        if (healSkillActivate && healActive && Hp < maxHp && !isJumping && !isDashing && !isTakeDamage && !isAttacking) //점프, 대쉬, 
         {
             isHealing=true;
             healCoroutine = StartCoroutine(HealCoroutine()); //healCoroutine변수에 해당 코루틴을 담아서 startHealing이 실행 돼야지만 stophealing이 작동되도록 함.

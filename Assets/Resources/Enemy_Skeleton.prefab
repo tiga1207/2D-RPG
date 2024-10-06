@@ -191,6 +191,7 @@ MonoBehaviour:
     m_Bits: 64
   player: {fileID: 0}
   experiencePoints: 90
+  fieldItem: {fileID: 6549036706612274581, guid: 8d62bfc3e352f4318b2823324d37065a, type: 3}
 --- !u!114 &7686444234326162874
 MonoBehaviour:
   m_ObjectHideFlags: 0

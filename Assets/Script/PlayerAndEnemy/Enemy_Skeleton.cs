@@ -21,6 +21,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
 
     public Player player;
     [SerializeField] private float experiencePoints = 90;
+    public GameObject fieldItem;
 
     protected override void Awake()
     {
@@ -163,7 +164,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
     public void Enemy_DieAfter()
     {
         Vector3 respawnPosition = transform.position;
-
+        Vector3 itemPosition = new Vector3(transform.position.x,transform.position.y-1,transform.position.z);
         if (PhotonNetwork.IsMasterClient)// 마스터 클라이언트 일 경우 
         {
             PhotonNetwork.Destroy(gameObject);//네트워크 상에서 적을 파괴함.
@@ -172,8 +173,9 @@ public class Enemy_Skeleton : Entity,IPunObservable
             {
                 enemyManager.RespawnEnemy(respawnPosition);// 적 리스폰
             }
+            ItemDrop(fieldItem,itemPosition);
         }
-        else
+        else // 슬레이브 클라이언트 일 경우
         {
             PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition); //마스터 클라이언트에게 파괴 요청.
         }
@@ -186,6 +188,24 @@ public class Enemy_Skeleton : Entity,IPunObservable
                 QuestManager.instance.UpdateKillCount();
                 attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
             }
+        }
+    }
+
+    private static void ItemDrop(GameObject gameObject,Vector3 _respawnPosition) //아이템 드랍 코드
+    {
+        Debug.Log("아이템 드랍 로직 진입");
+        int randomDropP = UnityEngine.Random.Range(1, 11); //1~10까지 중 랜덤 수
+        int itemP = UnityEngine.Random.Range(0, ItemDataBase.instace.itemDB.Count-1);
+        if (randomDropP > 7)//30퍼센트 확률로.
+        {
+            Debug.Log($"랜덤하게 아이템 생성! 아이템 리스트 {itemP+1}번째 아이템");
+            ItemDataBase.instace.itemAdd(itemP);
+            GameObject go = PhotonNetwork.Instantiate(gameObject.name, _respawnPosition, Quaternion.identity);
+            go.GetComponent<PhotonView>().RPC("SetItemID", RpcTarget.AllBuffered, ItemDataBase.instace.itemDB[itemP].itemID);
+        }
+        else
+        {
+            Debug.Log($"랜덤가챠 실패!! 랜덤 시드: {randomDropP}");
         }
     }
 
