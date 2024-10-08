@@ -361,15 +361,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inventorySlot:
-    item:
-      itemID: 
-      itemType: 0
-      itemName: 
-      itemImage: {fileID: 0}
-      effects: []
     itemCntMax: 0
     itemID: 
+    canOverlap: 0
     _itemCount: 0
   itemIcon: {fileID: 3745550319399613673}
   slotnum: 0
   itemCntText: {fileID: 5050776890450300253}
+  toolTip: {fileID: 5243961674059991565, guid: 27325924508414004b0e29041a4b3769, type: 3}
+  toolTipRectTransform: {fileID: 0}
+  tooTipItemName: {fileID: 0}
+  tooTipItemDesc: {fileID: 0}

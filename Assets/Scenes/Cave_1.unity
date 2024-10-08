@@ -70363,6 +70363,18 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[0].itemDescription
+      value: this is hp potion
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[1].itemDescription
+      value: this is mp potion
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[2].itemDescription
+      value: this fake
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
       propertyPath: itemDB.Array.data[0].effects.Array.size
       value: 1
       objectReference: {fileID: 0}

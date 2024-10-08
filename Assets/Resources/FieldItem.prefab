@@ -149,8 +149,10 @@ MonoBehaviour:
     itemID: 0
     itemType: 0
     itemName: 
+    itemDescription: 
     itemImage: {fileID: 0}
     effects: []
+    canOverlap: 0
   image: {fileID: 190218068307522911}
 --- !u!114 &8669788311839497424
 MonoBehaviour:

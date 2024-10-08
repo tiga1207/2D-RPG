@@ -16,6 +16,7 @@ public class Item
     public string itemID;
     public ItemType itemType;
     public string itemName;
+    public string itemDescription;
     public Sprite itemImage;
     public List<ItemEffect> effects;
     public bool canOverlap;
