@@ -135,7 +135,8 @@ public class QuestManager : MonoBehaviour
             {
                 foreach (var item in quest.rewardItems)
                 {
-                    player.playerInventory.AddItem(item);
+                    // player.playerInventory.AddItem(item);
+                    player.playerInventory.AddItem(item.itemID,1);
                 }       
             quest.status = QuestStatus.Rewarded;//퀘스트 상태를 보상받은 상태로 변경
 

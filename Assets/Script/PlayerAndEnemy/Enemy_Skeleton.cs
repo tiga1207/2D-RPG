@@ -195,13 +195,13 @@ public class Enemy_Skeleton : Entity,IPunObservable
     {
         Debug.Log("아이템 드랍 로직 진입");
         int randomDropP = UnityEngine.Random.Range(1, 11); //1~10까지 중 랜덤 수
-        int itemP = UnityEngine.Random.Range(0, ItemDataBase.instace.itemDB.Count-1);
-        if (randomDropP > 7)//30퍼센트 확률로.
+        int itemP = UnityEngine.Random.Range(0, ItemDataBase.instance.itemDB.Count-1);
+        if (randomDropP > 3)//아이템 드랍 확률
         {
             Debug.Log($"랜덤하게 아이템 생성! 아이템 리스트 {itemP+1}번째 아이템");
-            ItemDataBase.instace.itemAdd(itemP);
+            ItemDataBase.instance.itemAdd(itemP);
             GameObject go = PhotonNetwork.Instantiate(gameObject.name, _respawnPosition, Quaternion.identity);
-            go.GetComponent<PhotonView>().RPC("SetItemID", RpcTarget.AllBuffered, ItemDataBase.instace.itemDB[itemP].itemID);
+            go.GetComponent<PhotonView>().RPC("SetItemID", RpcTarget.AllBuffered, ItemDataBase.instance.itemDB[itemP].itemID);
         }
         else
         {

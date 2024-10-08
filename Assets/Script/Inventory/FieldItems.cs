@@ -11,7 +11,7 @@ public class FieldItems : MonoBehaviourPun
     [PunRPC]
     public void SetItemID(string itemID)
     {
-        item = ItemDataBase.instace.GetItemByID(itemID);
+        item = ItemDataBase.instance.GetItemByID(itemID);
         if (item != null)
         {
             image.sprite = item.itemImage;

@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class ItemDataBase : MonoBehaviourPunCallbacks
 {
-    public static ItemDataBase instace;
+    public static ItemDataBase instance;
 
     private void Awake() {
-        instace=this;
+        instance=this;
     }
 
     public List<Item>itemDB= new List<Item>();

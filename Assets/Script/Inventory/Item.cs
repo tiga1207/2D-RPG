@@ -22,14 +22,14 @@ public class Item
     public bool Use(Player player)
     {
         bool isUsed = false;
-        
+        // itemCnt--;
         foreach (ItemEffect effect in effects)
         {
             isUsed = effect.ExecuteRole(player);
         }
 
         return isUsed;
-    }   
+    }
 }
 
 

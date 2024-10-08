@@ -31,10 +31,10 @@ public class InventoryUI : MonoBehaviour
     private void Start()
     {
         inventoryPanel.SetActive(false);
-        StartCoroutine(InitializeInventory());
+        StartCoroutine(InitInventory());
     }
 
-    private IEnumerator InitializeInventory()
+    private IEnumerator InitInventory()
     {
         // Player 객체가 생성될 때까지 대기
         Player player = null;
@@ -54,6 +54,7 @@ public class InventoryUI : MonoBehaviour
         inven.onSlotCountChange += SlotChange;
         slots = slotHolder.GetComponentsInChildren<Slot>();
         inven.onChangeItem += RedrawSlotUI;
+        RedrawSlotUI();
         SlotChange(inven.SlotCnt);
     }
 
@@ -90,14 +91,27 @@ public class InventoryUI : MonoBehaviour
 
     void RedrawSlotUI()
     {
+        // 모든 슬롯을 초기화
         for (int i = 0; i < slots.Length; i++)
         {
             slots[i].RemoveSlot();
         }
+
+        // 인벤토리에 있는 아이템을 UI 슬롯에 업데이트
         for (int i = 0; i < inven.items.Count; i++)
         {
-            slots[i].item = inven.items[i];
-            slots[i].UpdateSlotUI();
+            string itemID = inven.items[i].itemID; // InventorySlot의 itemID 가져오기
+            int itemCount = inven.items[i].ItemCount; // 아이템 수량 가져오기
+
+            // 아이템 ID로 아이템 데이터를 가져옴
+            Item itemData = ItemDataBase.instance.GetItemByID(itemID);
+
+            if (itemData != null)
+            {
+                // 슬롯에 아이템 데이터를 설정
+                slots[i].inventorySlot = inven.items[i]; // InventorySlot을 슬롯에 할당
+                slots[i].UpdateSlotUI();  // UI 갱신
+            }
         }
     }
     
