@@ -39,13 +39,13 @@ public class Inventory : MonoBehaviourPun
     }
 
     // 아이템 추가: itemID와 획득한 수량만 관리
-    public bool AddItem(string itemID, int count = 1)
+    public bool AddItem(bool _canOverlap, string itemID, int count = 1)
     {
         if (!photonView.IsMine) return false;
 
         // 이미 해당 아이템이 인벤토리에 있는지 확인
-        InventorySlot existingSlot = items.Find(slot => slot.itemID == itemID);
-        if (existingSlot != null)
+        InventorySlot existingSlot = items.Find(inventorySlot => inventorySlot.itemID == itemID);
+        if (existingSlot != null && _canOverlap)
         {
             // 이미 있으면 개수만 증가
             existingSlot.ItemCount += count;
@@ -94,7 +94,7 @@ public class Inventory : MonoBehaviourPun
         if (other.CompareTag("FieldItem") && photonView.IsMine)
         {
             FieldItems fieldItems = other.GetComponent<FieldItems>();
-            if (fieldItems != null && AddItem(fieldItems.item.itemID, 1))
+            if (fieldItems != null && AddItem(fieldItems.item.canOverlap,fieldItems.item.itemID, 1))
             {
                 fieldItems.DestroyItem(); // 아이템 획득 후 필드에서 제거
             }

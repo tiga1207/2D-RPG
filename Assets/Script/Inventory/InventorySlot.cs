@@ -3,11 +3,9 @@ using UnityEngine;
 [System.Serializable]
 public class InventorySlot
 {
-    public Item item;
-    // public int itemCount;
-
     public int itemCntMax = 99;
     public string itemID;
+    public bool canOverlap;
 
     [SerializeField]private int _itemCount;
 
@@ -30,7 +28,7 @@ public class InventorySlot
         itemID = id;
         ItemCount = count;
     }
-    
+
     public void RemoveItemCount(int count)
     {
         ItemCount -= count;

@@ -18,6 +18,7 @@ public class Item
     public string itemName;
     public Sprite itemImage;
     public List<ItemEffect> effects;
+    public bool canOverlap;
 
     public bool Use(Player player)
     {
