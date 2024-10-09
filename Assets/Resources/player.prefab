@@ -1016,6 +1016,8 @@ MonoBehaviour:
   exp: 0
   attackers: []
   currentMapName: Cave_1
+  isCrushed: 0
+  StopTakeDamageTime: 1
   moveSpeed: 6
   gravity: 3.5
   jumpForce: 30

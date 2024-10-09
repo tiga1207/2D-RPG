@@ -15,4 +15,12 @@ public class SkeletonAnimEvent : MonoBehaviour
         enemy_Skeleton.Enemy_DieAfter();
     }
 
+    private void AnimationTrigger()
+    {
+        if (!enemy_Skeleton.isTakeDamage)
+        {
+            enemy_Skeleton.AttackOver();
+        }
+    }
+
 }

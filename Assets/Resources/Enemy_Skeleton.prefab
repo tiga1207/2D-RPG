@@ -184,6 +184,12 @@ MonoBehaviour:
   attackers: []
   PV: {fileID: 7686444234326162874}
   isEnemyDie: 0
+  isTakeDamage: 0
+  currentHp: 0
+  isAttacking: 0
+  attackActive: 1
+  attackCooldown: 5
+  attackCooldownTimer: 5
   moveSpeed: 1
   playerCheckDistance: 4
   whatIsPlayer:
@@ -192,6 +198,7 @@ MonoBehaviour:
   player: {fileID: 0}
   experiencePoints: 90
   fieldItem: {fileID: 6549036706612274581, guid: 8d62bfc3e352f4318b2823324d37065a, type: 3}
+  collisionDmg: 1
 --- !u!114 &7686444234326162874
 MonoBehaviour:
   m_ObjectHideFlags: 0

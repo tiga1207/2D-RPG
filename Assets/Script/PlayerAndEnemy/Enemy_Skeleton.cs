@@ -10,7 +10,13 @@ public class Enemy_Skeleton : Entity,IPunObservable
 
     public PhotonView PV;
     public bool isEnemyDie= false;
-    bool isAttacking;
+    public bool isTakeDamage = false;
+    public bool isAttacking=false;
+    public bool attackActivate =true;
+    [SerializeField] private float attackCooldown=1f;
+    [SerializeField] private float attackCooldownTimer=1f;
+    public bool isCooldownActive = false;
+
     [Header("Move info")]
     [SerializeField] private float moveSpeed = 1f;
 
@@ -76,20 +82,27 @@ public class Enemy_Skeleton : Entity,IPunObservable
         {
             if (isPlayerDetected.distance > 1)// 최대 탐지 사거리 playerCheckDistance보단 작음.
             {
-                rb.velocity = new Vector2(moveSpeed * 3f * facingDir, rb.velocity.y); //적 발견시 이동속도
-                Debug.Log("I see the player");
-                isAttacking = false;
+                rb.velocity = new Vector2(moveSpeed * 1.5f * facingDir, rb.velocity.y); //적 발견시 이동속도
+                // Debug.Log("I see the player");
+                // isAttacking = false;
             }
             else //공격 사거리(isPlayerDetected.distance <1 일 경우)) 내 플레이어 접근 시
             {
-                Debug.Log("Attack " + isPlayerDetected.collider.gameObject.name);
-                isAttacking = true;
+                if(!isAttacking && attackActivate)
+                {
+                // Debug.Log("Attack " + isPlayerDetected.collider.gameObject.name);
+                // isAttacking = true;
                 rb.velocity = new Vector2(0,0);// 특정 애니메이션(공격 모션 끝)이 끝나기 전까지는 해당 오브젝트가 움직이지 못하도록 고정시켜야함.
-                //코루틴을 통해 공격속도 적용시키기 및 특정 애니메이션 시점에서 캐릭터에게 데미지를 주도록 해야하며
                 AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID,damage);
+                if (!isCooldownActive) // 쿨타임이 진행 중이 아니면 코루틴 시작
+            {
+                StartCoroutine(AttackCooldown()); // 쿨타임 시작
+            }
+                // StartCoroutine(AttackCooldown());//공격 쿨타임(공격 속도에 따른) 코루틴 호출
+                }
             }
         }
-        else if(isEnemyDie)
+        else if(isEnemyDie || isTakeDamage)
         {
             rb.velocity = new Vector2(0,0);
         }
@@ -106,7 +119,6 @@ public class Enemy_Skeleton : Entity,IPunObservable
         facingDir = faceRight ? 1 : -1;
         transform.Rotate(0, 180, 0);
         hpBar.transform.Rotate(0,180,0);
-        HpText.transform.Rotate(0,180,0);
     }
 
     private void FindLocalPlayer()
@@ -122,25 +134,14 @@ public class Enemy_Skeleton : Entity,IPunObservable
         }
     }
 
-    
-    //코루틴 예시
-    // private IEnumerator StopTakeDamage()
-    // {
-    //     invincible = true;// 캐릭터 무적 상태
-    //     //GameObject _bloodEffectParticle = Instantiate(bloodEffect, transform.position, Quaternion.identity);
-    //     GameObject _bloodEffectParticle = PhotonNetwork.Instantiate(bloodEffect.name, transform.position, Quaternion.identity);//네트워크 상에 피격 파티클 생성
-    //     StartCoroutine(DestroyAfter(_bloodEffectParticle, StopTakeDamageTime));//생성된 파티클을 1초 뒤 파괴
-    //     yield return new WaitForSeconds(StopTakeDamageTime);// 1초 후 종료
-    //     isTakeDamage = false;
-    //     invincible = false;
-    //     isCrushed = false;
-    // }
-
     private void AnimatorController() //플레이어 애니메이션 관리 
     {
         bool isMoving = rb.velocity.x != 0;
         anim.SetBool("isMoving", isMoving);
         anim.SetBool("isEnemyDie", isEnemyDie);
+        anim.SetBool("isTakeDamage", isTakeDamage);
+        anim.SetBool("isAttacking",isAttacking);
+        
     }
 
     protected override void CollisionCheck()
@@ -162,8 +163,18 @@ public class Enemy_Skeleton : Entity,IPunObservable
         Debug.Log("적 히트 rpc 호출");
         if(Hp<=0) return;
         Hp -= _damageDone; //체력 감소
+        isTakeDamage =true;
         HpBarController(Hp);// 체력바 업데이트
         ShowDamageText(_damageDone, transform.position);// 데미지 표시 텍스트 메서드 호출
+        //피격후 0.1초동안 피격당하지 않을 시 피격 애니메이션 종료.
+        // StartCoroutine(StopTakeDamageSkeleton());
+    }
+
+     //코루틴 예시
+    private IEnumerator StopTakeDamageSkeleton()
+    {
+        yield return new WaitForSeconds(0.1f);
+        isTakeDamage = false;
     }
 
     private void EnemyDyingCheck()
@@ -171,6 +182,8 @@ public class Enemy_Skeleton : Entity,IPunObservable
         if (Hp <= 0 && !isEnemyDie)
         {
             isEnemyDie = true;
+            isTakeDamage= false;
+            isAttacking = false;
             return;
         }
     }
@@ -237,7 +250,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
             }
         }
     }
-
+    //플레이어 공격 시
     public void AttackPlayer(int playerViewID, float _damage)// 플레이어 공격
     {
         PhotonView playerPV = PhotonView.Find(playerViewID);
@@ -246,17 +259,68 @@ public class Enemy_Skeleton : Entity,IPunObservable
             Player player = playerPV.GetComponent<Player>();
             if (player != null && !player.invincible)
             {
-                Debug.Log("플레이어 공격중");
+                Debug.Log("플레이어 공격중 i'm attack player!!!");
+                attackActivate= false;
+                isAttacking= true;
+                // if(player.invincible) return;
                 player.TakeDamage(_damage);
             }
         }
+    }
+
+    //단순 충돌 시
+    public void AttackPlayerJustCollision(int playerViewID, float _damage)// 플레이어 공격
+    {
+        PhotonView playerPV = PhotonView.Find(playerViewID);
+        if (playerPV != null && playerPV.IsMine)
+        {
+            Player player = playerPV.GetComponent<Player>();
+            if (player != null && !player.invincible)
+            {
+                player.TakeDamage(_damage);
+            }
+        }
+    }
+
+    public void AttackOver()
+    {
+        if (isTakeDamage)
+        {
+            return; // 피격 상태에서는 공격 종료를 처리하지 않음
+        }
+        isAttacking = false;
+        // attackCooldownTimer=attackCooldown;
+    }
+
+    private IEnumerator AttackCooldown()
+    {
+        Debug.Log("쿨다운 코루틴 실행");
+        if (isCooldownActive) 
+        {
+            Debug.Log("쿨다운 코루틴 실행 취소");
+            yield break; // 쿨타임이 이미 진행 중이면 코루틴을 중단
+        }
+
+        isCooldownActive = true;
+        
+        while (attackCooldownTimer >= 0)
+        {
+            Debug.Log("쿨타임 내부 실행");
+            attackActivate=false;
+            attackCooldownTimer -= Time.deltaTime;
+            yield return null;
+        }
+        Debug.Log("쿨타임 끝");
+        attackCooldownTimer = attackCooldown; // 쿨타임 타이머를 초기화
+        isCooldownActive = false;
+        attackActivate = true;//공격쿨타임 타이머가 0이하일 때 공격 상태 활성화
     }
 
     //플레이어와 충돌시 플레이어에게 데미지 부여.
     private void OnCollisionEnter2D(Collision2D other) {
         if (other.gameObject.CompareTag("Player"))
         {
-            AttackPlayer(other.gameObject.GetComponent<PhotonView>().ViewID,collisionDmg);
+            AttackPlayerJustCollision(other.gameObject.GetComponent<PhotonView>().ViewID,collisionDmg);
         }
         
     }
