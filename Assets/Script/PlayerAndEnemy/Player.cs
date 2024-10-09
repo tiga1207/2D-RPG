@@ -15,6 +15,9 @@ public class Player : Entity, IPunObservable
     public string currentMapName; // 플레이어 현 위치 맵(씬)이름
     public static Player LocalPlayerInstance;
 
+    public bool isCrushed= false;
+    public float StopTakeDamageTime= 1f;
+
     private float xInput, yInput; //x축 이동, y축 이동
     private SpriteRenderer childSr;
     private Collider2D playerCollider;
@@ -202,6 +205,19 @@ public class Player : Entity, IPunObservable
             // DashAbility(); //대시 코루틴 미사용시
         }
     }
+    // 적이랑 충돌 시 밀려남(recoil) 구현
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Enemy") && !isCrushed)
+        {
+            // float recoilDistance =2f; 
+            float dirX = transform.position.x - other.transform.position.x > 0 ? 2f : -2f;
+            Debug.Log("dirx 값"+dirX);
+            transform.position = new Vector2(transform.position.x + dirX, transform.position.y);
+            Debug.Log("충돌"); 
+            isCrushed= true;
+        }
+    }
 
     private void LerpPlayerUI()
     {
@@ -307,23 +323,23 @@ public class Player : Entity, IPunObservable
     }
 
     protected void Hit(Transform _attackTransform, Vector2 _attackArea)
-{
-    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);//overlapBox 생성
-
-    for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
     {
-        if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);//overlapBox 생성
+
+        for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
         {
-            Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
-            if (!enemy.attackers.Contains(PV))
+            if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
             {
-                enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+                Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+                if (!enemy.attackers.Contains(PV))
+                {
+                    enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+                }
+                enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
+            
             }
-            enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
-           
         }
     }
-}
 
     public void AttackOver()
     {
@@ -546,10 +562,11 @@ public class Player : Entity, IPunObservable
         invincible = true;// 캐릭터 무적 상태
         //GameObject _bloodEffectParticle = Instantiate(bloodEffect, transform.position, Quaternion.identity);
         GameObject _bloodEffectParticle = PhotonNetwork.Instantiate(bloodEffect.name, transform.position, Quaternion.identity);//네트워크 상에 피격 파티클 생성
-        StartCoroutine(DestroyAfter(_bloodEffectParticle, 1f));//생성된 파티클을 1초 뒤 파괴
-        yield return new WaitForSeconds(1f);// 1초 후 종료
+        StartCoroutine(DestroyAfter(_bloodEffectParticle, StopTakeDamageTime));//생성된 파티클을 1초 뒤 파괴
+        yield return new WaitForSeconds(StopTakeDamageTime);// 1초 후 종료
         isTakeDamage = false;
         invincible = false;
+        isCrushed = false;
     }
     
 

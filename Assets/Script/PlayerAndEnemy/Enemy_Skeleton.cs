@@ -23,6 +23,8 @@ public class Enemy_Skeleton : Entity,IPunObservable
     [SerializeField] private float experiencePoints = 90;
     public GameObject fieldItem;
 
+    public float collisionDmg= 1f;
+
     protected override void Awake()
     {
         base.Awake();
@@ -58,15 +60,42 @@ public class Enemy_Skeleton : Entity,IPunObservable
 
     private void FlipController()
     {
-        if (rb.velocity.x > 0 && !facingRight)
-        {
-            PV.RPC("FlipRPC", RpcTarget.AllBuffered, true);
-
-        }
-        else if (rb.velocity.x < 0 && facingRight)
+        if(facingRight)
         {
             PV.RPC("FlipRPC", RpcTarget.AllBuffered, false);
+        }
+        else if(!facingRight)
+        {
+            PV.RPC("FlipRPC", RpcTarget.AllBuffered, true);
+        }
+    }
 
+    private void Movement()
+    {
+        if (isPlayerDetected) //플레이어 발견 여부에 따른 이동속도 및 행동
+        {
+            if (isPlayerDetected.distance > 1)// 최대 탐지 사거리 playerCheckDistance보단 작음.
+            {
+                rb.velocity = new Vector2(moveSpeed * 3f * facingDir, rb.velocity.y); //적 발견시 이동속도
+                Debug.Log("I see the player");
+                isAttacking = false;
+            }
+            else //공격 사거리(isPlayerDetected.distance <1 일 경우)) 내 플레이어 접근 시
+            {
+                Debug.Log("Attack " + isPlayerDetected.collider.gameObject.name);
+                isAttacking = true;
+                rb.velocity = new Vector2(0,0);// 특정 애니메이션(공격 모션 끝)이 끝나기 전까지는 해당 오브젝트가 움직이지 못하도록 고정시켜야함.
+                //코루틴을 통해 공격속도 적용시키기 및 특정 애니메이션 시점에서 캐릭터에게 데미지를 주도록 해야하며
+                AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID,damage);
+            }
+        }
+        else if(isEnemyDie)
+        {
+            rb.velocity = new Vector2(0,0);
+        }
+        else //평상시
+        {
+            rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
         }
     }
 
@@ -93,33 +122,19 @@ public class Enemy_Skeleton : Entity,IPunObservable
         }
     }
 
-    private void Movement()
-    {
-        if (isPlayerDetected) //플레이어 발견 여부에 따른 이동속도 및 행동
-        {
-            if (isPlayerDetected.distance > 1)
-            {
-                rb.velocity = new Vector2(moveSpeed * 1.5f * facingDir, rb.velocity.y); //적 발견시 이동
-                Debug.Log("I see the player");
-                isAttacking = false;
-            }
-            else //공격 사거리 내 플레이어 접근 시
-            {
-                Debug.Log("Attack " + isPlayerDetected.collider.gameObject.name);
-                isAttacking = true;
-                AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID);
-                // AttackPlayer();
-            }
-        }
-        else if(isEnemyDie)
-        {
-            rb.velocity = new Vector2(0,0);
-        }
-        else //평상시
-        {
-            rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
-        }
-    }
+    
+    //코루틴 예시
+    // private IEnumerator StopTakeDamage()
+    // {
+    //     invincible = true;// 캐릭터 무적 상태
+    //     //GameObject _bloodEffectParticle = Instantiate(bloodEffect, transform.position, Quaternion.identity);
+    //     GameObject _bloodEffectParticle = PhotonNetwork.Instantiate(bloodEffect.name, transform.position, Quaternion.identity);//네트워크 상에 피격 파티클 생성
+    //     StartCoroutine(DestroyAfter(_bloodEffectParticle, StopTakeDamageTime));//생성된 파티클을 1초 뒤 파괴
+    //     yield return new WaitForSeconds(StopTakeDamageTime);// 1초 후 종료
+    //     isTakeDamage = false;
+    //     invincible = false;
+    //     isCrushed = false;
+    // }
 
     private void AnimatorController() //플레이어 애니메이션 관리 
     {
@@ -155,7 +170,6 @@ public class Enemy_Skeleton : Entity,IPunObservable
     {
         if (Hp <= 0 && !isEnemyDie)
         {
-            // Enemy_DieAfter();
             isEnemyDie = true;
             return;
         }
@@ -224,7 +238,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
         }
     }
 
-    public void AttackPlayer(int playerViewID)// 플레이어 공격
+    public void AttackPlayer(int playerViewID, float _damage)// 플레이어 공격
     {
         PhotonView playerPV = PhotonView.Find(playerViewID);
         if (playerPV != null && playerPV.IsMine)
@@ -233,22 +247,39 @@ public class Enemy_Skeleton : Entity,IPunObservable
             if (player != null && !player.invincible)
             {
                 Debug.Log("플레이어 공격중");
-                player.TakeDamage(damage);
+                player.TakeDamage(_damage);
             }
         }
     }
-    // public override void HpBarController(float hp)
-    // {
-    //     base.HpBarController(hp);
-    //     if (hpBar != null)
-    //     {
-    //         hpBar.fillAmount = hp / maxHp;
-    //     }
-    //     if (HpText != null)
-    //     {
-    //         HpText.text = hp.ToString("F0"); // 텍스트로 변환
-    //     }
-    // }
+
+    //플레이어와 충돌시 플레이어에게 데미지 부여.
+    private void OnCollisionEnter2D(Collision2D other) {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            AttackPlayer(other.gameObject.GetComponent<PhotonView>().ViewID,collisionDmg);
+        }
+        
+    }
+
+    protected void Hit(Transform _attackTransform, Vector2 _attackArea)
+    {
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);//overlapBox 생성
+
+        for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
+        {
+            if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
+            {
+                Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+                if (!enemy.attackers.Contains(PV))
+                {
+                    enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+                }
+                enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
+            
+            }
+        }
+    }
+
     public override void HpBarController(float hp)
     {
         base.HpBarController(hp);

@@ -148,7 +148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lerpTime: 5
   groundCheck: {fileID: 3002605183346254416}
-  groundCheckDistance: 0.2
+  groundCheckDistance: 0.83
   wallCheck: {fileID: 2429296720611026235}
   wallCheckDistance: 1.07
   whatIsGround:
@@ -162,7 +162,7 @@ MonoBehaviour:
   slashEffect: {fileID: 0}
   maxHp: 20
   hp: 10
-  damage: 10
+  damage: 2
   hpBar: {fileID: 2465744573858256583}
   HpText: {fileID: 1294589479123610186}
   hpFillAmount: 0

@@ -15,8 +15,8 @@ public class Slot : MonoBehaviour, IPointerUpHandler, IPointerEnterHandler, IPoi
     public GameObject toolTip;
     private GameObject currentToolTip;  // 현재 활성화된 툴팁
     public RectTransform toolTipRectTransform;
-    public TextMeshProUGUI tooTipItemName;
-    public TextMeshProUGUI tooTipItemDesc;
+    // public TextMeshProUGUI tooTipItemName;
+    // public TextMeshProUGUI tooTipItemDesc;
 
 
     private void Start()
@@ -134,8 +134,7 @@ public class Slot : MonoBehaviour, IPointerUpHandler, IPointerEnterHandler, IPoi
             Item itemData = ItemDataBase.instance.GetItemByID(inventorySlot.itemID);
             if (itemData != null && toolTip != null)
             {
-                // Destroy(currentToolTip);
-                currentToolTip.SetActive(false);
+                Destroy(currentToolTip); //생성한 프리펩 파괴
                 Debug.Log("마우스 떠남.");
             }
         }
