@@ -16,7 +16,7 @@ public class Player : Entity, IPunObservable
     public static Player LocalPlayerInstance;
 
     public bool isCrushed= false;
-    public float StopTakeDamageTime= 1f;
+    public float StopTakeDamageTime= 0.2f;
 
     private float xInput, yInput; //x축 이동, y축 이동
     private SpriteRenderer childSr;

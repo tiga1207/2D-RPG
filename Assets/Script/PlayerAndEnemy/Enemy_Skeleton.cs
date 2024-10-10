@@ -88,16 +88,16 @@ public class Enemy_Skeleton : Entity,IPunObservable
             }
             else //공격 사거리(isPlayerDetected.distance <1 일 경우)) 내 플레이어 접근 시
             {
-                if(!isAttacking && attackActivate)
+                if(!isAttacking && attackActivate && !isEnemyDie)
                 {
                 // Debug.Log("Attack " + isPlayerDetected.collider.gameObject.name);
                 // isAttacking = true;
                 rb.velocity = new Vector2(0,0);// 특정 애니메이션(공격 모션 끝)이 끝나기 전까지는 해당 오브젝트가 움직이지 못하도록 고정시켜야함.
                 AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID,damage);
                 if (!isCooldownActive) // 쿨타임이 진행 중이 아니면 코루틴 시작
-            {
-                StartCoroutine(AttackCooldown()); // 쿨타임 시작
-            }
+                {
+                    StartCoroutine(AttackCooldown()); // 쿨타임 시작
+                }
                 // StartCoroutine(AttackCooldown());//공격 쿨타임(공격 속도에 따른) 코루틴 호출
                 }
             }
@@ -163,17 +163,18 @@ public class Enemy_Skeleton : Entity,IPunObservable
         Debug.Log("적 히트 rpc 호출");
         if(Hp<=0) return;
         Hp -= _damageDone; //체력 감소
+        isAttacking=false;// 공격중이라도 피격시 취소.
         isTakeDamage =true;
         HpBarController(Hp);// 체력바 업데이트
         ShowDamageText(_damageDone, transform.position);// 데미지 표시 텍스트 메서드 호출
-        //피격후 0.1초동안 피격당하지 않을 시 피격 애니메이션 종료.
+        //피격후 1초동안 피격당하지 않을 시 피격 애니메이션 종료.
         // StartCoroutine(StopTakeDamageSkeleton());
     }
 
      //코루틴 예시
     private IEnumerator StopTakeDamageSkeleton()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(1f);
         isTakeDamage = false;
     }
 
@@ -181,9 +182,9 @@ public class Enemy_Skeleton : Entity,IPunObservable
     {
         if (Hp <= 0 && !isEnemyDie)
         {
-            isEnemyDie = true;
             isTakeDamage= false;
             isAttacking = false;
+            isEnemyDie = true;
             return;
         }
     }
@@ -284,12 +285,21 @@ public class Enemy_Skeleton : Entity,IPunObservable
 
     public void AttackOver()
     {
-        if (isTakeDamage)
+        if (isTakeDamage || isEnemyDie)
         {
             return; // 피격 상태에서는 공격 종료를 처리하지 않음
         }
         isAttacking = false;
         // attackCooldownTimer=attackCooldown;
+    }
+
+    public void TakeDamageOver()
+    {
+        if (isAttacking || isEnemyDie)
+        {
+            return;
+        }
+        isTakeDamage = false;
     }
 
     private IEnumerator AttackCooldown()
