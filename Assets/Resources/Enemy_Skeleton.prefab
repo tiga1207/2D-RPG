@@ -185,11 +185,11 @@ MonoBehaviour:
   PV: {fileID: 7686444234326162874}
   isEnemyDie: 0
   isTakeDamage: 0
-  currentHp: 0
   isAttacking: 0
-  attackActive: 1
+  attackActivate: 1
   attackCooldown: 5
   attackCooldownTimer: 5
+  isCooldownActive: 0
   moveSpeed: 1
   playerCheckDistance: 4
   whatIsPlayer:
