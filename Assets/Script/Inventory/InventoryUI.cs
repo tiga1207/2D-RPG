@@ -80,6 +80,7 @@ public class InventoryUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
         {
             activeInventory = !activeInventory;
+            inventoryPanel.transform.SetAsLastSibling();//해당 ui를 최상단에서 보일 수 있도록 함.
             inventoryPanel.SetActive(activeInventory);
         }
     }

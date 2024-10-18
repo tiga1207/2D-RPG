@@ -16,7 +16,7 @@ public class Player : Entity, IPunObservable
     public static Player LocalPlayerInstance;
 
     public bool isCrushed= false;
-    public float StopTakeDamageTime= 0.2f;
+    public float StopTakeDamageTime= 0.5f;
 
     private float xInput, yInput; //x축 이동, y축 이동
     private SpriteRenderer childSr;
@@ -44,7 +44,15 @@ public class Player : Entity, IPunObservable
     
     [SerializeField] private float comboTime = 0.3f;
     private float comboTimeWindow;
+    [SerializeField] protected GameObject slashEffect;
+    [SerializeField] protected GameObject ultimateEffect;
     [SerializeField] private bool isAttacking;
+    [SerializeField] private bool isUltimateAttacking;
+    [SerializeField] private float ultimateAttackCooldown=1f;
+    [SerializeField] private float ultimateAttackCooldownTimer;
+    [SerializeField] private bool ultimateAttackActive = true;
+
+
     private int comboCounter;
 
     [Header("Player State")]
@@ -199,7 +207,7 @@ public class Player : Entity, IPunObservable
             CheckInput();
             CooldownManager();
             FlipController();
-            FlashWhileInvincible();
+            PlayerHited();
             
             LerpPlayerUI();
             // DashAbility(); //대시 코루틴 미사용시
@@ -322,20 +330,38 @@ public class Player : Entity, IPunObservable
         attackActive= true;//공격쿨타임 타이머가 0이하일 때 공격 상태 활성화
     }
 
+    private IEnumerator UltimateAttackCooldown()
+    {
+        while (ultimateAttackCooldownTimer >= 0)
+        {
+            // isAttacking=false;
+            ultimateAttackCooldownTimer -= Time.deltaTime;
+            yield return null;
+        }
+        ultimateAttackActive= true;//공격쿨타임 타이머가 0이하일 때 공격 상태 활성화
+    }
+
+    //일반 공격 범위
     protected void Hit(Transform _attackTransform, Vector2 _attackArea)
     {
         Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);//overlapBox 생성
 
         for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
         {
-            if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
+            // if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
+            if (objectsToHit[i].CompareTag("Enemy")) // overlapBox 영역 내부에 적 존재 시 
             {
-                Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
-                if (!enemy.attackers.Contains(PV))
+                // Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+                var enemy = objectsToHit[i].GetComponent<PhotonView>();
+                // if (!enemy.attackers.Contains(PV))
+                // {
+                //     enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+                // }
+                if(enemy!=null)
                 {
-                    enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+                // enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
+                enemy.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
                 }
-                enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
             
             }
         }
@@ -357,6 +383,53 @@ public class Player : Entity, IPunObservable
         {
             comboCounter = 0;
         }
+    }
+
+    //궁극기
+    private void UltimateAttackEvent()
+    {
+        if (!isGrounded)
+        {
+            return; // 플레이어가 땅에 있지 않으면 아래 다 날리기.
+        }
+        if (ultimateAttackActive && (yInput == 0 || yInput < 0) && isGrounded)// 플레이어가 지면에 있으면서 공격 가능 상태 일 경우
+        {
+            isUltimateAttacking= true;
+            invincible= true;
+            ultimateAttackActive=false;
+
+            ultimateAttackCooldownTimer=ultimateAttackCooldown;
+            // Hit(AttackTransform, AttackArea);// Hit 메서드 호출하여 적 공격.
+            StartCoroutine(UltimateAttackRoutine());
+            StartCoroutine(UltimateAttackCooldown());//공격쿨타임(공격속도에 따른) 코루틴 호출
+            GameObject ultimate = PhotonNetwork.Instantiate(ultimateEffect.name, AttackTransform.position, Quaternion.identity); // 슬래시 이펙트를 네트워크 상에서 생성
+            if(!facingRight)// 만약 플레이어가 반대 방향을 바라볼 경우 슬래시 이펙트 반대 방향에 생성
+            {
+                ultimate.transform.Rotate(0f, 180f, 0f);
+            }
+        }
+    }
+
+    private IEnumerator UltimateAttackRoutine()
+{
+    while (isUltimateAttacking) // 궁극기 애니메이션이 끝날 때까지
+    {
+        Hit(AttackTransform, AttackArea); // 타격 발생
+        CameraShaker.Instance.ShakeCamera(2f, 0.1f);//공격시 카메라 흔들림 기능 추가.
+        yield return new WaitForSeconds(0.2f); // 타격 간격
+    }
+}
+
+    public void UltimateAttackOver()
+    {
+        if (isTakeDamage)
+        {
+            return; // 피격 상태에서는 공격 종료를 처리하지 않음
+        }
+        isUltimateAttacking = false;
+        invincible= false;
+        ultimateAttackCooldownTimer=ultimateAttackCooldown;
+
     }
 
     private void CheckInput() // 사용자 키 입출력 관리
@@ -402,6 +475,10 @@ public class Player : Entity, IPunObservable
         {
             StopHealing();
         }
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            UltimateAttackEvent();
+        }
     }
 
 //대쉬 기능
@@ -441,7 +518,7 @@ public class Player : Entity, IPunObservable
 
     private void Movement()
     {
-        if (isAttacking || isPlayerDie) // 플레이어가 공격중일 때
+        if (isAttacking || isPlayerDie || isUltimateAttacking) // 플레이어가 공격중일 때
         {
             rb.velocity = new Vector2(0, 0);// 이동 불가.
         }
@@ -487,11 +564,13 @@ public class Player : Entity, IPunObservable
         anim.SetInteger("comboCounter", comboCounter);
         anim.SetBool("isTakeDamage", isTakeDamage);
         anim.SetBool("isPlayerDie", isPlayerDie);
+        anim.SetBool("isHealing",isHealing);
+        anim.SetBool("isUltimateAttacking",isUltimateAttacking);
 
         
     }
 
-    private void FlashWhileInvincible()// 플레이어가 무적 상태일 경우 효과 추가.
+    private void PlayerHited()// 플레이어가 무적 상태일 경우 효과 추가.
     {
         if (isTakeDamage && childSr != null)
         {
@@ -744,7 +823,12 @@ public class Player : Entity, IPunObservable
     public void AddExpRPC(float _ExpAmount) //경험치 및 레벨업 시스템.
     {
         if(PV.IsMine)
-        {//최대 레벨 도달 시 exp 예외 처리도 추가해야함.
+        {
+            if(Level == maxLevel)  //최대 레벨 도달 시 exp 예외 처리
+            {
+                Exp +=Mathf.RoundToInt(_ExpAmount);
+                return;
+            }
             if(Exp + _ExpAmount >= maxExp)// 경험치 획득량이 현 레벨 최대 경험치량 이상일 때(레벨업 시)
             {
                 Exp += _ExpAmount - maxExp;
@@ -914,13 +998,4 @@ public class Player : Entity, IPunObservable
     }
 
 }
-
-// public void UseItem(ItemEffect item)
-// {
-//     if(item == null || playerInventory == null)
-//     {
-//         return;
-//     }
-//     item.ExecuteRole(this);
-// }
 

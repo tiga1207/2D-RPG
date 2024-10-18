@@ -185,6 +185,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
             isTakeDamage= false;
             isAttacking = false;
             isEnemyDie = true;
+            gameObject.tag="DeadEnemy";
             return;
         }
     }
@@ -328,7 +329,7 @@ public class Enemy_Skeleton : Entity,IPunObservable
 
     //플레이어와 충돌시 플레이어에게 데미지 부여.
     private void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player")&& !isEnemyDie)
         {
             AttackPlayerJustCollision(other.gameObject.GetComponent<PhotonView>().ViewID,collisionDmg);
         }

@@ -26,7 +26,7 @@ public class Entity : MonoBehaviourPunCallbacks
     [SerializeField] protected Transform AttackTransform;
     [SerializeField] protected Vector2 AttackArea;
     [SerializeField] protected LayerMask attackableLayer;
-    [SerializeField] protected GameObject slashEffect;
+
 
     [Header("HP")]
     [SerializeField] protected float maxHp;

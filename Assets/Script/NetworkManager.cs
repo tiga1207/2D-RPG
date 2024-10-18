@@ -100,7 +100,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (player.GetComponent<PhotonView>().IsMine)
         {
             player.GetComponent<Inventory>().Initialize();
-            // 추가적으로 플레이어의 닉네임을 표시할 수 있습니다.
+            // 플레이어의 닉네임 표시
             player.GetComponentInChildren<TMP_Text>().text = PhotonNetwork.NickName;
         }
     }

@@ -18,6 +18,11 @@ public class PlayerAnimEvent : MonoBehaviour
         // player.AttackOver();
     }
 
+    private void UltimateAnimationOver()
+    {
+        player.UltimateAttackOver();
+    }
+
     private void CheckFinishAnim()
     {
         player.PlayerDieAfter();

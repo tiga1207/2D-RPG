@@ -36,6 +36,7 @@ public class QuestUI : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Q))
             {
                 activeQuestUI = !activeQuestUI;
+                QuestUIPanel.transform.SetAsLastSibling();//해당 ui를 최상단에서 보일 수 있도록 함.
                 QuestUIPanel.SetActive(activeQuestUI);
             }
         }
