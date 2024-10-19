@@ -359,6 +359,7 @@ public class Player : Entity, IPunObservable
                 // }
                 if(enemy!=null)
                 {
+                enemy.RPC("AddAttackerRPC", RpcTarget.AllBuffered, PV.ViewID);
                 // enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
                 enemy.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
                 }

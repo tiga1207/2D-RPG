@@ -198,7 +198,6 @@ MonoBehaviour:
   experiencePoints: 90
   fieldItem: {fileID: 6549036706612274581, guid: 8d62bfc3e352f4318b2823324d37065a, type: 3}
   collisionDmg: 1
-  enemyCollider2D: {fileID: 7232368068062475574}
 --- !u!114 &7686444234326162874
 MonoBehaviour:
   m_ObjectHideFlags: 0

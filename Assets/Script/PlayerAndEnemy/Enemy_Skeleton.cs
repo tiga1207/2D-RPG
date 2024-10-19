@@ -336,22 +336,31 @@ public class Enemy_Skeleton : Entity,IPunObservable
         
     }
 
-    protected void Hit(Transform _attackTransform, Vector2 _attackArea)
-    {
-        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);//overlapBox 생성
+    // protected void Hit(Transform _attackTransform, Vector2 _attackArea)
+    // {
+    //     Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);//overlapBox 생성
 
-        for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
-        {
-            if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
-            {
-                Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
-                if (!enemy.attackers.Contains(PV))
-                {
-                    enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
-                }
-                enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
+    //     for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
+    //     {
+    //         if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
+    //         {
+    //             Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
+    //             if (!enemy.attackers.Contains(PV))
+    //             {
+    //                 enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
+    //             }
+    //             enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
             
-            }
+    //         }
+    //     }
+    // }
+    [PunRPC]
+    public void AddAttackerRPC(int attackerViewID)
+    {
+        PhotonView attackerView = PhotonView.Find(attackerViewID);
+        if (attackerView != null && !attackers.Contains(attackerView))
+        {
+            attackers.Add(attackerView); // 공격자가 이미 리스트에 없으면 추가
         }
     }
 
@@ -380,11 +389,15 @@ public class Enemy_Skeleton : Entity,IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(Hp);
+            stream.SendNext(transform.position);
+            
             // stream.SendNext(maxHp);
         }
         else
         {
             Hp = (float)stream.ReceiveNext();
+            transform.position = (Vector3)stream.ReceiveNext();
+
             // maxHp = (float)stream.ReceiveNext();
             // HpBarController(hp);
         }

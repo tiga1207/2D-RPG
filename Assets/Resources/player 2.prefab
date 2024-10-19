@@ -239,7 +239,7 @@ Transform:
   m_GameObject: {fileID: 266314399188597393}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.12, y: 0.045, z: 0}
+  m_LocalPosition: {x: 0.424, y: 0.045, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -286,7 +286,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 2080040939, guid: 5e377112d37f84587a4fdd8a75cea653, type: 3}
+  m_Sprite: {fileID: -189699706, guid: a4980f486d743469b82fca87130705ed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -366,14 +366,9 @@ MonoBehaviour:
   - Type: 1
     SynchronizeType: 1
     Name: yVelopcity
-  - Type: 4
-    SynchronizeType: 0
-    Name: isPlayerDie
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
-  - SynchronizeType: 0
-    LayerIndex: 1
 --- !u!1 &757368442895309526
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,7 +394,7 @@ Transform:
   m_GameObject: {fileID: 757368442895309526}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.07, z: 0}
+  m_LocalPosition: {x: 0, y: -1.249, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -919,7 +914,7 @@ GameObject:
   - component: {fileID: 1523211523370137496}
   - component: {fileID: 6409218357704173548}
   m_Layer: 6
-  m_Name: player
+  m_Name: player 2
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -997,6 +992,7 @@ MonoBehaviour:
   attackableLayer:
     serializedVersion: 2
     m_Bits: 128
+  slashEffect: {fileID: 750351155395176926, guid: acf2fb224691549939a6dff670b40c67, type: 3}
   maxHp: 20
   hp: 20
   damage: 5
@@ -1021,7 +1017,7 @@ MonoBehaviour:
   attackers: []
   currentMapName: Cave_1
   isCrushed: 0
-  StopTakeDamageTime: 0.5
+  StopTakeDamageTime: 0.2
   moveSpeed: 6
   gravity: 3.5
   jumpForce: 30
@@ -1037,13 +1033,7 @@ MonoBehaviour:
   attackCooldownTimer: 2
   attackActive: 1
   comboTime: 0.3
-  slashEffect: {fileID: 750351155395176926, guid: acf2fb224691549939a6dff670b40c67, type: 3}
-  ultimateEffect: {fileID: 665976088495049474, guid: 6b8e593dc76474f6389ac0cac44e068f, type: 3}
   isAttacking: 0
-  isUltimateAttacking: 0
-  ultimateAttackCooldown: 1
-  ultimateAttackCooldownTimer: 0
-  ultimateAttackActive: 1
   bloodEffect: {fileID: 3180080277078973904, guid: a5070818335ea465f8feebe2fa229340, type: 3}
   hitFlashSpeed: 5
   invincible: 0
@@ -1103,8 +1093,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.027890325, y: 0.053489685}
-  m_Size: {x: 1.0429027, y: 2.277913}
+  m_Offset: {x: -0.015339494, y: -0.2351811}
+  m_Size: {x: 0.7165792, y: 2.0770984}
   m_Direction: 0
 --- !u!114 &-6711382382737738178
 MonoBehaviour:
