@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 
-public class Enemy_Skeleton : EnemyBase
+public class Enemy_Samurai : EnemyBase
 {
     [PunRPC]
     protected override void RequestDestroy(int viewID, Vector3 respawnPosition)
@@ -17,7 +17,7 @@ public class Enemy_Skeleton : EnemyBase
             EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
             if (enemyManager != null)
             {
-                enemyManager.RespawnSkeleton(respawnPosition);
+                enemyManager.RespawnSamurai(respawnPosition);
             }
     }
     }
@@ -27,7 +27,7 @@ public class Enemy_Skeleton : EnemyBase
         EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
         if (enemyManager != null && PhotonNetwork.IsMasterClient)
         {
-            enemyManager.RespawnSkeleton(respawnPosition);
+            enemyManager.RespawnSamurai(respawnPosition);
         }
     }
 

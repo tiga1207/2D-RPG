@@ -216,7 +216,8 @@ public class Player : Entity, IPunObservable
     // 적이랑 충돌 시 밀려남(recoil) 구현
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Enemy") && !isCrushed)
+        // if (other.gameObject.CompareTag("Enemy") && !isCrushed)
+        if (other.gameObject.layer == LayerMask.NameToLayer("Attackable") && !isCrushed)
         {
             // float recoilDistance =2f; 
             float dirX = transform.position.x - other.transform.position.x > 0 ? 2f : -2f;
@@ -349,7 +350,8 @@ public class Player : Entity, IPunObservable
         for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
         {
             // if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
-            if (objectsToHit[i].CompareTag("Enemy")) // overlapBox 영역 내부에 적 존재 시 
+            // if (objectsToHit[i].CompareTag("Enemy")) // overlapBox 영역 내부에 적 존재 시 
+            if (objectsToHit[i].gameObject.layer == LayerMask.NameToLayer("Attackable")) // overlapBox 영역 내부에 적 존재 시 
             {
                 // Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
                 var enemy = objectsToHit[i].GetComponent<PhotonView>();
