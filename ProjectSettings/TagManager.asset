@@ -8,6 +8,9 @@ TagManager:
   - FieldItem
   - ToolTip
   - DeadEnemy
+  - Skeleton
+  - Samurai
+  - Boss
   layers:
   - Default
   - TransparentFX
@@ -17,7 +20,7 @@ TagManager:
   - UI
   - Player
   - Attackable
-  - 
+  - DeadEnemy
   - 
   - 
   - 

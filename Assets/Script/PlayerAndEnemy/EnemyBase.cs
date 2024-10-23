@@ -25,6 +25,11 @@ public class EnemyBase : Entity,IPunObservable
     [SerializeField] protected LayerMask whatIsPlayer;
     protected RaycastHit2D isPlayerDetected;
 
+    [Header("Jump")]
+    [SerializeField] private int jumpCount = 0;
+    [SerializeField] private int maxJumpCount = 2;
+    public bool isJumping= false;
+    [SerializeField] private float jumpForce;
     public Player player;
     [SerializeField] protected float experiencePoints = 90;
     public GameObject fieldItem;
@@ -60,6 +65,25 @@ public class EnemyBase : Entity,IPunObservable
         if (!isGrounded || isWallDetected) // 벽 혹은 땅쪽일 경우 방향 전환
         {
             FlipController();
+        }
+    }
+
+    protected virtual void Jump() // 플레이어 점프 시.
+    {
+        if (isGrounded || jumpCount < maxJumpCount)// 플레이어가 땅에 있거나, 점프 카운트가 남아있을 경우
+        {
+            isJumping=true;
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            jumpCount++;
+        }
+    }
+
+    private void JumpAbility() // 점프 조건
+    {
+        if (isGrounded && rb.velocity.y <= 0)
+        {
+            jumpCount = 0;
+            isJumping=false;
         }
     }
 
@@ -158,7 +182,7 @@ public class EnemyBase : Entity,IPunObservable
     }
     
     [PunRPC]
-    public void HitedRPC(float _damageDone, Vector2 _hitDirection)
+    public virtual void HitedRPC(float _damageDone, Vector2 _hitDirection)
     {
         Debug.Log("적 히트 rpc 호출");
         if(Hp<=0) return;
@@ -198,7 +222,7 @@ public class EnemyBase : Entity,IPunObservable
         if (PhotonNetwork.IsMasterClient)// 마스터 클라이언트 일 경우 
         {
             PhotonNetwork.Destroy(gameObject);//네트워크 상에서 적을 파괴함.
-            EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+            // EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
             // if (enemyManager != null && PhotonNetwork.IsMasterClient)
             // {
             //     enemyManager.RespawnEnemy(respawnPosition);// 적 리스폰
@@ -256,11 +280,20 @@ public class EnemyBase : Entity,IPunObservable
         if (enemyPV != null && PhotonNetwork.IsMasterClient)
         {
             PhotonNetwork.Destroy(enemyPV.gameObject);
-            EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+            // EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
             // if (enemyManager != null)
             // {
             //     enemyManager.RespawnEnemy(respawnPosition);
             // }
+            ReqeustRespawn(respawnPosition);
+        }
+    }
+    protected virtual void ReqeustRespawn(Vector3 respawnPosition)
+    {
+        EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+        if (enemyManager != null)
+        {
+            enemyManager.RespawnEnemy(respawnPosition);
         }
     }
     //플레이어 공격 시

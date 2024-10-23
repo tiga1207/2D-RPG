@@ -194,6 +194,10 @@ MonoBehaviour:
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 64
+  jumpCount: 0
+  maxJumpCount: 2
+  isJumping: 0
+  jumpForce: 0
   player: {fileID: 0}
   experiencePoints: 90
   fieldItem: {fileID: 6549036706612274581, guid: 8d62bfc3e352f4318b2823324d37065a, type: 3}

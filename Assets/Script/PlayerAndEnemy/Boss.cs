@@ -1,405 +1,460 @@
-// using System.Collections;
-// using UnityEngine;
-// using Photon.Pun;
-// using TMPro;
-// using UnityEngine.UI;
-// using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Photon.Pun;
 
-// public class Boss : Entity,IPunObservable
-// {
+public class Boss : EnemyBase
+{
+    public Transform[] players; // 플레이어들의 Transform 배열
+    private Transform targetPlayer; // 현재 보스가 바라볼 타겟 플레이어
 
-//     public PhotonView PV;
-//     public bool isEnemyDie= false;
-//     public bool isTakeDamage = false;
-//     public bool isAttacking=false;
-//     public bool attackActivate =true;
-//     [SerializeField] private float attackCooldown=1f;
-//     [SerializeField] private float attackCooldownTimer=1f;
-//     public bool isCooldownActive = false;
+    public GameObject shurikenPrefab;
+    public Transform shurikenSpawnPoint;
 
-//     [Header("Move info")]
-//     [SerializeField] private float moveSpeed = 1f;
+    [Header("Attack Settings")]
+    public bool isWaitNextAttack = false;
+    Vector2 attackBoxSize = new Vector2(2f, 1f); // 공격 범위 설정 (너비 2, 높이 1)
+    public float dashSpeed = 10f;
+    public float jumpHeight = 5f;
+    public float shurikenSpeed = 10f;
+    public float shurikenLifetime = 2f;
+    public float dashDmg = 50f; 
+    public bool attackPattern1=false;
+    public bool attackPattern2=false;
+    public bool attackPattern3=false;
+    public bool isThrowShuriken=false;
+    public float detectPlayerDistanceLimit= 30f;
 
-//     [Header("Player Detection")]
-//     [SerializeField] private float playerCheckDistance;
-//     [SerializeField] private LayerMask whatIsPlayer;
-//     private RaycastHit2D isPlayerDetected;
+    // private bool isAttacking = false;
+    [SerializeField] private bool isBossDashing = false;
+    public float delayAttackPatternTime = 40f;
 
-//     public Player player;
-//     [SerializeField] private float experiencePoints = 90;
-//     public GameObject fieldItem;
+    public float distanceToPlayer; 
 
-//     public float collisionDmg= 1f;
+    private System.Random random = new System.Random(); // 랜덤 패턴을 위한 변수
 
-//     protected override void Awake()
-//     {
-//         base.Awake();
-//         FindLocalPlayer();
-//     }
+    protected override void Start()
+    {
+        base.Start();
+        collisionDmg= 10f; // 충돌 데미지 기본값 지정
+        FindClosestPlayer(); // 초기 타겟 플레이어 설정
+        // StartCoroutine(RandomAttackPattern()); // 랜덤 패턴 선택 시작
+    }
 
-//     protected override void Start()
-//     {
-//         base.Start();
+    // 매 프레임마다 가장 가까운 플레이어를 찾음
+    protected override void Update()
+    {
+        base.Update();
+        Movement();
+        NotAttackCondition();
+        AnimatorController();
+        LookAtTarget(targetPlayer);
+    }
+    protected override void Movement()
+    {
+        if(targetPlayer == null)
+        {
+            FindClosestPlayer();
+            return;
+        }
+        float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
 
-//         if (AttackTransform == null)
-//         {
-//             AttackTransform = transform;
-//         }
-//     }
+        // 플레이어가 30f 거리 내에 있으면 이속 2배
+        if (distanceToPlayer < detectPlayerDistanceLimit)
+        {
+            rb.velocity = new Vector2(moveSpeed * 2f * facingDir, rb.velocity.y);
+        }
 
-//     protected override void Update()
-//     {
-//         base.Update();
+        // else if (!isAttacking && !isEnemyDie)
+        else if (isAttacking || !isEnemyDie)
+        {
+            rb.velocity = Vector2.zero; // 공격 중일 때 이동 멈춤
+            // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
+            // isPlayerDetected에 대한 null 체크 추가
+            if (isPlayerDetected.collider != null)
+            {
+                // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
+            }
+            else
+            {
+                Debug.LogWarning("No player detected in Movement");
+            }
 
-//         // HpController();
-//         Movement();
-//         AnimatorController();
-//         EnemyDyingCheck();
-
-
-//         if (!isGrounded || isWallDetected) // 벽 혹은 땅쪽일 경우 방향 전환
-//         {
-//             FlipController();
-//         }
-//     }
-
-
-//     private void FlipController()
-//     {
-//         if(facingRight)
-//         {
-//             PV.RPC("FlipRPC", RpcTarget.AllBuffered, false);
-//         }
-//         else if(!facingRight)
-//         {
-//             PV.RPC("FlipRPC", RpcTarget.AllBuffered, true);
-//         }
-//     }
-
-//     private void Movement()
-//     {
-//         if (isPlayerDetected) //플레이어 발견 여부에 따른 이동속도 및 행동
-//         {
-//             if (isPlayerDetected.distance > 1)// 최대 탐지 사거리 playerCheckDistance보단 작음.
-//             {
-//                 rb.velocity = new Vector2(moveSpeed * 1.5f * facingDir, rb.velocity.y); //적 발견시 이동속도
-//                 // Debug.Log("I see the player");
-//                 // isAttacking = false;
-//             }
-//             else //공격 사거리(isPlayerDetected.distance <1 일 경우)) 내 플레이어 접근 시
-//             {
-//                 if(!isAttacking && attackActivate && !isEnemyDie)
-//                 {
-//                 // Debug.Log("Attack " + isPlayerDetected.collider.gameObject.name);
-//                 // isAttacking = true;
-//                 rb.velocity = new Vector2(0,0);// 특정 애니메이션(공격 모션 끝)이 끝나기 전까지는 해당 오브젝트가 움직이지 못하도록 고정시켜야함.
-//                 AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID,damage);
-//                 if (!isCooldownActive) // 쿨타임이 진행 중이 아니면 코루틴 시작
-//                 {
-//                     StartCoroutine(AttackCooldown()); // 쿨타임 시작
-//                 }
-//                 // StartCoroutine(AttackCooldown());//공격 쿨타임(공격 속도에 따른) 코루틴 호출
-//                 }
-//             }
-//         }
-//         else if(isEnemyDie || isTakeDamage)
-//         {
-//             rb.velocity = new Vector2(0,0);
-//         }
-//         else //평상시
-//         {
-//             rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
-//         }
-//     }
-
-//     [PunRPC]
-//     private void FlipRPC(bool faceRight)
-//     {
-//         facingRight = faceRight;
-//         facingDir = faceRight ? 1 : -1;
-//         transform.Rotate(0, 180, 0);
-//         hpBar.transform.Rotate(0,180,0);
-//     }
-
-//     private void FindLocalPlayer()
-//     {
-//         Player[] players = FindObjectsOfType<Player>();
-//         foreach (var player in players)
-//         {
-//             if (player.GetComponent<PhotonView>().IsMine)
-//             {
-//                 this.player = player;
-//                 break;
-//             }
-//         }
-//     }
-
-//     private void AnimatorController() //플레이어 애니메이션 관리 
-//     {
-//         bool isMoving = rb.velocity.x != 0;
-//         anim.SetBool("isMoving", isMoving);
-//         anim.SetBool("isEnemyDie", isEnemyDie);
-//         anim.SetBool("isTakeDamage", isTakeDamage);
-//         anim.SetBool("isAttacking",isAttacking);
+        }
         
-//     }
+        else if (isEnemyDie || isTakeDamage)
+        {
+            rb.velocity = Vector2.zero; // 적이 죽거나 데미지를 입으면 이동 멈춤
+        }
+        else // 평소 속도
+        {
+            rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
+        }
+    }
 
-//     protected override void CollisionCheck()
-//     {
-//         base.CollisionCheck();
-//         isPlayerDetected = Physics2D.Raycast(transform.position, Vector2.right, playerCheckDistance * facingDir, whatIsPlayer);
-//     }
+    private void NotAttackCondition()
+    {
+        if(!isAttacking && !isWaitNextAttack)
+        {   
+            AttackCondition();
+        }
+    }
 
-//     protected override void OnDrawGizmos()
-//     {
-//         base.OnDrawGizmos();
-//         Gizmos.color = Color.blue;
-//         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + playerCheckDistance * facingDir, transform.position.y));
-//     }
+    private void AttackCondition()
+    {
+        FindClosestPlayer();// 공격 중이 아닐 때만 플레이어 추적
+
+        if (targetPlayer == null)
+        {
+            Debug.LogWarning("No target player found in NotAttackCondition");
+            return; // targetPlayer가 null일 경우 함수 종료
+        }
+
+        float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
+
+        // 플레이어가 일정 거리 내에 있을 때 공격 패턴 실행
+        if (distanceToPlayer <= 10f && isWaitNextAttack) // 10f는 공격을 시작할 거리
+        {
+            StartCoroutine(RandomAttackPattern());
+        }
+    }
+
+    // 가장 가까운 플레이어를 찾는 메서드
+    // private void FindClosestPlayer()
+    // {
+    //     if (players.Length == 0)
+    //     {
+    //         Debug.LogWarning("No players found!");
+    //         return;
+    //     }
+    //     float closestDistance = Mathf.Infinity;
+    //     players = FindPlayers(); // 현재 씬의 플레이어들을 찾음
+
+    //     foreach (Transform player in players)
+    //     {
+    //         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+    //         if (distanceToPlayer <= detectPlayerDistanceLimit &&distanceToPlayer < closestDistance)
+    //         {
+    //             closestDistance = distanceToPlayer;
+    //             targetPlayer = player;
+    //         }
+    //     }
+
+    //     // 모든 플레이어가 같은 위치에 있을 경우 랜덤으로 한 명 선택
+    //     if (closestDistance == 0 && players.Length > 1)
+    //     {
+    //         targetPlayer = players[random.Next(players.Length)];
+    //     }
+
+    //     if (targetPlayer == null)
+    //     {
+    //         Debug.LogWarning("No target player found within range!");
+    //         return;
+    //     }
+
+    //     // 타겟 플레이어를 향해 회전
+    //     LookAtTarget(targetPlayer);
+    // }
+
+    private void FindClosestPlayer()
+{
+    players = FindPlayers(); // 현재 씬의 플레이어들을 먼저 찾음
+
+    if (players.Length == 0)
+    {
+        Debug.LogWarning("No players found!");
+        return;
+    }
+
+    float closestDistance = Mathf.Infinity;
     
-//     [PunRPC]
-//     public void HitedRPC(float _damageDone, Vector2 _hitDirection)
-//     {
-//         Debug.Log("적 히트 rpc 호출");
-//         if(Hp<=0) return;
-//         Hp -= _damageDone; //체력 감소
-//         isAttacking=false;// 공격중이라도 피격시 취소.
-//         isTakeDamage =true;
-//         HpBarController(Hp);// 체력바 업데이트
-//         ShowDamageText(_damageDone, transform.position);// 데미지 표시 텍스트 메서드 호출
-//         //피격후 1초동안 피격당하지 않을 시 피격 애니메이션 종료.
-//         // StartCoroutine(StopTakeDamageSkeleton());
-//     }
+    foreach (Transform player in players)
+    {
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        if (distanceToPlayer <= detectPlayerDistanceLimit && distanceToPlayer < closestDistance)
+        {
+            closestDistance = distanceToPlayer;
+            targetPlayer = player;
+        }
+    }
 
-//      //코루틴 예시
-//     private IEnumerator StopTakeDamageSkeleton()
-//     {
-//         yield return new WaitForSeconds(1f);
-//         isTakeDamage = false;
-//     }
+    // 플레이어가 한 명일 경우, 무조건 그 플레이어를 타겟으로 설정
+    if (players.Length == 1)
+    {
+        targetPlayer = players[0];
+    }
+    // 모든 플레이어가 같은 위치에 있을 경우 랜덤으로 한 명 선택 (두 명 이상일 때만 실행)
+    else if (closestDistance == 0 && players.Length > 1)
+    {
+        targetPlayer = players[random.Next(players.Length)];
+    }
 
-//     private void EnemyDyingCheck()
-//     {
-//         if (Hp <= 0 && !isEnemyDie)
-//         {
-//             isTakeDamage= false;
-//             isAttacking = false;
-//             isEnemyDie = true;
-//             gameObject.tag="DeadEnemy";
-//             return;
-//         }
-//     }
+    if (targetPlayer == null)
+    {
+        Debug.LogWarning("No target player found within range!");
+        return;
+    }
 
-//     public void Enemy_DieAfter()
-//     {
-//         Vector3 respawnPosition = transform.position;
-//         Vector3 itemPosition = new Vector3(transform.position.x,transform.position.y-1,transform.position.z);
-//         if (PhotonNetwork.IsMasterClient)// 마스터 클라이언트 일 경우 
-//         {
-//             PhotonNetwork.Destroy(gameObject);//네트워크 상에서 적을 파괴함.
-//             EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
-//             if (enemyManager != null && PhotonNetwork.IsMasterClient)
-//             {
-//                 enemyManager.RespawnEnemy(respawnPosition);// 적 리스폰
-//             }
-//             ItemDrop(fieldItem,itemPosition);
-//         }
-//         else // 슬레이브 클라이언트 일 경우
-//         {
-//             PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition); //마스터 클라이언트에게 파괴 요청.
-//         }
+    // 타겟 플레이어를 향해 회전
+    LookAtTarget(targetPlayer);
+}
 
-//         // 적을 처치한 플레이어에게 경험치 부여
-//         foreach (PhotonView attacker in attackers)
-//         {
-//             if (attacker != null)
-//             {
-//                 QuestManager.instance.UpdateKillCount();
-//                 attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
-//             }
-//         }
-//     }
+    // 타겟 플레이어를 바라보는 함수
+    private void LookAtTarget(Transform target)
+    {
+        Vector3 direction = (target.position - transform.position).normalized;
+        if (direction.x > 0 && !facingRight)
+        {
+            // Flip();
+            PV.RPC("FlipRPC", RpcTarget.AllBuffered, true);
+        }
+        else if (direction.x < 0 && facingRight)
+        {
+            // Flip();
+            PV.RPC("FlipRPC", RpcTarget.AllBuffered, false);
+        }
+    }
 
-//     private static void ItemDrop(GameObject gameObject,Vector3 _respawnPosition) //아이템 드랍 코드
-//     {
-//         Debug.Log("아이템 드랍 로직 진입");
-//         int randomDropP = UnityEngine.Random.Range(1, 11); //1~10까지 중 랜덤 수
-//         int itemP = UnityEngine.Random.Range(0, ItemDataBase.instance.itemDB.Count-1);
-//         if (randomDropP > 3)//아이템 드랍 확률
-//         {
-//             Debug.Log($"랜덤하게 아이템 생성! 아이템 리스트 {itemP+1}번째 아이템");
-//             ItemDataBase.instance.itemAdd(itemP);
-//             GameObject go = PhotonNetwork.Instantiate(gameObject.name, _respawnPosition, Quaternion.identity);
-//             go.GetComponent<PhotonView>().RPC("SetItemID", RpcTarget.AllBuffered, ItemDataBase.instance.itemDB[itemP].itemID);
-//         }
-//         else
-//         {
-//             Debug.Log($"랜덤가챠 실패!! 랜덤 시드: {randomDropP}");
-//         }
-//     }
+    
 
-//     [PunRPC]
-//     private void RequestDestroy(int viewID, Vector3 respawnPosition)
-//     {
-//         PhotonView enemyPV = PhotonView.Find(viewID);
-//         if (enemyPV != null && PhotonNetwork.IsMasterClient)
-//         {
-//             PhotonNetwork.Destroy(enemyPV.gameObject);
-//             EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
-//             if (enemyManager != null)
-//             {
-//                 enemyManager.RespawnEnemy(respawnPosition);
-//             }
-//         }
-//     }
-//     //플레이어 공격 시
-//     public void AttackPlayer(int playerViewID, float _damage)// 플레이어 공격
-//     {
-//         PhotonView playerPV = PhotonView.Find(playerViewID);
-//         if (playerPV != null && playerPV.IsMine)
-//         {
-//             Player player = playerPV.GetComponent<Player>();
-//             if (player != null && !player.invincible)
-//             {
-//                 Debug.Log("플레이어 공격중 i'm attack player!!!");
-//                 attackActivate= false;
-//                 isAttacking= true;
-//                 // if(player.invincible) return;
-//                 player.TakeDamage(_damage);
-//             }
-//         }
-//     }
+    // 플레이어들을 찾는 메서드 (PhotonView가 있는 오브젝트들만)
+    private Transform[] FindPlayers()
+    {
+        Player[] playersArray = FindObjectsOfType<Player>();
+        List<Transform> playerTransforms = new List<Transform>();
 
-//     //단순 충돌 시
-//     public void AttackPlayerJustCollision(int playerViewID, float _damage)// 플레이어 공격
-//     {
-//         PhotonView playerPV = PhotonView.Find(playerViewID);
-//         if (playerPV != null && playerPV.IsMine)
-//         {
-//             Player player = playerPV.GetComponent<Player>();
-//             if (player != null && !player.invincible)
-//             {
-//                 player.TakeDamage(_damage);
-//             }
-//         }
-//     }
+        foreach (Player player in playersArray)
+        {
+            if (player.GetComponent<PhotonView>().IsMine)
+            {
+                playerTransforms.Add(player.transform);
+            }
+        }
+        return playerTransforms.ToArray();
+    }
 
-//     public void AttackOver()
-//     {
-//         if (isTakeDamage || isEnemyDie)
-//         {
-//             return; // 피격 상태에서는 공격 종료를 처리하지 않음
-//         }
-//         isAttacking = false;
-//         // attackCooldownTimer=attackCooldown;
-//     }
+    // 랜덤한 공격 패턴을 선택하는 코루틴
+    private IEnumerator RandomAttackPattern()
+    {
+        isAttacking =true;
+        isWaitNextAttack= true;
+            // if (!isAttacking)
+            // {
+                int randomAttack = random.Next(5); //5개 패턴 중 랜덤 선택
+                switch (randomAttack)
+                {
+                    case 0:
+                        yield return StartCoroutine(DashAttack());
+                        break;
+                    case 1:
+                        Attack1();
+                        break;
+                    case 2:
+                        ThrowShuriken();
+                        break;
+                    case 3:
+                        Attack2();
+                        break;
+                    case 4:
+                        Attack3();
+                        break;
+                    
+                // }
+            }
 
-//     public void TakeDamageOver()
-//     {
-//         if (isAttacking || isEnemyDie)
-//         {
-//             return;
-//         }
-//         isTakeDamage = false;
-//     }
+            yield return new WaitForSeconds(delayAttackPatternTime); // 공격 패턴 간 대기 시간
+            isAttacking = false;
+            isWaitNextAttack = false;
+    
+    }
 
-//     private IEnumerator AttackCooldown()
-//     {
-//         Debug.Log("쿨다운 코루틴 실행");
-//         if (isCooldownActive) 
-//         {
-//             Debug.Log("쿨다운 코루틴 실행 취소");
-//             yield break; // 쿨타임이 이미 진행 중이면 코루틴을 중단
-//         }
 
-//         isCooldownActive = true;
+    // 대쉬 공격 패턴
+    private IEnumerator DashAttack()
+    {
+        isAttacking = true;
+        isBossDashing = true;
+        collisionDmg = dashDmg; // 충돌 데미지를 대쉬 데미지로 변환
+        Vector2 direction = (targetPlayer.position - transform.position).normalized;
+        rb.velocity = direction * dashSpeed;
+
+        yield return new WaitForSeconds(1f); // 대쉬 지속 시간
+
+        rb.velocity = Vector2.zero;
+        isBossDashing = false;
+        isAttacking = false;
+        collisionDmg = 10f;// 기본 충돌 데미지로 변경.
+    }
+
+    private void Attack1()
+    {
+        isAttacking = true;
+        attackPattern1 = true;
+        Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
+        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+
+            foreach (Collider2D playerCollider in playerToHit)
+            {
+                if (playerCollider != null && playerCollider.CompareTag("Player"))
+                {
+                    Player player = playerCollider.GetComponent<Player>();
+                    if (player != null)
+                    {
+                        // 플레이어에게 데미지 입히기
+                        player.TakeDamage(damage); // 데미지 계산 방식에 따라 적절히 처리
+                        Debug.Log("보스 근접 공격1패턴 실행");
+                    }
+                }
+            }
+    }
+
+    private void Attack2()
+    {
+        isAttacking = true;
+        attackPattern2 = true;
+        Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
+        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+
+            foreach (Collider2D playerCollider in playerToHit)
+            {
+                if (playerCollider != null && playerCollider.CompareTag("Player"))
+                {
+                    Player player = playerCollider.GetComponent<Player>();
+                    if (player != null)
+                    {
+                        // 플레이어에게 데미지 입히기
+                        player.TakeDamage(damage); // 데미지 계산 방식에 따라 적절히 처리
+                        Debug.Log("보스 근접 공격1패턴 실행");
+                    }
+                }
+            }
+    }
+
+    private void Attack3()
+    {
+        isAttacking = true;
+        attackPattern3 = true;
+        Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
+        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+
+            foreach (Collider2D playerCollider in playerToHit)
+            {
+                if (playerCollider != null && playerCollider.CompareTag("Player"))
+                {
+                    Player player = playerCollider.GetComponent<Player>();
+                    if (player != null)
+                    {
+                        // 플레이어에게 데미지 입히기
+                        player.TakeDamage(damage); // 데미지 계산 방식에 따라 적절히 처리
+                        Debug.Log("보스 근접 공격1패턴 실행");
+                    }
+                }
+            }
+    }
+
+    public void BossAttackOver()
+    {
+        if (isTakeDamage)
+        {
+            return; // 피격 상태에서는 공격 종료를 처리하지 않음
+        }
+        isAttacking = false;
+        attackPattern1 = false;
+        attackPattern2 = false;
+        attackPattern3 = false;
+    }
+
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(transform.position, attackBoxSize);
+    }
+
+    // // 점프 공격 패턴
+    // private IEnumerator JumpAttack()
+    // {
+    //     if (isGrounded)
+    //     {
+    //         isAttacking = true;
+    //         isJumping = true;
+    //         rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
+
+    //         yield return new WaitForSeconds(1f); // 점프 지속 시간
+
+    //         isJumping = false;
+    //         isAttacking = false;
+    //     }
+    // }
+
+    // 수리검 던지기 공격
+    private void ThrowShuriken()
+    {
+        isAttacking = true;
+        isThrowShuriken = true;
+        GameObject shuriken = PhotonNetwork.Instantiate(shurikenPrefab.name, shurikenSpawnPoint.position, Quaternion.identity);
+        Rigidbody2D shurikenRb = shuriken.GetComponent<Rigidbody2D>();
+        Vector2 direction = (targetPlayer.position - shurikenSpawnPoint.position).normalized;
+        shurikenRb.velocity = direction * shurikenSpeed;
+        StartCoroutine(DestroyAfter(shuriken, shurikenLifetime));
+        isThrowShuriken = false;
+        isAttacking = false;
+    }
+
+    protected override void AnimatorController() //플레이어 애니메이션 관리 
+    {
+        base.AnimatorController();
+        anim.SetBool("isBossDashing", isBossDashing);
+        anim.SetBool("attackPattern1", attackPattern1);
+        anim.SetBool("attackPattern2", attackPattern2);
+        anim.SetBool("attackPattern3", attackPattern3);
+        anim.SetBool("isThrowShuriken", isThrowShuriken);
+
         
-//         while (attackCooldownTimer >= 0)
-//         {
-//             Debug.Log("쿨타임 내부 실행");
-//             attackActivate=false;
-//             attackCooldownTimer -= Time.deltaTime;
-//             yield return null;
-//         }
-//         Debug.Log("쿨타임 끝");
-//         attackCooldownTimer = attackCooldown; // 쿨타임 타이머를 초기화
-//         isCooldownActive = false;
-//         attackActivate = true;//공격쿨타임 타이머가 0이하일 때 공격 상태 활성화
-//     }
+    }
 
-//     //플레이어와 충돌시 플레이어에게 데미지 부여.
-//     private void OnCollisionEnter2D(Collision2D other) {
-//         if (other.gameObject.CompareTag("Player")&& !isEnemyDie)
-//         {
-//             AttackPlayerJustCollision(other.gameObject.GetComponent<PhotonView>().ViewID,collisionDmg);
-//         }
-        
-//     }
+    protected override void EnemyDyingCheck()
+    {
+        if (Hp <= 0 && !isEnemyDie)
+        {
+            isTakeDamage= false;
+            isAttacking = false;
+            attackPattern1 =false;
+            attackPattern2 = false;
+            attackPattern3 = false;
+            isThrowShuriken = false;
+            isEnemyDie = true;
+            // gameObject.tag="DeadEnemy";
+            gameObject.layer=LayerMask.NameToLayer("DeadEnemy");
+            return;
+        }
+    }
 
-//     // protected void Hit(Transform _attackTransform, Vector2 _attackArea)
-//     // {
-//     //     Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);//overlapBox 생성
+    // 보스가 피해를 입으면 가장 가까운 플레이어를 다시 찾음
+    [PunRPC]
+    public override void HitedRPC(float _damageDone, Vector2 _hitDirection)
+    {
+        base.HitedRPC(_damageDone, _hitDirection);
+        FindClosestPlayer(); // 보스가 공격을 받을 때마다 다시 가까운 플레이어를 추적
+    }
 
-//     //     for (int i = 0; i < objectsToHit.Length; ++i)//overlapBox 내부에 영역 검사.
-//     //     {
-//     //         if (objectsToHit[i].GetComponent<Enemy_Skeleton>() != null) // overlapBox 영역 내부에 적 존재 시 
-//     //         {
-//     //             Enemy_Skeleton enemy = objectsToHit[i].GetComponent<Enemy_Skeleton>();
-//     //             if (!enemy.attackers.Contains(PV))
-//     //             {
-//     //                 enemy.attackers.Add(PV); // 플레이어의 PhotonView를 attackers 목록에 추가
-//     //             }
-//     //             enemy.PV.RPC("HitedRPC", RpcTarget.AllBuffered, damage, (Vector2)(transform.position - objectsToHit[i].transform.position));
-            
-//     //         }
-//     //     }
-//     // }
-//     [PunRPC]
-//     public void AddAttackerRPC(int attackerViewID)
-//     {
-//         PhotonView attackerView = PhotonView.Find(attackerViewID);
-//         if (attackerView != null && !attackers.Contains(attackerView))
-//         {
-//             attackers.Add(attackerView); // 공격자가 이미 리스트에 없으면 추가
-//         }
-//     }
+    protected override void ReqeustRespawn(Vector3 respawnPosition)
+    {
+        EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+        if (enemyManager != null)
+        {
+            enemyManager.RespawnBoss(respawnPosition);
+        }
+    }
+    protected override void RespawnEnemy(Vector3 respawnPosition)
+    {
 
-//     public override void HpBarController(float hp)
-//     {
-//         base.HpBarController(hp);
-//     }
+        EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+        if (enemyManager != null && PhotonNetwork.IsMasterClient)
+        {
+            enemyManager.RespawnBoss(respawnPosition);
+        }
+    }   
 
-//     public override float Hp
-//     {
-//         get { return hp; }
-//         set
-//         {
-//             if (hp != value)
-//             {
-//                 hp = Mathf.Clamp(value, 0, maxHp);
-//                 // HpBarController(hp);
+}
 
-//             }
-//         }
-//     }
-
-
-//      public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-//     {
-//         if (stream.IsWriting)
-//         {
-//             stream.SendNext(Hp);
-//             stream.SendNext(transform.position);
-            
-//             // stream.SendNext(maxHp);
-//         }
-//         else
-//         {
-//             Hp = (float)stream.ReceiveNext();
-//             transform.position = (Vector3)stream.ReceiveNext();
-
-//             // maxHp = (float)stream.ReceiveNext();
-//             // HpBarController(hp);
-//         }
-//     }
-// }

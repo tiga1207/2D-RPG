@@ -207,7 +207,7 @@ public class Player : Entity, IPunObservable
             CheckInput();
             CooldownManager();
             FlipController();
-            PlayerHited();
+            PlayerWhenHited();
             
             LerpPlayerUI();
             // DashAbility(); //대시 코루틴 미사용시
@@ -283,7 +283,7 @@ public class Player : Entity, IPunObservable
 //공격
     private void StartAttackEvent()
     {
-        if (!isGrounded)
+        if (!isGrounded||isUltimateAttacking)
         {
             return; // 플레이어가 땅에 있지 않으면 아래 다 날리기.
         }
@@ -391,7 +391,7 @@ public class Player : Entity, IPunObservable
     //궁극기
     private void UltimateAttackEvent()
     {
-        if (!isGrounded)
+        if (!isGrounded||isAttacking)
         {
             return; // 플레이어가 땅에 있지 않으면 아래 다 날리기.
         }
@@ -573,7 +573,7 @@ public class Player : Entity, IPunObservable
         
     }
 
-    private void PlayerHited()// 플레이어가 무적 상태일 경우 효과 추가.
+    private void PlayerWhenHited()// 플레이어가 무적 상태일 경우 효과 추가.
     {
         if (isTakeDamage && childSr != null)
         {

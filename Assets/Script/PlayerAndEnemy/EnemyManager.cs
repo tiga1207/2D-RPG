@@ -12,6 +12,11 @@ public class EnemyManager : MonoBehaviourPunCallbacks
 
     public List<Transform> samuraiSpawnPoints; // 적을 스폰할 위치 목록
     public GameObject samuraiPrefab; // 적 프리팹
+    public GameObject bossPrefab; // 적 프리팹
+    public Transform bossSpawnPoint;
+
+    private List<GameObject> bossList = new List<GameObject>();
+    
 
     private List<GameObject> enemies = new List<GameObject>();
 
@@ -36,6 +41,11 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         // {
         //     SpawnEnemies();
         // }
+        // 적 중복 생성 제거를 위해 주석처리
+        if (PhotonNetwork.IsMasterClient)
+        {
+            SpawnBoss();
+        }
     }
 
     public void SpawnEnemies()
@@ -59,6 +69,16 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         }
     }
 
+    //보스 스폰 로직
+    public void SpawnBoss()
+    {
+        if(bossSpawnPoint != null)
+        {
+            GameObject boss = PhotonNetwork.Instantiate(bossPrefab.name, bossSpawnPoint.position, Quaternion.identity);
+            bossList.Add(boss);
+        }
+    }
+
     public void RespawnSkeleton(Vector3 position)
     {
         StartCoroutine(RespawnSkeletonCoroutine(position));
@@ -70,6 +90,10 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     public void RespawnEnemy(Vector3 position)
     {
         StartCoroutine(RespawnEnemyCoroutine(position));
+    }
+    public void RespawnBoss(Vector3 position)
+    {
+        StartCoroutine(RespawnBossCoroutine(position));
     }
 
     IEnumerator RespawnSkeletonCoroutine(Vector3 position)
@@ -90,11 +114,17 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     IEnumerator RespawnEnemyCoroutine(Vector3 position)
     {
         yield return new WaitForSeconds(5f); //리스폰 소요 시간
-        GameObject enemy = PhotonNetwork.Instantiate(skeletonPrefab.name, position, Quaternion.identity);
-        enemies.Add(enemy);
-        GameObject samurai = PhotonNetwork.Instantiate(samuraiPrefab.name, position, Quaternion.identity);
-        enemies.Add(samurai);
+        // GameObject enemy = PhotonNetwork.Instantiate(skeletonPrefab.name, position, Quaternion.identity);
+        // enemies.Add(enemy);
+        // GameObject samurai = PhotonNetwork.Instantiate(samuraiPrefab.name, position, Quaternion.identity);
+        // enemies.Add(samurai);
 
+    }
+     IEnumerator RespawnBossCoroutine(Vector3 position)
+    {
+        yield return new WaitForSeconds(50f); //보스 리스폰 소요 시간
+        GameObject boss = PhotonNetwork.Instantiate(bossPrefab.name, bossSpawnPoint.position, Quaternion.identity);
+        bossList.Add(boss);
     }
 }
 

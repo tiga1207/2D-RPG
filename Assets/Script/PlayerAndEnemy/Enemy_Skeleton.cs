@@ -7,19 +7,13 @@ using System;
 
 public class Enemy_Skeleton : EnemyBase
 {
-    [PunRPC]
-    protected override void RequestDestroy(int viewID, Vector3 respawnPosition)
+    protected override void ReqeustRespawn(Vector3 respawnPosition)
     {
-        PhotonView enemyPV = PhotonView.Find(viewID);
-        if (enemyPV != null && PhotonNetwork.IsMasterClient)
+        EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+        if (enemyManager != null)
         {
-            PhotonNetwork.Destroy(enemyPV.gameObject);
-            EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
-            if (enemyManager != null)
-            {
-                enemyManager.RespawnSkeleton(respawnPosition);
-            }
-    }
+            enemyManager.RespawnSkeleton(respawnPosition);
+        }
     }
     protected override void RespawnEnemy(Vector3 respawnPosition)
     {
