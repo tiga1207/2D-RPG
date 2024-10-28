@@ -217,7 +217,7 @@ public class Player : Entity, IPunObservable
     private void OnCollisionEnter2D(Collision2D other)
     {
         // if (other.gameObject.CompareTag("Enemy") && !isCrushed)
-        if (other.gameObject.layer == LayerMask.NameToLayer("Attackable") && !isCrushed)
+        if (other.gameObject.layer == LayerMask.NameToLayer("Attackable") && !isCrushed &&!invincible)
         {
             // float recoilDistance =2f; 
             float dirX = transform.position.x - other.transform.position.x > 0 ? 2f : -2f;

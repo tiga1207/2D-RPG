@@ -59,28 +59,42 @@ public class Boss : EnemyBase
         }
         float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
 
-        // 플레이어가 30f 거리 내에 있으면 이속 2배
+        // 보스와 플레이어의 거리가 탐지거리내o에 있으면 이속 2배
         if (distanceToPlayer < detectPlayerDistanceLimit)
         {
             rb.velocity = new Vector2(moveSpeed * 2f * facingDir, rb.velocity.y);
         }
-
-        // else if (!isAttacking && !isEnemyDie)
-        else if (isAttacking || !isEnemyDie)
+        //공격 거리 내에 있을 경우
+        else if(distanceToPlayer <10f)
         {
-            rb.velocity = Vector2.zero; // 공격 중일 때 이동 멈춤
-            // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
-            // isPlayerDetected에 대한 null 체크 추가
-            if (isPlayerDetected.collider != null)
+            if(!isAttacking && attackActivate && !isEnemyDie)
             {
-                // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
+                rb.velocity = new Vector2(0,0);// 특정 애니메이션(공격 모션 끝)이 끝나기 전까지는 해당 오브젝트가 움직이지 못하도록 고정시켜야함.
+                // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID,damage);
+                RandomAttackPattern();
+                if (!isCooldownActive) // 쿨타임이 진행 중이 아니면 코루틴 시작
+                {
+                    StartCoroutine(AttackCooldown()); // 쿨타임 시작
+                }
             }
-            else
-            {
-                Debug.LogWarning("No player detected in Movement");
-            }
-
         }
+
+        // // else if (!isAttacking && !isEnemyDie)
+        // else if (isAttacking || !isEnemyDie)
+        // {
+        //     rb.velocity = Vector2.zero; // 공격 중일 때 이동 멈춤
+        //     // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
+        //     // isPlayerDetected에 대한 null 체크 추가
+        //     if (isPlayerDetected.collider != null)
+        //     {
+        //         // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
+        //     }
+        //     else
+        //     {
+        //         Debug.LogWarning("No player detected in Movement");
+        //     }
+
+        // }
         
         else if (isEnemyDie || isTakeDamage)
         {
@@ -112,11 +126,11 @@ public class Boss : EnemyBase
 
         float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
 
-        // 플레이어가 일정 거리 내에 있을 때 공격 패턴 실행
-        if (distanceToPlayer <= 10f && isWaitNextAttack) // 10f는 공격을 시작할 거리
-        {
-            StartCoroutine(RandomAttackPattern());
-        }
+        // 플레이어가 일정 거리 내에 있고, isWaitNextAttack이 활성화 됐을 때 공격 패턴 실행
+        // if (distanceToPlayer <= 10f && isWaitNextAttack) // 10f는 공격을 시작할 거리
+        // {
+        //     StartCoroutine(RandomAttackPattern());
+        // }
     }
 
     // 가장 가까운 플레이어를 찾는 메서드
@@ -234,17 +248,47 @@ public class Boss : EnemyBase
     }
 
     // 랜덤한 공격 패턴을 선택하는 코루틴
-    private IEnumerator RandomAttackPattern()
+    // private IEnumerator RandomAttackPattern()
+    // {
+    //     isAttacking =true;
+    //     isWaitNextAttack= true;
+    //         // if (!isAttacking)
+    //         // {
+    //             int randomAttack = random.Next(5); //5개 패턴 중 랜덤 선택
+    //             switch (randomAttack)
+    //             {
+    //                 case 0:
+    //                     yield return StartCoroutine(DashAttack());
+    //                     break;
+    //                 case 1:
+    //                     Attack1();
+    //                     break;
+    //                 case 2:
+    //                     ThrowShuriken();
+    //                     break;
+    //                 case 3:
+    //                     Attack2();
+    //                     break;
+    //                 case 4:
+    //                     Attack3();
+    //                     break;
+                    
+    //             // }
+    //         }
+
+    //         yield return new WaitForSeconds(delayAttackPatternTime); // 공격 패턴 간 대기 시간
+    //         isAttacking = false;
+    //         isWaitNextAttack = false;
+    // }
+
+    private void RandomAttackPattern()
     {
-        isAttacking =true;
-        isWaitNextAttack= true;
-            // if (!isAttacking)
-            // {
-                int randomAttack = random.Next(5); //5개 패턴 중 랜덤 선택
+        // isAttacking =true;
+                int randomAttack = UnityEngine.Random.Range(0,5);
                 switch (randomAttack)
                 {
                     case 0:
-                        yield return StartCoroutine(DashAttack());
+                        StartCoroutine(DashAttack());
                         break;
                     case 1:
                         Attack1();
@@ -261,11 +305,8 @@ public class Boss : EnemyBase
                     
                 // }
             }
-
-            yield return new WaitForSeconds(delayAttackPatternTime); // 공격 패턴 간 대기 시간
-            isAttacking = false;
-            isWaitNextAttack = false;
-    
+            // isAttacking = false;
+            // isWaitNextAttack = false;
     }
 
 
@@ -298,9 +339,12 @@ public class Boss : EnemyBase
                 if (playerCollider != null && playerCollider.CompareTag("Player"))
                 {
                     Player player = playerCollider.GetComponent<Player>();
-                    if (player != null)
+                    if (player != null && !player.invincible)
                     {
+                        attackActivate = false;
                         // 플레이어에게 데미지 입히기
+                        isAttacking = true;
+                        attackPattern1 = true;
                         player.TakeDamage(damage); // 데미지 계산 방식에 따라 적절히 처리
                         Debug.Log("보스 근접 공격1패턴 실행");
                     }
@@ -310,8 +354,8 @@ public class Boss : EnemyBase
 
     private void Attack2()
     {
-        isAttacking = true;
-        attackPattern2 = true;
+        // isAttacking = true;
+        // attackPattern2 = true;
         Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
         Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
 
@@ -320,11 +364,14 @@ public class Boss : EnemyBase
                 if (playerCollider != null && playerCollider.CompareTag("Player"))
                 {
                     Player player = playerCollider.GetComponent<Player>();
-                    if (player != null)
+                    if (player != null && !player.invincible)
                     {
+                        attackActivate = false;
                         // 플레이어에게 데미지 입히기
+                        isAttacking = true;
+                        attackPattern2 = true;
                         player.TakeDamage(damage); // 데미지 계산 방식에 따라 적절히 처리
-                        Debug.Log("보스 근접 공격1패턴 실행");
+                        Debug.Log("보스 근접 공격2패턴 실행");
                     }
                 }
             }
@@ -342,11 +389,14 @@ public class Boss : EnemyBase
                 if (playerCollider != null && playerCollider.CompareTag("Player"))
                 {
                     Player player = playerCollider.GetComponent<Player>();
-                    if (player != null)
+                    if (player != null && !player.invincible)
                     {
+                        attackActivate = false;
                         // 플레이어에게 데미지 입히기
+                        isAttacking = true;
+                        attackPattern3 = true;
                         player.TakeDamage(damage); // 데미지 계산 방식에 따라 적절히 처리
-                        Debug.Log("보스 근접 공격1패턴 실행");
+                        Debug.Log("보스 근접 공격3패턴 실행");
                     }
                 }
             }
