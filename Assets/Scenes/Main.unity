@@ -824,6 +824,7 @@ MonoBehaviour:
   OptionPanel: {fileID: 1017996024}
   GoGamePanelBtn: {fileID: 1410201383}
   GoGameOptionBtn: {fileID: 187427884}
+  QuitGameBtn: {fileID: 1208840577}
   Roombtn: {fileID: 18547923}
 --- !u!4 &231466321
 Transform:
