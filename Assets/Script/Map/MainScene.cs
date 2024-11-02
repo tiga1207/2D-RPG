@@ -15,6 +15,7 @@ public class MainScene : MonoBehaviourPunCallbacks
     public GameObject OptionPanel;
     public Button GoGamePanelBtn;
     public Button GoGameOptionBtn;
+    public Button QuitGameBtn;
     public Button Roombtn;
         private Coroutine loadingCoroutine;
 
@@ -32,12 +33,25 @@ public class MainScene : MonoBehaviourPunCallbacks
         {
             Roombtn.onClick.AddListener(OnRoomButtonClicked);
         }
+        if (QuitGameBtn != null)
+        {
+            QuitGameBtn.onClick.AddListener(QuitGame);
+        }
     }
 
     public void GoGamePanel()
     {
         MainPanel.SetActive(false);
         GamePanel.SetActive(true);
+    }
+    public void QuitGame()
+    {
+        Debug.Log("나가기 버튼 눌림");
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
     }
 
     public void GoOptionPanel()
