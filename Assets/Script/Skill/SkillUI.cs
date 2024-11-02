@@ -12,6 +12,7 @@ public class SkillUI : MonoBehaviour
     public GameObject SkillUIPanel;
     public GameObject DashArea;
     public GameObject HealArea;
+    public GameObject UltimateArea;
     public static SkillUI Instance;
 
     public GameObject skillPrefab; // 스킬 항목 프리팹
@@ -158,6 +159,19 @@ public class SkillUI : MonoBehaviour
                 {
                     currentPlayer.healSkillActivate = true;
                     HealArea.SetActive(true);
+                }
+            }
+            else if (skill.skillName == "Ultimate")
+            {
+                if (skill.level == 0)
+                {
+                    currentPlayer.ultimateSkillActivate = false;
+                    UltimateArea.SetActive(false);
+                }
+                else
+                {
+                    currentPlayer.ultimateSkillActivate = true;
+                    UltimateArea.SetActive(true);
                 }
             }
         }

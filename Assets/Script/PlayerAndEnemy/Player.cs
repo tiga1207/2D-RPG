@@ -47,10 +47,13 @@ public class Player : Entity, IPunObservable
     [SerializeField] protected GameObject slashEffect;
     [SerializeField] protected GameObject ultimateEffect;
     [SerializeField] private bool isAttacking;
+
+
+    public bool ultimateSkillActivate;
     [SerializeField] private bool isUltimateAttacking;
-    [SerializeField] private float ultimateAttackCooldown=1f;
-    [SerializeField] private float ultimateAttackCooldownTimer;
-    [SerializeField] private bool ultimateAttackActive = true;
+    public float ultimateAttackCooldown=1f;
+    public float ultimateAttackCooldownTimer;
+    public bool ultimateAttackActive = true;
 
 
     private int comboCounter;
@@ -337,6 +340,7 @@ public class Player : Entity, IPunObservable
         {
             // isAttacking=false;
             ultimateAttackCooldownTimer -= Time.deltaTime;
+            SkillUIManager.Instance.UpdateUltimate(ultimateAttackCooldownTimer);
             yield return null;
         }
         ultimateAttackActive= true;//공격쿨타임 타이머가 0이하일 때 공격 상태 활성화
@@ -395,7 +399,7 @@ public class Player : Entity, IPunObservable
         {
             return; // 플레이어가 땅에 있지 않으면 아래 다 날리기.
         }
-        if (ultimateAttackActive && (yInput == 0 || yInput < 0) && isGrounded)// 플레이어가 지면에 있으면서 공격 가능 상태 일 경우
+        if (ultimateSkillActivate &&ultimateAttackActive && (yInput == 0 || yInput < 0) && isGrounded)// 플레이어가 지면에 있으면서 공격 가능 상태 일 경우
         {
             isUltimateAttacking= true;
             invincible= true;
@@ -535,6 +539,12 @@ public class Player : Entity, IPunObservable
         }
     }
 
+    [PunRPC]
+    public void AddJumpCountRPC()
+    {
+        maxJumpCount = 3;
+    }
+
     private void Jump() // 플레이어 점프 시.
     {
         if (isGrounded || jumpCount < maxJumpCount)// 플레이어가 땅에 있거나, 점프 카운트가 남아있을 경우
@@ -627,7 +637,7 @@ public class Player : Entity, IPunObservable
     {
         if(PV.IsMine)// 내 플레이어일 경우
         {
-            if(hp<=0)
+            if(hp<=0 || invincible)
             {
                 return;
             }

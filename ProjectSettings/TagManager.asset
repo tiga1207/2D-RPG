@@ -11,6 +11,7 @@ TagManager:
   - Skeleton
   - Samurai
   - Boss
+  - shuriken
   layers:
   - Default
   - TransparentFX

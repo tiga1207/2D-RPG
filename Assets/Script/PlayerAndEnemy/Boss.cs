@@ -12,18 +12,19 @@ public class Boss : EnemyBase
     public Transform shurikenSpawnPoint;
 
     [Header("Attack Settings")]
-    public bool isWaitNextAttack = false;
-    Vector2 attackBoxSize = new Vector2(2f, 1f); // 공격 범위 설정 (너비 2, 높이 1)
+
+    [SerializeField] protected Transform ShurikenAttackTransform;
+    [SerializeField] protected Vector2 ShurikenAttackArea;
     public float dashSpeed = 10f;
     public float jumpHeight = 5f;
-    public float shurikenSpeed = 10f;
+    public float shurikenSpeed = 30f;
     public float shurikenLifetime = 2f;
     public float dashDmg = 50f; 
     public bool attackPattern1=false;
     public bool attackPattern2=false;
     public bool attackPattern3=false;
     public bool isThrowShuriken=false;
-    public float detectPlayerDistanceLimit= 30f;
+    public float detectPlayerDistanceLimit= 50f;
 
     // private bool isAttacking = false;
     [SerializeField] private bool isBossDashing = false;
@@ -38,180 +39,161 @@ public class Boss : EnemyBase
         base.Start();
         collisionDmg= 10f; // 충돌 데미지 기본값 지정
         FindClosestPlayer(); // 초기 타겟 플레이어 설정
-        // StartCoroutine(RandomAttackPattern()); // 랜덤 패턴 선택 시작
     }
-
-    // 매 프레임마다 가장 가까운 플레이어를 찾음
     protected override void Update()
     {
         base.Update();
         Movement();
-        NotAttackCondition();
+        // NotAttackCondition();
         AnimatorController();
         LookAtTarget(targetPlayer);
     }
     protected override void Movement()
     {
-        if(targetPlayer == null)
+        if (targetPlayer == null)
         {
             FindClosestPlayer();
             return;
         }
+
         float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
 
-        // 보스와 플레이어의 거리가 탐지거리내o에 있으면 이속 2배
-        if (distanceToPlayer < detectPlayerDistanceLimit)
+        // 일정 거리 이상 멀어졌을 경우 타겟 해제
+        if (distanceToPlayer > detectPlayerDistanceLimit)
         {
-            rb.velocity = new Vector2(moveSpeed * 2f * facingDir, rb.velocity.y);
+            targetPlayer = null;
+            rb.velocity = new Vector2(0,0);
+            return;
         }
-        //공격 거리 내에 있을 경우
-        else if(distanceToPlayer <10f)
+
+        // 공격 범위 내에 플레이어가 있고 쿨타임 중이면 보스를 멈춤
+        if (IsPlayerInAttackArea() && isCooldownActive)
         {
-            if(!isAttacking && attackActivate && !isEnemyDie)
+            rb.velocity = new Vector2(0,0);
+            return;
+        }
+
+        if (IsPlayerInShurikenArea() && attackActivate && !isAttacking && !isEnemyDie && !isCooldownActive)
+        {
+            rb.velocity = Vector2.zero;
+            ThrowShuriken();
+            if (!isCooldownActive)
             {
-                rb.velocity = new Vector2(0,0);// 특정 애니메이션(공격 모션 끝)이 끝나기 전까지는 해당 오브젝트가 움직이지 못하도록 고정시켜야함.
-                // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID,damage);
-                RandomAttackPattern();
-                if (!isCooldownActive) // 쿨타임이 진행 중이 아니면 코루틴 시작
-                {
-                    StartCoroutine(AttackCooldown()); // 쿨타임 시작
-                }
+                StartCoroutine(AttackCooldown());
             }
         }
 
-        // // else if (!isAttacking && !isEnemyDie)
-        // else if (isAttacking || !isEnemyDie)
-        // {
-        //     rb.velocity = Vector2.zero; // 공격 중일 때 이동 멈춤
-        //     // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
-        //     // isPlayerDetected에 대한 null 체크 추가
-        //     if (isPlayerDetected.collider != null)
-        //     {
-        //         // AttackPlayer(isPlayerDetected.collider.gameObject.GetComponent<PhotonView>().ViewID, damage);
-        //     }
-        //     else
-        //     {
-        //         Debug.LogWarning("No player detected in Movement");
-        //     }
-
-        // }
+        // AttackArea 범위 내에 플레이어가 있을 경우 공격 준비
+        else if (IsPlayerInAttackArea() && attackActivate && !isAttacking && !isEnemyDie && !isCooldownActive)
+        {
+            RandomAttackPattern();
+            // 공격 쿨타임이 진행 중이 아닐 때만 코루틴 실행
+            if (!isCooldownActive)
+            {
+                StartCoroutine(AttackCooldown());
+            }
+            // if(isBossDashing) return;
+            new Vector2(0,0);
+            
+            
+            
+        }
         
-        else if (isEnemyDie || isTakeDamage)
+        else if (!isAttacking && !isEnemyDie) // 공격 중이 아니고 살아있으면 이동
         {
-            rb.velocity = Vector2.zero; // 적이 죽거나 데미지를 입으면 이동 멈춤
-        }
-        else // 평소 속도
-        {
-            rb.velocity = new Vector2(moveSpeed * facingDir, rb.velocity.y);
+
+            // // 수리검 공격 범위에 플레이어가 있으면 수리검 던지기
+            // 
+            // else
+            // {
+            //     // 플레이어를 추적
+            //     Vector2 direction = (targetPlayer.position - transform.position).normalized;
+            //     rb.velocity = new Vector2(moveSpeed * direction.x, rb.velocity.y);
+            // }
+            // 플레이어를 추적
+            Vector2 direction = (targetPlayer.position - transform.position).normalized;
+            rb.velocity = new Vector2(moveSpeed * direction.x, rb.velocity.y);
         }
     }
 
-    private void NotAttackCondition()
+    private bool IsPlayerInAttackArea()
     {
-        if(!isAttacking && !isWaitNextAttack)
-        {   
-            AttackCondition();
+        // AttackTransform은 공격 범위의 중심 위치, AttackArea는 공격 범위 크기, attackableLayer는 플레이어가 포함된 레이어
+        Collider2D[] playerColliders = Physics2D.OverlapBoxAll(AttackTransform.position, AttackArea, 0, attackableLayer);
+
+        foreach (Collider2D collider in playerColliders)
+        {
+            if (collider.CompareTag("Player"))
+            {
+                return true; // 공격 범위 내에 플레이어가 있을 경우 true 반환
+            }
         }
+        return false; // 공격 범위 내에 플레이어가 없을 경우 false 반환
     }
 
-    private void AttackCondition()
+    protected override void OnDrawGizmos()
     {
-        FindClosestPlayer();// 공격 중이 아닐 때만 플레이어 추적
+        base.OnDrawGizmos();
+        Gizmos.DrawWireCube(ShurikenAttackTransform.position, ShurikenAttackArea);
+    }
+
+    private bool IsPlayerInShurikenArea()
+    {
+        // AttackTransform은 공격 범위의 중심 위치, AttackArea는 공격 범위 크기, attackableLayer는 플레이어가 포함된 레이어
+        Collider2D[] playerColliders = Physics2D.OverlapBoxAll(ShurikenAttackTransform.position, ShurikenAttackArea, 0, attackableLayer);
+
+        foreach (Collider2D collider in playerColliders)
+        {
+            if (collider.CompareTag("Player"))
+            {
+                return true; // 공격 범위 내에 플레이어가 있을 경우 true 반환
+            }
+        }
+        return false; // 공격 범위 내에 플레이어가 없을 경우 false 반환
+    }
+
+    private void FindClosestPlayer()
+    {
+        players = FindPlayers(); // 현재 씬의 플레이어들을 먼저 찾음
+
+        if (players.Length == 0)
+        {
+            Debug.LogWarning("No players found!");
+            return;
+        }
+
+        float closestDistance = Mathf.Infinity;
+        
+        foreach (Transform player in players)
+        {
+            float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+            if (distanceToPlayer <= detectPlayerDistanceLimit && distanceToPlayer < closestDistance)
+            {
+                closestDistance = distanceToPlayer;
+                targetPlayer = player;
+            }
+        }
+
+        // 플레이어가 한 명일 경우, 무조건 그 플레이어를 타겟으로 설정
+        if (players.Length == 1)
+        {
+            targetPlayer = players[0];
+        }
+        // 모든 플레이어가 같은 위치에 있을 경우 랜덤으로 한 명 선택 (두 명 이상일 때만 실행)
+        else if (closestDistance == 0 && players.Length > 1)
+        {
+            targetPlayer = players[random.Next(players.Length)];
+        }
 
         if (targetPlayer == null)
         {
-            Debug.LogWarning("No target player found in NotAttackCondition");
-            return; // targetPlayer가 null일 경우 함수 종료
+            Debug.LogWarning("No target player found within range!");
+            return;
         }
 
-        float distanceToPlayer = Vector2.Distance(transform.position, targetPlayer.position);
-
-        // 플레이어가 일정 거리 내에 있고, isWaitNextAttack이 활성화 됐을 때 공격 패턴 실행
-        // if (distanceToPlayer <= 10f && isWaitNextAttack) // 10f는 공격을 시작할 거리
-        // {
-        //     StartCoroutine(RandomAttackPattern());
-        // }
+        // 타겟 플레이어를 향해 회전
+        LookAtTarget(targetPlayer);
     }
-
-    // 가장 가까운 플레이어를 찾는 메서드
-    // private void FindClosestPlayer()
-    // {
-    //     if (players.Length == 0)
-    //     {
-    //         Debug.LogWarning("No players found!");
-    //         return;
-    //     }
-    //     float closestDistance = Mathf.Infinity;
-    //     players = FindPlayers(); // 현재 씬의 플레이어들을 찾음
-
-    //     foreach (Transform player in players)
-    //     {
-    //         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-    //         if (distanceToPlayer <= detectPlayerDistanceLimit &&distanceToPlayer < closestDistance)
-    //         {
-    //             closestDistance = distanceToPlayer;
-    //             targetPlayer = player;
-    //         }
-    //     }
-
-    //     // 모든 플레이어가 같은 위치에 있을 경우 랜덤으로 한 명 선택
-    //     if (closestDistance == 0 && players.Length > 1)
-    //     {
-    //         targetPlayer = players[random.Next(players.Length)];
-    //     }
-
-    //     if (targetPlayer == null)
-    //     {
-    //         Debug.LogWarning("No target player found within range!");
-    //         return;
-    //     }
-
-    //     // 타겟 플레이어를 향해 회전
-    //     LookAtTarget(targetPlayer);
-    // }
-
-    private void FindClosestPlayer()
-{
-    players = FindPlayers(); // 현재 씬의 플레이어들을 먼저 찾음
-
-    if (players.Length == 0)
-    {
-        Debug.LogWarning("No players found!");
-        return;
-    }
-
-    float closestDistance = Mathf.Infinity;
-    
-    foreach (Transform player in players)
-    {
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-        if (distanceToPlayer <= detectPlayerDistanceLimit && distanceToPlayer < closestDistance)
-        {
-            closestDistance = distanceToPlayer;
-            targetPlayer = player;
-        }
-    }
-
-    // 플레이어가 한 명일 경우, 무조건 그 플레이어를 타겟으로 설정
-    if (players.Length == 1)
-    {
-        targetPlayer = players[0];
-    }
-    // 모든 플레이어가 같은 위치에 있을 경우 랜덤으로 한 명 선택 (두 명 이상일 때만 실행)
-    else if (closestDistance == 0 && players.Length > 1)
-    {
-        targetPlayer = players[random.Next(players.Length)];
-    }
-
-    if (targetPlayer == null)
-    {
-        Debug.LogWarning("No target player found within range!");
-        return;
-    }
-
-    // 타겟 플레이어를 향해 회전
-    LookAtTarget(targetPlayer);
-}
 
     // 타겟 플레이어를 바라보는 함수
     private void LookAtTarget(Transform target)
@@ -247,99 +229,71 @@ public class Boss : EnemyBase
         return playerTransforms.ToArray();
     }
 
-    // 랜덤한 공격 패턴을 선택하는 코루틴
-    // private IEnumerator RandomAttackPattern()
-    // {
-    //     isAttacking =true;
-    //     isWaitNextAttack= true;
-    //         // if (!isAttacking)
-    //         // {
-    //             int randomAttack = random.Next(5); //5개 패턴 중 랜덤 선택
-    //             switch (randomAttack)
-    //             {
-    //                 case 0:
-    //                     yield return StartCoroutine(DashAttack());
-    //                     break;
-    //                 case 1:
-    //                     Attack1();
-    //                     break;
-    //                 case 2:
-    //                     ThrowShuriken();
-    //                     break;
-    //                 case 3:
-    //                     Attack2();
-    //                     break;
-    //                 case 4:
-    //                     Attack3();
-    //                     break;
-                    
-    //             // }
-    //         }
-
-    //         yield return new WaitForSeconds(delayAttackPatternTime); // 공격 패턴 간 대기 시간
-    //         isAttacking = false;
-    //         isWaitNextAttack = false;
-    // }
-
     private void RandomAttackPattern()
     {
         // isAttacking =true;
-                int randomAttack = UnityEngine.Random.Range(0,5);
-                switch (randomAttack)
-                {
-                    case 0:
-                        StartCoroutine(DashAttack());
-                        break;
-                    case 1:
-                        Attack1();
-                        break;
-                    case 2:
-                        ThrowShuriken();
-                        break;
-                    case 3:
-                        Attack2();
-                        break;
-                    case 4:
-                        Attack3();
-                        break;
-                    
-                // }
-            }
-            // isAttacking = false;
-            // isWaitNextAttack = false;
+        int randomAttack = UnityEngine.Random.Range(0,3);
+        switch (randomAttack)
+        {
+            case 0:
+                Attack1();
+                break;
+            case 1:
+                Attack2();
+                break;
+            case 2:
+                Attack3();
+                break;
+            // case 3:
+            //     StartCoroutine(DashAttack());
+            //     break;
+            // case 4:
+            //     ThrowShuriken();
+            //     break;
+            
+        // }
+        }   
+        // isAttacking = false;
+        // isWaitNextAttack = false;
     }
 
 
-    // 대쉬 공격 패턴
-    private IEnumerator DashAttack()
-    {
-        isAttacking = true;
-        isBossDashing = true;
-        collisionDmg = dashDmg; // 충돌 데미지를 대쉬 데미지로 변환
-        Vector2 direction = (targetPlayer.position - transform.position).normalized;
-        rb.velocity = direction * dashSpeed;
+    // // 대쉬 공격 패턴
+    // private IEnumerator DashAttack()
+    // {
+    //     isAttacking = true;
+    //     isBossDashing = true;
+    //     collisionDmg = dashDmg; // 충돌 데미지를 대쉬 데미지로 변환
+    //     Vector2 direction = (targetPlayer.position - transform.position).normalized;
+    //     // rb.velocity = direction * dashSpeed;
+    //     rb.velocity = new Vector2(direction.x * dashSpeed, rb.velocity.y);
 
-        yield return new WaitForSeconds(1f); // 대쉬 지속 시간
 
-        rb.velocity = Vector2.zero;
-        isBossDashing = false;
-        isAttacking = false;
-        collisionDmg = 10f;// 기본 충돌 데미지로 변경.
-    }
+    //     yield return new WaitForSeconds(3f); // 대쉬 지속 시간
+
+    //     // rb.velocity = Vector2.zero;
+    //     isBossDashing = false;
+    //     isAttacking = false;
+    //     collisionDmg = 10f;// 기본 충돌 데미지로 변경.
+    // }
+
 
     private void Attack1()
     {
         isAttacking = true;
         attackPattern1 = true;
         Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
-        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+        // Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(AttackTransform.position, AttackArea, 0, attackableLayer);//overlapBox 생성
+
 
             foreach (Collider2D playerCollider in playerToHit)
             {
                 if (playerCollider != null && playerCollider.CompareTag("Player"))
                 {
                     Player player = playerCollider.GetComponent<Player>();
-                    if (player != null && !player.invincible)
+                    // if (player != null && !player.invincible)
+                    if (player != null)
                     {
                         attackActivate = false;
                         // 플레이어에게 데미지 입히기
@@ -357,14 +311,17 @@ public class Boss : EnemyBase
         // isAttacking = true;
         // attackPattern2 = true;
         Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
-        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+        // Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(AttackTransform.position, AttackArea, 0, attackableLayer);//overlapBox 생성
+
 
             foreach (Collider2D playerCollider in playerToHit)
             {
                 if (playerCollider != null && playerCollider.CompareTag("Player"))
                 {
                     Player player = playerCollider.GetComponent<Player>();
-                    if (player != null && !player.invincible)
+                    // if (player != null && !player.invincible)
+                    if (player != null)
                     {
                         attackActivate = false;
                         // 플레이어에게 데미지 입히기
@@ -381,21 +338,23 @@ public class Boss : EnemyBase
     {
         isAttacking = true;
         attackPattern3 = true;
-        Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
-        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+        // Vector2 attackPosition = transform.position; // 공격 위치를 보스 위치로 설정
+        // Collider2D[] playerToHit = Physics2D.OverlapBoxAll(attackPosition, attackBoxSize, 0, LayerMask.GetMask("Player"));//overlapBox 생성
+        Collider2D[] playerToHit = Physics2D.OverlapBoxAll(AttackTransform.position, AttackArea, 0, attackableLayer);//overlapBox 생성
 
             foreach (Collider2D playerCollider in playerToHit)
             {
                 if (playerCollider != null && playerCollider.CompareTag("Player"))
                 {
                     Player player = playerCollider.GetComponent<Player>();
-                    if (player != null && !player.invincible)
+                    // if (player != null && !player.invincible)
+                    if (player != null)
                     {
                         attackActivate = false;
                         // 플레이어에게 데미지 입히기
                         isAttacking = true;
                         attackPattern3 = true;
-                        player.TakeDamage(damage); // 데미지 계산 방식에 따라 적절히 처리
+                        player.TakeDamage(damage);
                         Debug.Log("보스 근접 공격3패턴 실행");
                     }
                 }
@@ -404,38 +363,17 @@ public class Boss : EnemyBase
 
     public void BossAttackOver()
     {
-        if (isTakeDamage)
-        {
-            return; // 피격 상태에서는 공격 종료를 처리하지 않음
-        }
+        // if (isTakeDamage)
+        // {
+        //     return; // 피격 상태에서는 공격 종료를 처리하지 않음
+        // }
         isAttacking = false;
         attackPattern1 = false;
         attackPattern2 = false;
         attackPattern3 = false;
+        isThrowShuriken = false;
+
     }
-
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position, attackBoxSize);
-    }
-
-    // // 점프 공격 패턴
-    // private IEnumerator JumpAttack()
-    // {
-    //     if (isGrounded)
-    //     {
-    //         isAttacking = true;
-    //         isJumping = true;
-    //         rb.velocity = new Vector2(rb.velocity.x, jumpHeight);
-
-    //         yield return new WaitForSeconds(1f); // 점프 지속 시간
-
-    //         isJumping = false;
-    //         isAttacking = false;
-    //     }
-    // }
 
     // 수리검 던지기 공격
     private void ThrowShuriken()
@@ -446,14 +384,16 @@ public class Boss : EnemyBase
         Rigidbody2D shurikenRb = shuriken.GetComponent<Rigidbody2D>();
         Vector2 direction = (targetPlayer.position - shurikenSpawnPoint.position).normalized;
         shurikenRb.velocity = direction * shurikenSpeed;
-        StartCoroutine(DestroyAfter(shuriken, shurikenLifetime));
-        isThrowShuriken = false;
-        isAttacking = false;
+        if(shuriken != null)
+        {
+            StartCoroutine(DestroyAfter(shuriken, shurikenLifetime));
+        }
     }
 
     protected override void AnimatorController() //플레이어 애니메이션 관리 
     {
         base.AnimatorController();
+        anim.SetBool("isTakeDamage", !isAttacking && isTakeDamage);
         anim.SetBool("isBossDashing", isBossDashing);
         anim.SetBool("attackPattern1", attackPattern1);
         anim.SetBool("attackPattern2", attackPattern2);
@@ -484,7 +424,17 @@ public class Boss : EnemyBase
     [PunRPC]
     public override void HitedRPC(float _damageDone, Vector2 _hitDirection)
     {
-        base.HitedRPC(_damageDone, _hitDirection);
+        Debug.Log("적 히트 rpc 호출");
+        if(Hp<=0) return;
+        Hp -= _damageDone; //체력 감소
+        // isAttacking=false;// 공격중이라도 피격시 취소.
+        HpBarController(Hp);// 체력바 업데이트
+        ShowDamageText(_damageDone, transform.position);// 데미지 표시 텍스트 메서드 호출
+        if(isAttacking || isEnemyDie)
+        {
+            return;
+        }
+        isTakeDamage =true;
         FindClosestPlayer(); // 보스가 공격을 받을 때마다 다시 가까운 플레이어를 추적
     }
 
@@ -504,7 +454,41 @@ public class Boss : EnemyBase
         {
             enemyManager.RespawnBoss(respawnPosition);
         }
-    }   
+    }
+
+    public override void Enemy_DieAfter()
+    {
+        Vector3 respawnPosition = transform.position;
+        Vector3 itemPosition = new Vector3(transform.position.x,transform.position.y-1,transform.position.z);
+        if (PhotonNetwork.IsMasterClient)// 마스터 클라이언트 일 경우 
+        {
+            PhotonNetwork.Destroy(gameObject);//네트워크 상에서 적을 파괴함.
+            // EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+            // if (enemyManager != null && PhotonNetwork.IsMasterClient)
+            // {
+            //     enemyManager.RespawnEnemy(respawnPosition);// 적 리스폰
+            // }
+            RespawnEnemy(respawnPosition);
+            ItemDrop(fieldItem,itemPosition);
+        }
+        else // 슬레이브 클라이언트 일 경우
+        {
+            PV.RPC("RequestDestroy", RpcTarget.MasterClient, PV.ViewID, respawnPosition); //마스터 클라이언트에게 파괴 요청.
+        }
+
+        // 적을 처치한 플레이어에게 경험치 부여
+        foreach (PhotonView attacker in attackers)
+        {
+            if (attacker != null)
+            {
+                QuestManager.instance.UpdateKillCount();
+                attacker.RPC("AddExpRPC", attacker.Owner, experiencePoints);
+                attacker.RPC("AddJumpCountRPC", attacker.Owner);
+            }
+        }
+        
+    }
+
 
 }
 

@@ -65,6 +65,8 @@ Transform:
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 785710085879625239}
+  - {fileID: 373716819680549889}
   - {fileID: 7782520645242035249}
   - {fileID: 1222283949151579356}
   - {fileID: 3002605183346254416}
@@ -195,11 +197,11 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  AttackTransform: {fileID: 1222283949151579356}
-  AttackArea: {x: 0, y: 0}
+  AttackTransform: {fileID: 785710085879625239}
+  AttackArea: {x: 3, y: 6}
   attackableLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   maxHp: 1000
   hp: 1000
   damage: 1
@@ -227,8 +229,8 @@ MonoBehaviour:
   isTakeDamage: 0
   isAttacking: 0
   attackActivate: 1
-  attackCooldown: 1
-  attackCooldownTimer: 1
+  attackCooldown: 5
+  attackCooldownTimer: 5
   isCooldownActive: 0
   moveSpeed: 2
   playerCheckDistance: 0
@@ -246,10 +248,11 @@ MonoBehaviour:
   players: []
   shurikenPrefab: {fileID: 3651354140240913608, guid: b6f2be42756464099a05635c805b7f1d, type: 3}
   shurikenSpawnPoint: {fileID: 1222283949151579356}
-  isWaitNextAttack: 1
+  ShurikenAttackTransform: {fileID: 373716819680549889}
+  ShurikenAttackArea: {x: 10, y: 10}
   dashSpeed: 10
   jumpHeight: 5
-  shurikenSpeed: 10
+  shurikenSpeed: 20
   shurikenLifetime: 2
   dashDmg: 50
   attackPattern1: 0
@@ -713,6 +716,68 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &8035471817357732417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 785710085879625239}
+  m_Layer: 6
+  m_Name: AttackTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &785710085879625239
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8035471817357732417}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.19, y: -0.02, z: 0}
+  m_LocalScale: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8140598976961325910}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8187422015329351077
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 373716819680549889}
+  m_Layer: 6
+  m_Name: Shuriken Attack Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &373716819680549889
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8187422015329351077}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.54, y: -0.02, z: 0}
+  m_LocalScale: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8140598976961325910}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8289350427927997181
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,6 +15,9 @@ public class SkillUIManager : MonoBehaviour
     public Image healImage; // 대쉬 스킬을 표시할 UI 이미지
     public TextMeshProUGUI healText;
 
+    public Image UltimateImage; // 대쉬 스킬을 표시할 UI 이미지
+    public TextMeshProUGUI UltimateText;
+
     void Awake()
     {
         if (Instance == null)
@@ -30,7 +33,7 @@ public class SkillUIManager : MonoBehaviour
     public void SetPlayer(Player player)
     {
         currentPlayer = player;
-        InitializeUI(player.dashCooldownTimer,player.healCoolTimer);
+        InitializeUI(player.dashCooldownTimer,player.healCoolTimer,player.ultimateAttackCooldownTimer);
     }
 
     public void UpdateDash(float dashCooldownTimer)
@@ -51,6 +54,7 @@ public class SkillUIManager : MonoBehaviour
         }
     }
 
+
     public void UpdateHeal(float healCoolTimer)
     {
         if (healImage != null)
@@ -68,11 +72,29 @@ public class SkillUIManager : MonoBehaviour
             }
         }
     }
+    public void UpdateUltimate(float ultimateAttackCooldownTimer)
+    {
+        if (UltimateImage != null)
+        {
+            UltimateImage.fillAmount = ultimateAttackCooldownTimer/currentPlayer.ultimateAttackCooldown;
+        }
+        if (UltimateText != null)
+        {          
+            if(ultimateAttackCooldownTimer == currentPlayer.dashCooldown || ultimateAttackCooldownTimer<=0)
+            {
+                UltimateText.text = null;
+            }
+            else{
+                UltimateText.text = ultimateAttackCooldownTimer.ToString("F0");
+            }
+        }
+    }
 
-    public void InitializeUI(float dashCooldownTimer,float healCoolTimer)
+    public void InitializeUI(float dashCooldownTimer,float healCoolTimer, float ultimateAttackCooldownTimer)
     {
         UpdateDash(dashCooldownTimer);
         UpdateHeal(healCoolTimer);
+        UpdateUltimate(ultimateAttackCooldownTimer);
 
     }
 
@@ -82,6 +104,7 @@ public class SkillUIManager : MonoBehaviour
         {
             UpdateDash(currentPlayer.dashCooldownTimer);
             UpdateHeal(currentPlayer.healCoolTimer);
+            UpdateUltimate(currentPlayer.ultimateAttackCooldownTimer);
         }
     }
 }

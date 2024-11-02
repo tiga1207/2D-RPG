@@ -1040,8 +1040,9 @@ MonoBehaviour:
   slashEffect: {fileID: 750351155395176926, guid: acf2fb224691549939a6dff670b40c67, type: 3}
   ultimateEffect: {fileID: 665976088495049474, guid: 6b8e593dc76474f6389ac0cac44e068f, type: 3}
   isAttacking: 0
+  ultimateSkillActivate: 0
   isUltimateAttacking: 0
-  ultimateAttackCooldown: 1
+  ultimateAttackCooldown: 20
   ultimateAttackCooldownTimer: 0
   ultimateAttackActive: 1
   bloodEffect: {fileID: 3180080277078973904, guid: a5070818335ea465f8feebe2fa229340, type: 3}

@@ -215,7 +215,7 @@ public class EnemyBase : Entity,IPunObservable
         }
     }
 
-    public void Enemy_DieAfter()
+    public virtual void Enemy_DieAfter()
     {
         Vector3 respawnPosition = transform.position;
         Vector3 itemPosition = new Vector3(transform.position.x,transform.position.y-1,transform.position.z);
@@ -255,7 +255,8 @@ public class EnemyBase : Entity,IPunObservable
         }
     }
 
-    private static void ItemDrop(GameObject gameObject,Vector3 _respawnPosition) //아이템 드랍 코드
+    // private static void ItemDrop(GameObject gameObject,Vector3 _respawnPosition) //아이템 드랍 코드
+    public virtual void ItemDrop(GameObject gameObject,Vector3 _respawnPosition) //아이템 드랍 코드
     {
         Debug.Log("아이템 드랍 로직 진입");
         int randomDropP = UnityEngine.Random.Range(1, 11); //1~10까지 중 랜덤 수
@@ -330,11 +331,16 @@ public class EnemyBase : Entity,IPunObservable
 
     public void AttackOver()
     {
-        if (isTakeDamage || isEnemyDie)
+        // if (isTakeDamage || isEnemyDie)
+        // {
+        //     return; // 피격 상태에서는 공격 종료를 처리하지 않음
+        // }
+        if (isEnemyDie)
         {
             return; // 피격 상태에서는 공격 종료를 처리하지 않음
         }
         isAttacking = false;
+        isTakeDamage=false;
         // attackCooldownTimer=attackCooldown;
     }
 
