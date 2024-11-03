@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+option csharp_namespace = "myungbae";  // C# 네임스페이스 설정
+
+service GameService {
+    rpc getMapProgress (MapProgressRequest) returns (MapProgressResponse);
+    rpc saveMapProgress (MapProgressRequest) returns (MapProgressResponse);
+    rpc getUserInfo (UserInfoRequest) returns (UserInfoResponse);
+    rpc saveUserInfo (UserInfoRequest) returns (UserInfoResponse);
+    rpc getItemRelation(ItemRelationRequest) returns (ItemRelationResponse);
+    rpc saveItemRelation(ItemRelationRequest) returns (ItemRelationResponse);
+}
+
+message MapProgressRequest {
+    int32 userid = 1;
+    int32 mapprogress = 2;
+    double xloc = 3;
+    double yloc = 4;
+    double zloc = 5;
+    string checkmessage = 6;
+}
+
+message MapProgressResponse {
+    int32 userid = 1;
+    int32 mapprogress = 2;
+    double xloc = 3;
+    double yloc = 4;
+    double zloc = 5;
+    string checkmessage = 6;
+}
+
+message UserInfoRequest {
+    int32 userid = 1;
+    string nkname = 2;
+    int32 exp = 3;
+    string savetime = 4;
+    string checkmessage = 5;
+}
+
+message UserInfoResponse {
+    int32 userid = 1;
+    string nkname = 2;
+    int32 exp = 3;
+    string savetime = 4;
+    string checkmessage = 5;
+}
+
+message ItemRelationRequest {
+    int32 userid = 1;
+    string itemid = 2;
+    string itemname = 3;
+    int32 quantity = 4;
+    string checkmessage = 5;
+}
+
+message ItemRelationResponse {
+    int32 userid = 1;
+    string itemid = 2;
+    string itemname = 3;
+    int32 quantity = 4;
+    string checkmessage = 5;
+}
