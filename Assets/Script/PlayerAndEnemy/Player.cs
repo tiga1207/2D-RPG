@@ -194,6 +194,7 @@ public class Player : Entity, IPunObservable
             StatUI.Instance.SetPlayer(this);
             SkillUI.Instance.SetPlayer(this);
             QuestUI.Instance.SetPlayer(this);
+            PlayerSoundManager.Instance.SetPlayer(this);
         }
     }
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 public class EnemyManager : MonoBehaviourPunCallbacks
 {
@@ -19,6 +20,14 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     
 
     private List<GameObject> enemies = new List<GameObject>();
+    private bool isPlayerNearbyBossZone = false; // 플레이어가 보스 스폰 Collider 근처에 있는지 여부
+    public GameObject bossSpawnPanel;
+    public GameObject BossInteractionDesc;
+    public int bossSpawnPanelCount=0;
+
+    public GameObject bgmObject; 
+    public AudioClip bossBgm; // 보스 등장 시 바뀔 브금
+    private AudioSource bgmAudioSource;
 
 
     void Awake()
@@ -36,15 +45,58 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     }
     void Start()
     {
+        if (bgmObject != null)
+        {
+            bgmAudioSource = bgmObject.GetComponent<AudioSource>();
+        }
         //적 중복 생성 제거를 위해 주석처리
         // if (PhotonNetwork.IsMasterClient)
         // {
         //     SpawnEnemies();
         // }
         // 적 중복 생성 제거를 위해 주석처리
+        //if (PhotonNetwork.IsMasterClient)
+        //{
+        //    SpawnBoss();
+        //}
+    }
+    void Update()
+    {
+        if (isPlayerNearbyBossZone && Input.GetKeyDown(KeyCode.F)&& bossSpawnPanelCount ==0) // F키 눌렀을 때
+        {
+            bossSpawnPanelCount++;
+            StartCoroutine(BossSpawnPanelOn());
+            Debug.Log("F키 누름");
+        }
+    }
+
+    IEnumerator BossSpawnPanelOn()
+    {
+        bossSpawnPanel.SetActive(true);
+        BossInteractionDesc.SetActive(false);
+        BossBgmOn(); // 보스 소환클릭시 음악 변경
+        CameraShaker.Instance.ShakeCamera(10f, 3f);// 카메라 흔들림 기능 추가.
+        yield return new WaitForSeconds(3);
         if (PhotonNetwork.IsMasterClient)
         {
             SpawnBoss();
+        }
+        bossSpawnPanel.SetActive(false);
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerNearbyBossZone = true;
+            BossInteractionDesc.SetActive(true);
+        }
+    }
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerNearbyBossZone = false;
+            BossInteractionDesc.SetActive(false);
         }
     }
 
@@ -76,6 +128,15 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         {
             GameObject boss = PhotonNetwork.Instantiate(bossPrefab.name, bossSpawnPoint.position, Quaternion.identity);
             bossList.Add(boss);
+        }
+    }
+
+    private void BossBgmOn()
+    {
+        if (bgmAudioSource != null && bossBgm != null)
+        {
+            bgmAudioSource.clip = bossBgm;
+            bgmAudioSource.Play(); // 보스 음악 재생
         }
     }
 
@@ -120,11 +181,13 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         // enemies.Add(samurai);
 
     }
+
+    //현재 보스 리스폰은 비활성화 함.
      IEnumerator RespawnBossCoroutine(Vector3 position)
     {
         yield return new WaitForSeconds(50f); //보스 리스폰 소요 시간
-        GameObject boss = PhotonNetwork.Instantiate(bossPrefab.name, bossSpawnPoint.position, Quaternion.identity);
-        bossList.Add(boss);
+        //GameObject boss = PhotonNetwork.Instantiate(bossPrefab.name, bossSpawnPoint.position, Quaternion.identity);
+        //bossList.Add(boss);
     }
 }
 

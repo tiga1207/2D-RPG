@@ -16,6 +16,7 @@ public class DialogueManager : MonoBehaviour
     public TextMeshProUGUI dialogueText; // 대화 텍스트 UI
     private int dialogueIndex = 0;
     private bool IsDialogueActive = false; // 대화 활성화 상태 -> 대화 완료 후에도 대화가 다시 시작되는 것을 방지
+    private bool startDialogue = false; //
 
     void Awake()
     {
@@ -47,21 +48,27 @@ public class DialogueManager : MonoBehaviour
     }
     void Update()
     {
-        if (IsDialogueActive && Input.GetMouseButtonDown(0)) // 왼쪽 마우스 버튼 클릭 감지
+        if (IsDialogueActive && Input.GetMouseButtonDown(0) && !startDialogue) // 왼쪽 마우스 버튼 클릭 감지
         {
             // 화면을 클릭했을 때 대화창의 범위 안인지 확인
-            if (Dialogue.activeSelf)
+            if (Dialogue.activeSelf && startDialogue)
             {
+                startDialogue = true; 
                 ShowNextDialogue();
             }
+        }
+
+        if(Input.GetMouseButtonUp(0))
+        {
+            startDialogue = false;
         }
     }
     // NPC 대화를 시작할 때 호출
     public void StartDialogue(NPC npc)
     {
         currentNPC = npc;
-        currentNpcName.text= currentNPC.npcId;
-        currentNpcImage.sprite= currentNPC.npcImage;
+        currentNpcName.text = currentNPC.npcId;
+        currentNpcImage.sprite = currentNPC.npcImage;
         dialogueIndex = 0;
         IsDialogueActive = true;
         ShowNextDialogue();
@@ -69,7 +76,8 @@ public class DialogueManager : MonoBehaviour
 
     public void ShowNextDialogue()
     {
-        if(currentNPC != null)
+        
+        if (currentNPC != null)
         {
             if (!IsDialogueActive)
             {
@@ -85,10 +93,10 @@ public class DialogueManager : MonoBehaviour
                 questCancelButtons.gameObject.SetActive(true);
                 return;
             }
-        
-            else if(currentNPC.IsQuestCompleted())
+
+            else if (currentNPC.IsQuestCompleted())
             {
-                QuestManager questManager= QuestManager.instance;
+                QuestManager questManager = QuestManager.instance;
                 Dialogue.SetActive(true);
                 questManager.RewardAndQuestStatusManager(currentNPC);
                 // dialogueText.text = "퀘스트 완료를 확인했습니다. 보상을 지급합니다..";
@@ -107,14 +115,14 @@ public class DialogueManager : MonoBehaviour
                 dialogueText.text = currentNPC.dialogues[dialogueIndex]; // 대화 텍스트 표시
                 dialogueIndex++;
             }
-            else if(currentNPC.IsNotStarted() && dialogueIndex >= currentNPC.dialogues.Count)
+            else if (currentNPC.IsNotStarted() && dialogueIndex >= currentNPC.dialogues.Count)
             {
                 // 대화가 끝났을 때 퀘스트 수락/취소 버튼 표시
                 questAcceptButtons.gameObject.SetActive(true);
                 questDeclineButtons.gameObject.SetActive(true);
             }
 
-        }   
+        }
     }
 
     public void AcceptQuest()

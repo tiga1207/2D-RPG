@@ -104,7 +104,8 @@ public class UIManager : MonoBehaviour
 
         if (levelText != null)
         {
-            levelText.text = "레벨: "+level.ToString("F0");
+            // levelText.text = "레벨: "+level.ToString("F0");
+            levelText.text = "경지: "+level.ToString("F0");
         }
     }
 

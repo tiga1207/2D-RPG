@@ -50,7 +50,9 @@ public class StatUI : MonoBehaviour
     {
         if (hpText != null)
         {
-            hpText.text = "Player Max Hp:\t"+maxHp.ToString("F0");
+            //hpText.text = "Player Max Hp:\t"+maxHp.ToString("F0");
+            hpText.text = "최대 체력:\t" + maxHp.ToString("F0");
+
         }
     }
 
@@ -58,7 +60,8 @@ public class StatUI : MonoBehaviour
     {
         if (mpText != null)
         {
-            mpText.text = "Player Max Mp:\t"+maxMp.ToString("F0");
+            // mpText.text = "Player Max Mp:\t"+maxMp.ToString("F0");
+            mpText.text = "최대 내공:\t"+maxMp.ToString("F0");
         }
     }
     public void UpdateLEVEL(float level)
@@ -66,7 +69,8 @@ public class StatUI : MonoBehaviour
 
         if (levelText != null)
         {
-            levelText.text = "Player Level:\t"+level.ToString("F0");
+            // levelText.text = "Player Level:\t"+level.ToString("F0");
+            levelText.text = "경지:\t"+level.ToString("F0");
         }
     }
     public void UpdateDamage(float damage)
@@ -74,7 +78,8 @@ public class StatUI : MonoBehaviour
 
         if (damageText != null)
         {
-            damageText.text = "Player Damage:\t"+damage.ToString("F0");
+            // damageText.text = "Player Damage:\t"+damage.ToString("F0");
+            damageText.text = "데미지:\t"+damage.ToString("F0");
         }
     }
 
@@ -83,7 +88,8 @@ public class StatUI : MonoBehaviour
 
         if (statPointText != null)
         {
-            statPointText.text = "Player StatPoint:\t"+statPoint.ToString("F0");
+            // statPointText.text = "Player StatPoint:\t"+statPoint.ToString("F0");
+            statPointText.text = "성장 포인트:\t"+statPoint.ToString("F0");
         }
     }
 

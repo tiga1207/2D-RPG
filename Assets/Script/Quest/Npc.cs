@@ -4,6 +4,7 @@ using UnityEngine;
 public class NPC : MonoBehaviour
 {
     public string npcId;
+    public string npcName;
     public Sprite npcImage;
     public List<string> dialogues; // NPC의 대화 리스트
     public Quest quest; // NPC가 제공하는 퀘스트
