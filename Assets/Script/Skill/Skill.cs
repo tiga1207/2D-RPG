@@ -5,6 +5,7 @@ using UnityEngine;
 public class Skill
 {
     private Player currentPlayer;
+    //public int skillId;
     public string skillName;      // 스킬 이름
     public string description;    // 스킬 설명
     public int level;             // 스킬 레벨
@@ -15,6 +16,7 @@ public class Skill
 
     public Skill(string skillName, string description, Sprite icon, int maxLevel)
     {
+        //this.skillId = skillId;
         this.skillName = skillName;
         this.description = description;
         this.level = 0; // 기본적으로 0레벨

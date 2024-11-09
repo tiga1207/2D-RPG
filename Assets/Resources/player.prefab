@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 5752315902200482074}
   - component: {fileID: 4268919147259785970}
   - component: {fileID: 3339415452581135648}
-  - component: {fileID: 2237711574291727021}
+  - component: {fileID: 5528207751692775363}
   m_Layer: 0
   m_Name: Animator
   m_TagString: Untagged
@@ -381,7 +381,7 @@ MonoBehaviour:
     LayerIndex: 0
   - SynchronizeType: 0
     LayerIndex: 1
---- !u!114 &2237711574291727021
+--- !u!114 &5528207751692775363
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1056,6 +1056,56 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &7634941561376665533
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3256237535833938890}
+  - component: {fileID: 479658319336328836}
+  m_Layer: 0
+  m_Name: playeraudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &3256237535833938890
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7634941561376665533}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.07000041, y: 0.50377476, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5547500187906680006}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &479658319336328836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7634941561376665533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6635093f43d1a34d8399a5c47d29e77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 3197294800794654163}
+  dashSound: {fileID: 8300000, guid: cb9abeec4c88d654baacac9203a9f63f, type: 3}
+  attackSound: {fileID: 8300000, guid: b8f71804695beff42a9a5dc81486fcf3, type: 3}
+  attackSound2: {fileID: 8300000, guid: b2e70d8a4b1c0e24aa68246f94f082d6, type: 3}
+  healSound: {fileID: 8300000, guid: c85e52813d655af4db18c15e90867502, type: 3}
+  deadSound: {fileID: 8300000, guid: 7b6612a76cb98c2468dd98a6aaa7e668, type: 3}
 --- !u!1 &8346508614294085424
 GameObject:
   m_ObjectHideFlags: 0
@@ -1097,6 +1147,7 @@ Transform:
   - {fileID: 3010158931055562133}
   - {fileID: 8954982989536883309}
   - {fileID: 3708154215671826251}
+  - {fileID: 3256237535833938890}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &4511717088579066677
@@ -1175,6 +1226,7 @@ MonoBehaviour:
   maxExp: 100
   exp: 0
   attackers: []
+  userId: 0
   currentMapName: Cave_1
   isCrushed: 0
   StopTakeDamageTime: 0.5

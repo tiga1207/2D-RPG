@@ -16,70 +16,78 @@ public class StubClient
         client = new GameService.GameServiceClient(channel);
     }
 
-    public void getUserInfo(int userid)
+    public async Task getUserInfo(int userid)
     {
         var request = new UserInfoRequest { Userid = userid };
-        var response = client.getUserInfo(request);
-
-        Console.WriteLine(response.Checkmessage);
-        Console.WriteLine("User ID : " + response.Userid);
-        Console.WriteLine("Nickname : " + response.Nkname);
-        Console.WriteLine("Experience : " + response.Exp);
-        Console.WriteLine("Save Time : " + response.Savetime);
+        var response = client.getUserInfoAsync(request);
     }
 
-    public void saveUserInfo(int userid, string nkname, int exp, string savetime)
+    public async Task saveUserInfo(int userid, string nkname, float curexp, float maxexp, float userlevel,
+                            float curhp, float maxhp, float curmp, float maxmp, float attpower, float statpoint, float skillpoint)
     {
         var request = new UserInfoRequest
         {
             Userid = userid,
             Nkname = nkname,
-            Exp = exp,
-            Savetime = savetime
+            Curexp = curexp,
+            Maxexp = maxexp,
+            Userlevel = userlevel,
+            Curhp = curhp,
+            Maxhp = maxhp,
+            Curmp = curmp,
+            Maxmp = maxmp,
+            Attpower = attpower,
+            Statpoint = statpoint,
+            Skillpoint = skillpoint,
         };
 
-        var response = client.saveUserInfo(request);
-        Console.WriteLine(response.Checkmessage);
+        var response = await client.saveUserInfoAsync(request);
     }
 
-    public void getMapProgress(int userid)
+    public async Task getUserLocation(int userid)
     {
-        var request = new MapProgressRequest { Userid = userid };
-        var response = client.getMapProgress(request);
-
-        Console.WriteLine(response.Checkmessage);
-        Console.WriteLine("User ID : " + response.Userid);
-        Console.WriteLine("User Location : " + response.Xloc + ", " + response.Yloc + ", " + response.Zloc);
-        Console.WriteLine("Map Progress : " + response.Mapprogress);
+        var request = new UserLocationRequest { Userid = userid };
+        var response = client.getUserLocationAsync(request);
     }
 
-    public void saveMapProgress(int userid, int mapprogress, double xloc, double yloc, double zloc)
+    public async Task saveUserLocation(int userid, float xloc, float yloc, float zloc)
     {
-        var request = new MapProgressRequest
+        var request = new UserLocationRequest
         {
             Userid = userid,
-            Mapprogress = mapprogress,
             Xloc = xloc,
             Yloc = yloc,
             Zloc = zloc
         };
 
-        var response = client.saveMapProgress(request);
+        var response = await client.saveUserLocationAsync(request);
     }
 
-    public void getItemRelation(int userid)
+    public async Task getSkillRelation(int userid)
+    {
+        var request = new SkillRelationRequest { Userid = userid };
+        var response = client.getSkillRelationAsync(request);
+    }
+
+    public async Task saveSkillRelation(int userid, int skillid, int skilllevel)
+    {
+        var request = new SkillRelationRequest
+        {
+            Userid = userid,
+            Skillid = skillid,
+            Skilllevel = skilllevel
+        };
+
+        var response = await client.saveSkillRelationAsync(request);
+    }
+
+    public async Task getItemRelation(int userid)
     {
         var request = new ItemRelationRequest { Userid = userid };
-        var response = client.getItemRelation(request);
-
-        Console.WriteLine(response.Checkmessage);
-        Console.WriteLine("User ID : " + response.Userid);
-        Console.WriteLine("Item ID : " + response.Itemid);
-        Console.WriteLine("Item Name : " + response.Itemname);
-        Console.WriteLine("Quantity : " + response.Quantity);
+        var response = client.getItemRelationAsync(request);
     }
 
-    public void saveItemRelation(int userid, string itemid, int quantity)
+    public async Task saveItemRelation(int userid, string itemid, int quantity)
     {
         var request = new ItemRelationRequest
         {
@@ -88,7 +96,7 @@ public class StubClient
             Quantity = quantity
         };
 
-        var response = client.saveItemRelation(request);
+        var response = await client.saveItemRelationAsync(request);
     }
 
     public async Task ShutdownAsync()

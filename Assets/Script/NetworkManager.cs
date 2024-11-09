@@ -9,6 +9,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
 
     public GameObject RespawnPanel;
+    public int userId;
     public GameObject UserUI;
     public GameObject UserSkillUi;
     public GameObject userRespawn;
@@ -88,6 +89,16 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
+    private int MakeUserId(string nickname)
+    {
+        int userId = 0;
+        foreach (char c in nickname)
+        {
+            userId += (int)c;
+        }
+        return userId;
+    }
+
     public void SpawnPlayer()
     {
 
@@ -97,11 +108,19 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
         GameObject player = PhotonNetwork.Instantiate("Player", userRespawn.transform.position, Quaternion.identity);
         PhotonNetwork.LocalPlayer.TagObject = player;//
+
+
         if (player.GetComponent<PhotonView>().IsMine)
         {
+
+            //userId= MakeUserId(PhotonNetwork.NickName);
+            //player.GetComponent<Player>().userId = userId;
+
+
             player.GetComponent<Inventory>().Initialize();
             // 플레이어의 닉네임 표시
             player.GetComponentInChildren<TMP_Text>().text = PhotonNetwork.NickName;
+
         }
     }
 

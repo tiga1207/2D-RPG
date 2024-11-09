@@ -728,7 +728,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 4495133383317510795}
   attackSound: {fileID: 8300000, guid: b8f71804695beff42a9a5dc81486fcf3, type: 3}
-  hurtSound: {fileID: 8300000, guid: 561a417b29773554789bb83802c6f8f0, type: 3}
   throwSound: {fileID: 8300000, guid: e98c1a9451bfb474fbdbdd734879936e, type: 3}
   deadSound: {fileID: 8300000, guid: ddad0b6065789174988b97afc5dc5b8e, type: 3}
 --- !u!1 &6052562189071236264

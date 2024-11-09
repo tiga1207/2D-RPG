@@ -9,24 +9,38 @@ public class SaveLoadManager : MonoBehaviour
     private StubClient stubclient;
     private string host = "localhost";
     private int port = 9090;
+    private Player playerinfo;
 
-    // Start is called before the first frame update
+    // Called before the first frame
     void Start()
     {
         stubclient = new StubClient(host, port);
+        playerinfo = FindObjectOfType<Player>();
     }
 
-    // For Save Button
     public async void OnSaveButtonClick()
     {
         await Task.Run(() =>
         {
-            stubclient.saveUserInfo(1, "testuser1", 10, "2024-10-28 21:08:26");
-            stubclient.saveItemRelation(1, "c100", 1);
-            stubclient.saveItemRelation(1, "c101", 3);
-            stubclient.saveMapProgress(1, 0, -40, -8, 0);
+            // PlayerStats에서 데이터 가져오기
+            int userid = playerinfo.userId;
+            string nkname = playerinfo.NickNameText.text;        // NickNameText? NickName?
+            float curexp = playerinfo.Exp;
+            float maxexp = playerinfo.MaxExp;
+            float userlevel = playerinfo.Level;
+            float curhp = playerinfo.Hp;
+            float maxhp = playerinfo.MaxMp;
+            float curmp = playerinfo.Mp;
+            float maxmp = playerinfo.MaxMp;
+            float attpower = playerinfo.Damage;
+            float statpoint = playerinfo.LevelupStatPoint;
+            float skillpoint = playerinfo.LevelupSkillPoint;
+            string savetime = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-            Debug.Log("User info, item relations, and map progress saved successfully.");
+            // 서버에 데이터 전송
+            stubclient.saveUserInfo(userid, nkname, curexp, maxexp, userlevel, curhp, maxhp, curmp, maxmp, attpower, statpoint, skillpoint);
+
+            Debug.Log("User info saved successfully.");
         });
     }
 
@@ -36,7 +50,7 @@ public class SaveLoadManager : MonoBehaviour
         await Task.Run(() =>
         {
             stubclient.getUserInfo(1);
-            Debug.Log("User info, item relations, and map progress loaded successfully.");
+            Debug.Log("User info loaded successfully.");
         });
         
     }

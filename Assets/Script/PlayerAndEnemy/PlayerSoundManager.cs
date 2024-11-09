@@ -15,15 +15,7 @@ public class PlayerSoundManager : MonoBehaviour
     public AudioClip deadSound;
     void Awake()
     {
-        // Singleton 패턴 구현
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 

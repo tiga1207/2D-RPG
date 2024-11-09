@@ -11,7 +11,8 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 public class Player : Entity, IPunObservable
-{   
+{
+    public int userId;
     public string currentMapName; // 플레이어 현 위치 맵(씬)이름
     public static Player LocalPlayerInstance;
 
@@ -109,6 +110,8 @@ public class Player : Entity, IPunObservable
 
         NickNameText.text = PV.IsMine ? PhotonNetwork.NickName : PV.Owner.NickName;
         NickNameText.color = PV.IsMine ? Color.green : Color.red;
+        //userId = PV.IsMine ? MakeUserId(PhotonNetwork.NickName) : MakeUserId(PV.Owner.NickName);
+        //userId = PV.IsMine ? PhotonNetwork.NickName) : MakeUserId(PV.Owner.NickName);
 
         if (sr != null)
         {    
@@ -231,6 +234,16 @@ public class Player : Entity, IPunObservable
             isCrushed= true;
         }
     }
+
+    //private int MakeUserId(string nickname)
+    //{
+    //    int userId = 0;
+    //    foreach (char c in nickname)
+    //    {
+    //        userId += (int)c;
+    //    }
+    //    return userId;
+    //}
 
     private void LerpPlayerUI()
     {
