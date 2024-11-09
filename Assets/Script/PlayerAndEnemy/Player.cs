@@ -13,6 +13,10 @@ using System.Collections.Generic;
 public class Player : Entity, IPunObservable
 {
     public int userId;
+    public float xloc;
+    public float yloc;
+    public float zloc;
+
     public string currentMapName; // 플레이어 현 위치 맵(씬)이름
     public static Player LocalPlayerInstance;
 
@@ -206,6 +210,9 @@ public class Player : Entity, IPunObservable
         base.Update();
         if (PV.IsMine)
         {
+            xloc = transform.position.x;
+            yloc = transform.position.y;
+            zloc = transform.position.z;
             PlayerDying();
             AnimatorController();
             

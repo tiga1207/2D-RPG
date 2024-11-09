@@ -9433,6 +9433,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RespawnPanel: {fileID: 927431661}
+  userId: 0
   UserUI: {fileID: 765170839}
   UserSkillUi: {fileID: 668649605}
   userRespawn: {fileID: 1835654715}
@@ -41326,21 +41327,24 @@ MonoBehaviour:
   contentPanel: {fileID: 481339493}
   skillPointText: {fileID: 907535206}
   skillList:
-  - skillName: "\uB2A5\uACF5\uD5C8\uB3C4"
+  - skillId: 1
+    skillName: "\uB2A5\uACF5\uD5C8\uB3C4"
     description: "\uD3ED\uBC1C\uC801\uC778 \uD798\uC744 \uC0AC\uC6A9\uD558\uC5EC
       \uC55E\uC73C\uB85C \uB3CC\uC9C4\uD569\uB2C8\uB2E4."
     level: 0
     icon: {fileID: 21300000, guid: c67fbf9375ad5c34399c2849430ca7f7, type: 3}
     maxLevel: 10
     levelText: {fileID: 0}
-  - skillName: "\uC6B4\uAE30\uC870\uC2DD"
+  - skillId: 2
+    skillName: "\uC6B4\uAE30\uC870\uC2DD"
     description: "\uC9E7\uC740 \uC2DC\uAC04 \uB3D9\uC548 \uB0B4\uACF5\uC744 \uC0AC\uC6A9\uD558\uC5EC
       \uCCB4\uB825\uC744 \uC18C\uD3ED \uD68C\uBCF5\uD569\uB2C8\uB2E4."
     level: 0
     icon: {fileID: 21300000, guid: bb67b03c2969d104caba950c446f8c8d, type: 3}
     maxLevel: 10
     levelText: {fileID: 0}
-  - skillName: "\uC131\uBA85\uC808\uAE30"
+  - skillId: 3
+    skillName: "\uC131\uBA85\uC808\uAE30"
     description: "\uC77C\uC2DC\uC801\uC73C\uB85C \uBB34\uC801\uC758 \uACBD\uC9C0\uC5D0
       \uB4E4\uC5B4\uC11C\uBA70, \uC774\uC2ED\uCD08\uC2DD\uC758 \uC608\uB9AC\uD55C
       \uAC80\uCD08\uB85C \uC801\uC744 \uC12C\uBA78\uD569\uB2C8\uB2E4."
@@ -73700,6 +73704,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[3].itemID
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
       propertyPath: itemLocations.Array.data[0]
       value: 
       objectReference: {fileID: 2038571499}
@@ -73728,7 +73736,19 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[3].itemName
+      value: mpPotion
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[3].itemType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
       propertyPath: itemDB.Array.data[2].itemImage
+      value: 
+      objectReference: {fileID: 21300000, guid: 12b9289cee25b433fa06373acb394069, type: 2}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[3].itemImage
       value: 
       objectReference: {fileID: 21300000, guid: 12b9289cee25b433fa06373acb394069, type: 2}
     - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
@@ -73748,6 +73768,10 @@ PrefabInstance:
       value: this fake
       objectReference: {fileID: 0}
     - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[3].itemDescription
+      value: this fake
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
       propertyPath: itemDB.Array.data[0].effects.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -73760,6 +73784,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[3].effects.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
       propertyPath: itemDB.Array.data[0].effects.Array.data[0]
       value: 
       objectReference: {fileID: 11400000, guid: 9a4bcd5b2e49b43e6a9308601daeaa88, type: 2}
@@ -73769,6 +73797,10 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 82b0bba5b56a6426a92843682ecdca9d, type: 2}
     - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
       propertyPath: itemDB.Array.data[2].effects.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 82b0bba5b56a6426a92843682ecdca9d, type: 2}
+    - target: {fileID: 2016777322751450019, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}
+      propertyPath: itemDB.Array.data[3].effects.Array.data[0]
       value: 
       objectReference: {fileID: 11400000, guid: 82b0bba5b56a6426a92843682ecdca9d, type: 2}
     - target: {fileID: 3033224489130470281, guid: 068270dcd87ad495981b6ec9791e49b4, type: 3}

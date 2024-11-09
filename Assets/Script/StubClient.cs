@@ -16,10 +16,12 @@ public class StubClient
         client = new GameService.GameServiceClient(channel);
     }
 
-    public async Task getUserInfo(int userid)
+    public async Task<UserInfoResponse> getUserInfo(int userid)
     {
         var request = new UserInfoRequest { Userid = userid };
-        var response = client.getUserInfoAsync(request);
+        var response = await client.getUserInfoAsync(request);
+
+        return response;
     }
 
     public async Task saveUserInfo(int userid, string nkname, float curexp, float maxexp, float userlevel,
@@ -44,10 +46,12 @@ public class StubClient
         var response = await client.saveUserInfoAsync(request);
     }
 
-    public async Task getUserLocation(int userid)
+    public async Task<UserLocationResponse> getUserLocation(int userid)
     {
         var request = new UserLocationRequest { Userid = userid };
-        var response = client.getUserLocationAsync(request);
+        var response = await client.getUserLocationAsync(request);
+
+        return response;
     }
 
     public async Task saveUserLocation(int userid, float xloc, float yloc, float zloc)
@@ -63,10 +67,12 @@ public class StubClient
         var response = await client.saveUserLocationAsync(request);
     }
 
-    public async Task getSkillRelation(int userid)
+    public async Task<SkillRelationResponse> getSkillRelation(int userid)
     {
         var request = new SkillRelationRequest { Userid = userid };
-        var response = client.getSkillRelationAsync(request);
+        var response = await client.getSkillRelationAsync(request);
+
+        return response;
     }
 
     public async Task saveSkillRelation(int userid, int skillid, int skilllevel)
@@ -81,10 +87,12 @@ public class StubClient
         var response = await client.saveSkillRelationAsync(request);
     }
 
-    public async Task getItemRelation(int userid)
+    public async Task<ItemRelationResponse> getItemRelation(int userid)
     {
         var request = new ItemRelationRequest { Userid = userid };
-        var response = client.getItemRelationAsync(request);
+        var response = await client.getItemRelationAsync(request);
+
+        return response;
     }
 
     public async Task saveItemRelation(int userid, string itemid, int quantity)

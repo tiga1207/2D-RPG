@@ -113,8 +113,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (player.GetComponent<PhotonView>().IsMine)
         {
 
-            //userId= MakeUserId(PhotonNetwork.NickName);
-            //player.GetComponent<Player>().userId = userId;
+            userId = MakeUserId(PhotonNetwork.NickName);
+            player.GetComponent<Player>().userId = userId;
 
 
             player.GetComponent<Inventory>().Initialize();

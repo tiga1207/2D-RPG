@@ -29,7 +29,7 @@ public class Entity : MonoBehaviourPunCallbacks
 
 
     [Header("HP")]
-    [SerializeField] protected float maxHp;
+    [SerializeField] public float maxHp;
     
     [SerializeField] protected float hp;
     [SerializeField] public float damage;
@@ -39,7 +39,7 @@ public class Entity : MonoBehaviourPunCallbacks
 
 
     [Header("Mana")]
-    [SerializeField] protected float maxMp;
+    [SerializeField] public float maxMp;
 
     [SerializeField] protected float mp;
     [SerializeField] protected Image mpBar;
@@ -61,7 +61,7 @@ public class Entity : MonoBehaviourPunCallbacks
 
     [Header("Exp")]
 
-    [SerializeField] protected float maxExp =100;
+    [SerializeField] public float maxExp =100;
     [SerializeField] protected float exp;
     // [SerializeField] protected Image ExpBar;
     // [SerializeField] protected TextMeshProUGUI ExpText;

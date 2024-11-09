@@ -1227,6 +1227,9 @@ MonoBehaviour:
   exp: 0
   attackers: []
   userId: 0
+  xloc: 0
+  yloc: 0
+  zloc: 0
   currentMapName: Cave_1
   isCrushed: 0
   StopTakeDamageTime: 0.5
