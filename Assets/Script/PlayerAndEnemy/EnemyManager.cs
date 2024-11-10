@@ -67,8 +67,10 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         if (isPlayerNearbyBossZone && Input.GetKeyDown(KeyCode.F)&& bossSpawnPanelCount ==0) // F키 눌렀을 때
         {
             bossSpawnPanelCount++;
-            bossTrigger.SetActive(false);
             StartCoroutine(BossSpawnPanelOn());
+            //bossTrigger.SetActive(false);
+            PhotonNetwork.Destroy(bossTrigger);
+
             Debug.Log("F키 누름");
         }
     }
@@ -86,22 +88,24 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         }
         bossSpawnPanel.SetActive(false);
     }
-    private void OnTriggerEnter2D(Collider2D other)
+    //private void OnTriggerEnter2D(Collider2D other)
+    public void PlayerEnteredBossZone()
     {
-        if (other.CompareTag("Player"))
-        {
+        //if (other.CompareTag("Player"))
+        //{
             isPlayerNearbyBossZone = true;
             BossInteractionDesc.SetActive(true);
-        }
+        //}
     }
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
+    //private void OnTriggerExit2D(Collider2D other)
+        public void PlayerExitedBossZone()
         {
-            isPlayerNearbyBossZone = false;
-            BossInteractionDesc.SetActive(false);
+            //if (other.CompareTag("Player"))
+            //{
+                isPlayerNearbyBossZone = false;
+                BossInteractionDesc.SetActive(false);
+            //}
         }
-    }
 
     public void SpawnEnemies()
     {

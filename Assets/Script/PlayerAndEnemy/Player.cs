@@ -131,8 +131,8 @@ public class Player : Entity, IPunObservable
         {
             // 2D 카메라
             var CM = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
-            //CM.Follow = transform;
-            //CM.LookAt = transform;
+            CM.Follow = transform;
+            CM.LookAt = transform;
             //CM.Follow = null;
             //CM.LookAt = null;
             //CM.transform.position = new Vector3(currentMapCenter.position.x, currentMapCenter.position.y, CM.transform.position.z);
@@ -958,7 +958,7 @@ public class Player : Entity, IPunObservable
                 exp = Mathf.Clamp(value, 0, maxExp);
                 if (PV.IsMine)
                 {
-                    StatUI.Instance.UpdateEXP(MaxExp);
+                    //StatUI.Instance.UpdateEXP(MaxExp);
 
                     // UIManager.Instance.UpdateEXP(exp, maxExp);
                 }

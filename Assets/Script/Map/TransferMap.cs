@@ -9,10 +9,11 @@ using UnityEngine.SceneManagement;
 public class TransferMap : MonoBehaviour
 {
     //public List<Transform> transformList;
-    public CinemachineVirtualCamera cinemachineCamera;
-    public Transform teleportTransform; //플레이어 텔포 위치
+    //public CinemachineVirtualCamera cinemachineCamera;
     //public Transform teleportCameraTransform; // 카메라 위치
-    public SpriteRenderer mapSpriteRenderer; // 카메라 위치
+    //public SpriteRenderer mapSpriteRenderer; // 카메라 위치
+    
+    public Transform teleportTransform; //플레이어 텔포 위치
     private bool isPlayerNearbyTeleportZone = false; // 플레이어가 텔레포트 지역 근처에 있는지 여부
     public GameObject teleportPanel;
     //public GameObject teleportDesc;
@@ -46,7 +47,7 @@ public class TransferMap : MonoBehaviour
         if (player != null && player.GetComponent<PhotonView>().IsMine)
         {
             player.transform.position = teleportTransform.position;
-            CamearaInit();
+            //CamearaInit();
 
             //if (cinemachineCamera != null && teleportCameraTransform != null)
             //{
@@ -57,34 +58,34 @@ public class TransferMap : MonoBehaviour
         }
     }
 
-    private void CamearaInit()
-    {
-        if (cinemachineCamera != null && mapSpriteRenderer != null)
-        {
-            // 스프라이트렌더러의 bounds를 이용해 크기 및 중심 위치 가져오기
-            float objectWidth = mapSpriteRenderer.bounds.size.x;
-            float objectHeight = mapSpriteRenderer.bounds.size.y;
-            Vector3 objectCenter = mapSpriteRenderer.bounds.center;
+    //private void CamearaInit()
+    //{
+    //    if (cinemachineCamera != null && mapSpriteRenderer != null)
+    //    {
+    //        // 스프라이트렌더러의 bounds를 이용해 크기 및 중심 위치 가져오기
+    //        float objectWidth = mapSpriteRenderer.bounds.size.x;
+    //        float objectHeight = mapSpriteRenderer.bounds.size.y;
+    //        Vector3 objectCenter = mapSpriteRenderer.bounds.center;
 
-            // 화면 비율과 오브젝트 비율 계산
-            float screenRatio = (float)Screen.width / Screen.height;
-            float targetRatio = objectWidth / objectHeight;
+    //        // 화면 비율과 오브젝트 비율 계산
+    //        float screenRatio = (float)Screen.width / Screen.height;
+    //        float targetRatio = objectWidth / objectHeight;
 
-            // 카메라의 Orthographic Size 설정
-            if (screenRatio >= targetRatio)
-            {
-                cinemachineCamera.m_Lens.OrthographicSize = objectHeight / 2;
-            }
-            else
-            {
-                float differenceInSize = targetRatio / screenRatio;
-                cinemachineCamera.m_Lens.OrthographicSize = objectHeight / 2 * differenceInSize;
-            }
+    //        // 카메라의 Orthographic Size 설정
+    //        if (screenRatio >= targetRatio)
+    //        {
+    //            cinemachineCamera.m_Lens.OrthographicSize = objectHeight / 2;
+    //        }
+    //        else
+    //        {
+    //            float differenceInSize = targetRatio / screenRatio;
+    //            cinemachineCamera.m_Lens.OrthographicSize = objectHeight / 2 * differenceInSize;
+    //        }
 
-            // 카메라 위치를 스프라이트 중심에 맞춤
-            cinemachineCamera.transform.position = new Vector3(objectCenter.x, objectCenter.y, cinemachineCamera.transform.position.z);
-        }
-    }
+    //        // 카메라 위치를 스프라이트 중심에 맞춤
+    //        cinemachineCamera.transform.position = new Vector3(objectCenter.x, objectCenter.y, cinemachineCamera.transform.position.z);
+    //    }
+    //}
     IEnumerator teleportPanelOn()
     {
         Player player = Player.LocalPlayerInstance;
