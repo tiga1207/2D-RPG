@@ -972,7 +972,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1230,6 +1230,8 @@ MonoBehaviour:
   xloc: 0
   yloc: 0
   zloc: 0
+  currentMapCenter: {fileID: 0}
+  isTeleporting: 0
   currentMapName: Cave_1
   isCrushed: 0
   StopTakeDamageTime: 0.5

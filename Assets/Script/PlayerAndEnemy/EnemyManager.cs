@@ -3,6 +3,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using TMPro;
 
 public class EnemyManager : MonoBehaviourPunCallbacks
 {
@@ -10,6 +11,7 @@ public class EnemyManager : MonoBehaviourPunCallbacks
     [Header("Enemy Settings")]
     public List<Transform> skeletonSpawnPoints; // 적을 스폰할 위치 목록
     public GameObject skeletonPrefab; // 적 프리팹
+    public GameObject bossTrigger; // 상호작용시 없애버리는 용도
 
     public List<Transform> samuraiSpawnPoints; // 적을 스폰할 위치 목록
     public GameObject samuraiPrefab; // 적 프리팹
@@ -65,6 +67,7 @@ public class EnemyManager : MonoBehaviourPunCallbacks
         if (isPlayerNearbyBossZone && Input.GetKeyDown(KeyCode.F)&& bossSpawnPanelCount ==0) // F키 눌렀을 때
         {
             bossSpawnPanelCount++;
+            bossTrigger.SetActive(false);
             StartCoroutine(BossSpawnPanelOn());
             Debug.Log("F키 누름");
         }

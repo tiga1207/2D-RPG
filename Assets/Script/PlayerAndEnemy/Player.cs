@@ -17,6 +17,10 @@ public class Player : Entity, IPunObservable
     public float yloc;
     public float zloc;
 
+    public Transform currentMapCenter;
+
+    public bool isTeleporting = false;
+
     public string currentMapName; // 플레이어 현 위치 맵(씬)이름
     public static Player LocalPlayerInstance;
 
@@ -127,8 +131,11 @@ public class Player : Entity, IPunObservable
         {
             // 2D 카메라
             var CM = GameObject.Find("CMCamera").GetComponent<CinemachineVirtualCamera>();
-            CM.Follow = transform;
-            CM.LookAt = transform;
+            //CM.Follow = transform;
+            //CM.LookAt = transform;
+            //CM.Follow = null;
+            //CM.LookAt = null;
+            //CM.transform.position = new Vector3(currentMapCenter.position.x, currentMapCenter.position.y, CM.transform.position.z);
 
             // SceneManager.sceneLoaded += OnSceneLoaded;  // 씬 로드 이벤트 구독
 
@@ -262,6 +269,7 @@ public class Player : Entity, IPunObservable
     public void PlayerDieAfter() //플레이어 사망 후처리 로직
     {
         gameObject.SetActive(false);// 플레이어 오브젝트 비활성화 시키기.
+        //PhotonNetwork.Destroy(gameObject);
         isPlayerDie = false;
         PlayerRespawn.Instance.OnRespawnPanel();    
     }
@@ -462,7 +470,7 @@ public class Player : Entity, IPunObservable
 
     private void CheckInput() // 사용자 키 입출력 관리
     {
-        if(isPlayerDie)
+        if(isPlayerDie || isTeleporting)
         {
             return;
         }
@@ -546,7 +554,7 @@ public class Player : Entity, IPunObservable
 
     private void Movement()
     {
-        if (isAttacking || isPlayerDie || isUltimateAttacking) // 플레이어가 공격중일 때
+        if (isAttacking || isPlayerDie || isUltimateAttacking || isTeleporting) // 플레이어가 공격중일 때
         {
             rb.velocity = new Vector2(0, 0);// 이동 불가.
         }
@@ -950,6 +958,8 @@ public class Player : Entity, IPunObservable
                 exp = Mathf.Clamp(value, 0, maxExp);
                 if (PV.IsMine)
                 {
+                    StatUI.Instance.UpdateEXP(MaxExp);
+
                     // UIManager.Instance.UpdateEXP(exp, maxExp);
                 }
             }

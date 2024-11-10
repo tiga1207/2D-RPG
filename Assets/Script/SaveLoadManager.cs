@@ -80,8 +80,8 @@ public class SaveLoadManager : MonoBehaviour
             playerinfo.maxMp = loadedInfo.Maxmp;
             
             StatUI.Instance.UpdateHP(loadedInfo.Maxhp);
-            StatUI.Instance.UpdateHP(loadedInfo.Maxhp);
-            StatUI.Instance.UpdateHP(loadedInfo.Maxhp);
+            StatUI.Instance.UpdateMP(loadedInfo.Maxmp);
+            StatUI.Instance.UpdateEXP(loadedInfo.Maxexp);
 
 
 

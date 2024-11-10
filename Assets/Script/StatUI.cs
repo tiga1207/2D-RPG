@@ -43,7 +43,7 @@ public class StatUI : MonoBehaviour
     public void SetPlayer(Player player)
     {
         currentPlayer = player;
-        InitializeUI(player.MaxHp, player.MaxMp, player.Level, player.Damage, player.LevelupStatPoint);
+        InitializeUI(player.MaxHp, player.MaxMp,player.maxExp, player.Level, player.Damage, player.LevelupStatPoint);
     }
 
     public void UpdateHP(float maxHp)
@@ -64,6 +64,17 @@ public class StatUI : MonoBehaviour
             mpText.text = "최대 내공:\t"+maxMp.ToString("F0");
         }
     }
+
+    public void UpdateEXP(float maxExp)
+    {
+        if (mpText != null)
+        {
+            // mpText.text = "Player Max Mp:\t"+maxMp.ToString("F0");
+            mpText.text = "최대 경험치:\t" + maxExp.ToString("F0");
+        }
+    }
+
+
     public void UpdateLEVEL(float level)
     {
 
@@ -93,11 +104,12 @@ public class StatUI : MonoBehaviour
         }
     }
 
-    public void InitializeUI(float maxHp, float maxMp, float level, float damage, float statPoint)
+    public void InitializeUI(float maxHp, float maxMp, float maxExp, float level, float damage, float statPoint)
     {
         UpdateLEVEL(level);
         UpdateHP(maxHp);
         UpdateMP(maxMp);
+        UpdateEXP(maxExp);
         UpdateDamage(damage);
         UpdateStatPoint(statPoint);
     }
