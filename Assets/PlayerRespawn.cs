@@ -29,10 +29,10 @@ public class PlayerRespawn : MonoBehaviour
     {
         NetworkManager networkManager = NetworkManager.Instance;
         respawnPanel.SetActive(false);
-        if(respawnBtn != null)
-        {
-            respawnBtn.onClick.AddListener(RespawnPlayer);
-        }
+        //if (respawnBtn != null)
+        //{
+        //    respawnBtn.onClick.AddListener(RespawnPlayer);
+        //}
     }
 
     private void CamearaInit()
@@ -71,13 +71,13 @@ public class PlayerRespawn : MonoBehaviour
         {
             // 새로운 플레이어 객체 생성
             GameObject playerPrefab = PhotonNetwork.Instantiate("Player", NetworkManager.Instance.userRespawn.transform.position, Quaternion.identity);
-
             if (playerPrefab.GetComponent<PhotonView>().IsMine)
             {
                 Player.LocalPlayerInstance = playerPrefab.GetComponent<Player>();
                 //playerPrefab.GetComponent<Player>().Hp = playerPrefab.GetComponent<Player>().MaxHp / 2f; // 체력의 절반으로 리스폰
                 playerPrefab.GetComponentInChildren<TMP_Text>().text = PhotonNetwork.NickName;
-
+                Player.LocalPlayerInstance.transform.position = NetworkManager.Instance.userRespawn.transform.position;
+                Player.LocalPlayerInstance.userId = NetworkManager.Instance.MakeUserId(PhotonNetwork.NickName);
                 // 필요시 추가 초기화 작업
                 //playerPrefab.GetComponent<Inventory>().Initialize();
             }

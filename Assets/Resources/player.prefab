@@ -1230,6 +1230,7 @@ MonoBehaviour:
   xloc: 0
   yloc: 0
   zloc: 0
+  respawnTransform: {fileID: 7412698376756307955, guid: 113b9c6a778797a4494580731e8eb57a, type: 3}
   currentMapCenter: {fileID: 0}
   isTeleporting: 0
   currentMapName: Cave_1
