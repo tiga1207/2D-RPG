@@ -52,7 +52,7 @@ public class Skill
     }
 
     // 레벨 텍스트 업데이트
-    private void UpdateLevelText()
+    public void UpdateLevelText()
     {
         if (levelText != null)
         {

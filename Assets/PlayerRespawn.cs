@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -65,25 +66,42 @@ public class PlayerRespawn : MonoBehaviour
 
     public void RespawnPlayer()
     {
-        Debug.Log("리스폰 버튼 눌림");
-        respawnPanel.SetActive(false);
 
-        Player player = Player.LocalPlayerInstance;
-        if(player != null)
+        if (Player.LocalPlayerInstance == null)
         {
-            player.transform.position = NetworkManager.Instance.userRespawn.transform.position; // 리스폰 위치로 이동
-            player.Hp=player.MaxHp/2f; // 플레이어의 최대체력의 반 회복시키고 부활
-            if(player.Exp > player.MaxExp/5f)// 사망시 플레이어 경험치 10퍼 삭제.
+            // 새로운 플레이어 객체 생성
+            GameObject playerPrefab = PhotonNetwork.Instantiate("Player", NetworkManager.Instance.userRespawn.transform.position, Quaternion.identity);
+
+            if (playerPrefab.GetComponent<PhotonView>().IsMine)
             {
-                player.Exp-= player.MaxExp/5f;
+                Player.LocalPlayerInstance = playerPrefab.GetComponent<Player>();
+                //playerPrefab.GetComponent<Player>().Hp = playerPrefab.GetComponent<Player>().MaxHp / 2f; // 체력의 절반으로 리스폰
+                playerPrefab.GetComponentInChildren<TMP_Text>().text = PhotonNetwork.NickName;
+
+                // 필요시 추가 초기화 작업
+                //playerPrefab.GetComponent<Inventory>().Initialize();
             }
-            else
-            {
-                player.Exp = 0;
-            }
-            player.gameObject.SetActive(true); //플레이어 활성화
         }
-        CamearaInit();
+        respawnPanel.SetActive(false);
+        //Debug.Log("리스폰 버튼 눌림");
+        //respawnPanel.SetActive(false);
+
+        //Player player = Player.LocalPlayerInstance;
+        //if(player != null)
+        //{
+        //    player.transform.position = NetworkManager.Instance.userRespawn.transform.position; // 리스폰 위치로 이동
+        //    player.Hp=player.MaxHp/2f; // 플레이어의 최대체력의 반 회복시키고 부활
+        //    if(player.Exp > player.MaxExp/5f)// 사망시 플레이어 경험치 10퍼 삭제.
+        //    {
+        //        player.Exp-= player.MaxExp/5f;
+        //    }
+        //    else
+        //    {
+        //        player.Exp = 0;
+        //    }
+        //    player.gameObject.SetActive(true); //플레이어 활성화
+        //}
+        //CamearaInit();
 
         // GameObject player = PhotonNetwork.LocalPlayer.TagObject as GameObject;
         // if (player != null)

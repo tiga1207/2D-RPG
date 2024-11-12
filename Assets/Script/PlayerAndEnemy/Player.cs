@@ -268,9 +268,17 @@ public class Player : Entity, IPunObservable
 
     public void PlayerDieAfter() //플레이어 사망 후처리 로직
     {
-        gameObject.SetActive(false);// 플레이어 오브젝트 비활성화 시키기.
-        //PhotonNetwork.Destroy(gameObject);
-        isPlayerDie = false;
+         foreach (Skill skill in SkillUI.Instance.skillList)
+         {
+            skill.level = 0;     // 각 스킬 레벨 초기화
+            skill.UpdateLevelText();
+         }
+        SkillUI.Instance.UpdatePlayerUI();
+
+        // gameObject.SetActive(false);// 플레이어 오브젝트 비활성화 시키기.
+        PhotonNetwork.Destroy(gameObject);
+        Player.LocalPlayerInstance = null;
+        //isPlayerDie = false;
         PlayerRespawn.Instance.OnRespawnPanel();    
     }
 

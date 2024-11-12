@@ -104,6 +104,9 @@ public class SaveLoadManager : MonoBehaviour
 
             // 다른 속성 및 위치 정보 불러오기
             playerinfo.Level = loadedInfo.Userlevel;
+            playerinfo.LevelController(loadedInfo.Userlevel);
+
+
             playerinfo.Damage = loadedInfo.Attpower;
             playerinfo.LevelupStatPoint = loadedInfo.Statpoint;
             playerinfo.LevelupSkillPoint = loadedInfo.Skillpoint;
