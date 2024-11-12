@@ -89,7 +89,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private int MakeUserId(string nickname)
+    public int MakeUserId(string nickname)
     {
         int userId = 0;
         foreach (char c in nickname)

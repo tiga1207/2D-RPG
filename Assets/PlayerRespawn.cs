@@ -77,6 +77,7 @@ public class PlayerRespawn : MonoBehaviour
                 Player.LocalPlayerInstance = playerPrefab.GetComponent<Player>();
                 //playerPrefab.GetComponent<Player>().Hp = playerPrefab.GetComponent<Player>().MaxHp / 2f; // 체력의 절반으로 리스폰
                 playerPrefab.GetComponentInChildren<TMP_Text>().text = PhotonNetwork.NickName;
+                Player.LocalPlayerInstance.userId = NetworkManager.Instance.MakeUserId(PhotonNetwork.NickName);
 
                 // 필요시 추가 초기화 작업
                 //playerPrefab.GetComponent<Inventory>().Initialize();
